@@ -253,6 +253,90 @@ const defaultJobs = [
     postedDate: '2 days ago',
     recruiterId: 'user-recruiter-1',
     fairWorkPact: true
+  },
+  {
+    id: 'job-10',
+    title: 'Sales Consultant',
+    companyName: 'Singhal Autohaus (Jawa Yezdi Motorcycles)',
+    logoSeed: 'JY',
+    location: 'Ganesha Nagar, Bathinda',
+    type: 'Full-time',
+    mode: 'On-site',
+    salary: '₹15,000 - ₹20,000 / mo',
+    experience: 'Entry-level',
+    skills: ['Customer Relationship Management', 'Showroom Operations', 'Product Promotion', 'Automotive Sales'],
+    description: 'Singhal Autohaus, the authorized showroom for Jawa Yezdi Motorcycles in Bathinda, is hiring a Sales Consultant. You will welcome walk-in customers, showcase motorcycle features, schedule test rides, and facilitate financing options.',
+    requirements: [
+      'Graduate or equivalent qualification.',
+      'Passionate about motorcycles and automotive retail.',
+      'Fluency in Punjabi and Hindi is required.',
+      'Prior showroom or direct customer handling experience is preferred.'
+    ],
+    benefits: [
+      'Attractive performance incentives per vehicle sold.',
+      'Regular product training from national experts.',
+      'Standard festival bonuses.',
+      'Employee discounts on motorcycle service and parts.'
+    ],
+    postedDate: '1 day ago',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
+  },
+  {
+    id: 'job-11',
+    title: 'Medical Receptionist & GDA',
+    companyName: 'Sukhmani Diagnocare',
+    logoSeed: 'SD',
+    location: 'Bathinda, Punjab',
+    type: 'Full-time',
+    mode: 'On-site',
+    salary: '₹12,000 - ₹16,000 / mo',
+    experience: 'Entry-level',
+    skills: ['Hospital Reception', 'Customer Service', 'Medical Records', 'Basic Excel'],
+    description: 'Sukhmani Diagnocare is seeking a General Duty Assistant / Medical Receptionist. Responsibilities include welcoming patients, managing diagnostic test registrations, issuing billing receipts, and answering patient phone queries.',
+    requirements: [
+      '12th pass or Graduate with basic computer literacy.',
+      'Polite communication and empathy towards patients.',
+      'Fluent in Punjabi and Hindi.',
+      'Previous experience in a hospital or diagnostic lab is a plus.'
+    ],
+    benefits: [
+      'Free annual health check-up benefits for family members.',
+      'Standard overtime compensation package.',
+      'Merit-based annual salary increments.',
+      'Safe and sanitized work environment.'
+    ],
+    postedDate: '3 days ago',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
+  },
+  {
+    id: 'job-12',
+    title: 'Front Desk Executive cum Telecaller',
+    companyName: 'Mittal Job Consultancy',
+    logoSeed: 'MC',
+    location: 'Ajit Road, Bathinda',
+    type: 'Full-time',
+    mode: 'On-site',
+    salary: '₹10,000 - ₹14,000 / mo',
+    experience: 'Entry-level',
+    skills: ['Telecalling', 'Front Office', 'Customer Support', 'Data Entry'],
+    description: 'Mittal Job Consultancy is seeking a Front Desk Executive cum Telecaller. You will manage incoming inquiries from job aspirants, maintain database records of candidates, and schedule interview lineups for local companies.',
+    requirements: [
+      'Good communication skills in Punjabi and Hindi.',
+      'Basic knowledge of MS Office (Word/Excel).',
+      'Pleasant phone manner and phone etiquette.',
+      'Willingness to handle high volumes of calls.'
+    ],
+    benefits: [
+      'Performance incentives based on candidate joining targets.',
+      'Paid sick leave allowances.',
+      'Casual, supportive team workspace.',
+      'Annual salary reviews.'
+    ],
+    postedDate: 'Just now',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
   }
 ];
 
