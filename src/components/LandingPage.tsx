@@ -1,0 +1,375 @@
+import React, { useState } from 'react';
+import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, ArrowRight } from 'lucide-react';
+import { useAppState } from '../context/AppContext';
+
+export const LandingPage: React.FC = () => {
+  const { setPerspective } = useAppState();
+  const [searchTitle, setSearchTitle] = useState('');
+  const [searchLoc, setSearchLoc] = useState('');
+  
+  // Interactive mini vibe quiz
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('hyriq_landing_search', searchTitle);
+    localStorage.setItem('hyriq_landing_location', searchLoc);
+    setPerspective('candidate');
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    localStorage.setItem('hyriq_landing_category', categoryName);
+    setPerspective('candidate');
+  };
+
+  const handleQuizAnswer = (answer: string) => {
+    const nextAnswers = [...quizAnswers, answer];
+    setQuizAnswers(nextAnswers);
+    if (quizStep < 2) {
+      setQuizStep(prev => prev + 1);
+    } else {
+      // Calculate and save recommendation
+      let recommendedCategory = 'Tech & Engineering';
+      if (nextAnswers[0] === 'creative') recommendedCategory = 'Design & Product';
+      else if (nextAnswers[1] === 'people') recommendedCategory = 'Sales & Operations';
+      else if (nextAnswers[2] === 'independent') recommendedCategory = 'Marketing & Content';
+      
+      localStorage.setItem('hyriq_landing_category', recommendedCategory);
+      setQuizStep(3);
+    }
+  };
+
+  const resetQuiz = () => {
+    setQuizStep(0);
+    setQuizAnswers([]);
+  };
+
+  const categories = [
+    { name: 'Tech & Engineering', count: 124, icon: <Zap size={20} color="#818cf8" /> },
+    { name: 'Design & Product', count: 85, icon: <Sparkles size={20} color="#f472b6" /> },
+    { name: 'Marketing & Content', count: 62, icon: <TrendingUp size={20} color="#fb7185" /> },
+    { name: 'Sales & Operations', count: 94, icon: <MessageSquare size={20} color="#22d3ee" /> }
+  ];
+
+  return (
+    <div className="animate-fade-in" style={{ paddingBottom: '80px' }}>
+      {/* Hero Section */}
+      <section style={{
+        padding: '80px 0 60px 0',
+        textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background glow effects */}
+        <div style={{
+          position: 'absolute',
+          top: '-10%',
+          left: '15%',
+          width: '350px',
+          height: '350px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%)',
+          zIndex: -1,
+          pointerEvents: 'none'
+        }}></div>
+        <div style={{
+          position: 'absolute',
+          bottom: '10%',
+          right: '10%',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(6,182,212,0.12) 0%, rgba(0,0,0,0) 70%)',
+          zIndex: -1,
+          pointerEvents: 'none'
+        }}></div>
+
+        <div className="container">
+          <span className="badge badge-primary" style={{ marginBottom: '20px', padding: '6px 14px', fontSize: '13px' }}>
+            <Sparkles size={12} style={{ marginRight: '6px' }} />
+            The Job Portal Built for the Next Gen
+          </span>
+
+          <h1 style={{
+            fontFamily: 'Outfit',
+            fontSize: '64px',
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: '-1.5px',
+            maxWidth: '850px',
+            margin: '0 auto 24px auto'
+          }}>
+            Find Your Next <span className="text-gradient-primary">Vibe</span>.<br />
+            Hire Your Next <span className="text-gradient-secondary">Rockstar</span>.
+          </h1>
+
+          <p style={{
+            fontSize: '18px',
+            color: 'var(--text-secondary)',
+            maxWidth: '600px',
+            margin: '0 auto 40px auto',
+            lineHeight: 1.6
+          }}>
+            Hyriq matches outstanding candidates with progressive companies. Direct chat, direct applications, zero hiring noise.
+          </p>
+
+          {/* Search Form */}
+          <form onSubmit={handleSearchSubmit} className="glass-panel animate-glow" style={{
+            maxWidth: '800px',
+            margin: '0 auto 60px auto',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            borderRadius: '16px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: '200px', padding: '8px 12px', gap: '8px' }}>
+              <Search size={18} color="var(--text-muted)" />
+              <input
+                type="text"
+                placeholder="Job title, skills or keyword..."
+                value={searchTitle}
+                onChange={(e) => setSearchTitle(e.target.value)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: '#fff',
+                  width: '100%',
+                  fontFamily: 'var(--sans-font)'
+                }}
+              />
+            </div>
+            
+            <div style={{ width: '1px', height: '32px', backgroundColor: 'var(--border-color)', display: 'none' }} className="search-divider"></div>
+
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: '200px', padding: '8px 12px', gap: '8px' }}>
+              <MapPin size={18} color="var(--text-muted)" />
+              <input
+                type="text"
+                placeholder="Location (e.g. Remote, SF)..."
+                value={searchLoc}
+                onChange={(e) => setSearchLoc(e.target.value)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: '#fff',
+                  width: '100%',
+                  fontFamily: 'var(--sans-font)'
+                }}
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ padding: '14px 28px' }}>
+              Explore Jobs
+            </button>
+          </form>
+
+          {/* Core Metrics */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '24px',
+            maxWidth: '1000px',
+            margin: '0 auto'
+          }}>
+            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>15,000+</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Active Gen-Z Jobs</p>
+            </div>
+            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>4,200+</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Verified Workplaces</p>
+            </div>
+            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>85%</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Average Match Rate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Categories Section */}
+      <section style={{ padding: '60px 0' }}>
+        <div className="container">
+          <h2 style={{ textAlign: 'center', marginBottom: '40px', fontWeight: 700, fontSize: '32px' }}>
+            Browse by <span className="text-gradient-primary">Category</span>
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '24px'
+          }}>
+            {categories.map((cat, idx) => (
+              <div 
+                key={idx}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="glass-panel glass-panel-hover"
+                style={{
+                  padding: '32px 24px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '16px',
+                  textAlign: 'center'
+                }}
+              >
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid var(--border-color)'
+                }}>
+                  {cat.icon}
+                </div>
+                <div>
+                  <h4 style={{ color: '#fff', fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>{cat.name}</h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{cat.count} open roles</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Vibe Quiz Wrapper */}
+      <section style={{ padding: '60px 0' }}>
+        <div className="container" style={{ maxWidth: '750px' }}>
+          <div className="glass-panel animate-glow" style={{ padding: '40px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '-30px',
+              width: '120px',
+              height: '120px',
+              borderRadius: '50%',
+              background: 'rgba(168, 85, 247, 0.1)',
+              filter: 'blur(30px)'
+            }}></div>
+
+            {quizStep === 0 && (
+              <div style={{ textAlign: 'center' }}>
+                <span className="badge badge-secondary" style={{ marginBottom: '12px' }}>Interactive Quiz</span>
+                <h3 style={{ fontSize: '26px', fontWeight: 700, marginBottom: '16px', color: '#fff' }}>Find Your Career Vibe</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '15px' }}>
+                  Answer 3 quick questions about your work style, and we will match you with custom career feeds.
+                </p>
+                <button onClick={() => setQuizStep(1)} className="btn btn-primary">
+                  Start Vibe Quiz <ArrowRight size={16} />
+                </button>
+              </div>
+            )}
+
+            {quizStep === 1 && (
+              <div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>Question 1 of 3</span>
+                <h4 style={{ fontSize: '20px', color: '#fff', fontWeight: 600, margin: '8px 0 24px 0' }}>
+                  How do you prefer to spend your work day?
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <button onClick={() => handleQuizAnswer('tech')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    💻 Writing code, analyzing logic, and building systems
+                  </button>
+                  <button onClick={() => handleQuizAnswer('creative')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    🎨 Designing user interfaces, mockups, or copywriting
+                  </button>
+                  <button onClick={() => handleQuizAnswer('management')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    📈 Coordinating projects, leading standups, and talking to clients
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {quizStep === 2 && (
+              <div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>Question 2 of 3</span>
+                <h4 style={{ fontSize: '20px', color: '#fff', fontWeight: 600, margin: '8px 0 24px 0' }}>
+                  What kind of team environment fuels you the most?
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <button onClick={() => handleQuizAnswer('collaborative')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    👥 Highly collaborative, active Discord/Slack, daily syncs
+                  </button>
+                  <button onClick={() => handleQuizAnswer('independent')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    🏡 Fully async, remote-first, deep focused blocks of work
+                  </button>
+                  <button onClick={() => handleQuizAnswer('people')} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                    🤝 Directly helping developers, customer support, or organizing community events
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {quizStep === 3 && (
+              <div style={{ textAlign: 'center' }}>
+                <span className="badge badge-success" style={{ marginBottom: '12px' }}>Vibe Matched!</span>
+                <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', marginBottom: '12px' }}>Matches Found!</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '28px', fontSize: '15px' }}>
+                  We calculated your responses. You would fit perfectly into our{' '}
+                  <strong style={{ color: 'var(--primary)' }}>
+                    {localStorage.getItem('hyriq_landing_category') || 'Tech & Engineering'}
+                  </strong>{' '}
+                  roles!
+                </p>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button onClick={() => setPerspective('candidate')} className="btn btn-primary">
+                    View Matches <ArrowRight size={16} />
+                  </button>
+                  <button onClick={resetQuiz} className="btn btn-ghost">
+                    Retake
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Grid */}
+      <section style={{ padding: '60px 0' }}>
+        <div className="container">
+          <h2 style={{ textAlign: 'center', marginBottom: '40px', fontWeight: 700, fontSize: '32px' }}>
+            Hiring Without the <span className="text-gradient-secondary">Bureacracy</span>
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '32px'
+          }}>
+            <div className="glass-panel" style={{ padding: '32px' }}>
+              <div style={{ color: 'var(--primary)', marginBottom: '16px' }}><Zap size={32} /></div>
+              <h3 style={{ color: '#fff', fontSize: '20px', marginBottom: '12px' }}>1-Click Vibe Match</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
+                Apply with a clean interactive profile. Recruiters see your skills, project highlights, and preferences instantly.
+              </p>
+            </div>
+            
+            <div className="glass-panel" style={{ padding: '32px' }}>
+              <div style={{ color: 'var(--secondary)', marginBottom: '16px' }}><MessageSquare size={32} /></div>
+              <h3 style={{ color: '#fff', fontSize: '20px', marginBottom: '12px' }}>Direct Messaging</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
+                Skip the auto-rejection emails. Chat directly with technical recruiters and managers once your profile is matched.
+              </p>
+            </div>
+
+            <div className="glass-panel" style={{ padding: '32px' }}>
+              <div style={{ color: 'var(--accent)', marginBottom: '16px' }}><ShieldCheck size={32} /></div>
+              <h3 style={{ color: '#fff', fontSize: '20px', marginBottom: '12px' }}>Verified Employers</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
+                No ghost jobs, no bait-and-switch. Every employer on Hyriq is authenticated with active projects and clear salary rates.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
