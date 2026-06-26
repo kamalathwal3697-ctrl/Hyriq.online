@@ -3,7 +3,7 @@ import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, 
 import { useAppState } from '../context/AppContext';
 
 export const LandingPage: React.FC = () => {
-  const { setPerspective, promoSlots } = useAppState();
+  const { setPerspective, promoSlots, jobs } = useAppState();
   const [searchTitle, setSearchTitle] = useState('');
   const [searchLoc, setSearchLoc] = useState('');
   
@@ -54,11 +54,29 @@ export const LandingPage: React.FC = () => {
     setQuizAnswers([]);
   };
 
+  const getCategoryCount = (catName: string) => {
+    return jobs.filter(job => {
+      if (catName === 'Tech & Engineering') {
+        return job.title.includes('Engineer') || job.skills.includes('React') || job.skills.includes('TypeScript') || job.skills.includes('Node.js');
+      }
+      if (catName === 'Design & Product') {
+        return job.title.includes('Design') || job.skills.includes('UI Design') || job.skills.includes('Figma') || job.title.includes('Product');
+      }
+      if (catName === 'Marketing & Content') {
+        return job.title.includes('Marketing') || job.title.includes('Content') || job.skills.includes('Copywriting') || job.skills.includes('SEO');
+      }
+      if (catName === 'Sales & Operations') {
+        return job.title.includes('Sales') || job.title.includes('Operations') || job.title.includes('Advocate');
+      }
+      return false;
+    }).length;
+  };
+
   const categories = [
-    { name: 'Tech & Engineering', count: 124, icon: <Zap size={20} color="#818cf8" /> },
-    { name: 'Design & Product', count: 85, icon: <Sparkles size={20} color="#f472b6" /> },
-    { name: 'Marketing & Content', count: 62, icon: <TrendingUp size={20} color="#fb7185" /> },
-    { name: 'Sales & Operations', count: 94, icon: <MessageSquare size={20} color="#22d3ee" /> }
+    { name: 'Tech & Engineering', count: getCategoryCount('Tech & Engineering'), icon: <Zap size={20} color="#818cf8" /> },
+    { name: 'Design & Product', count: getCategoryCount('Design & Product'), icon: <Sparkles size={20} color="#f472b6" /> },
+    { name: 'Marketing & Content', count: getCategoryCount('Marketing & Content'), icon: <TrendingUp size={20} color="#fb7185" /> },
+    { name: 'Sales & Operations', count: getCategoryCount('Sales & Operations'), icon: <MessageSquare size={20} color="#22d3ee" /> }
   ];
 
   return (
@@ -293,16 +311,16 @@ export const LandingPage: React.FC = () => {
             margin: '0 auto'
           }}>
             <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
-              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>15,000+</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Active Gen-Z Jobs</p>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>{jobs.length}</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Active Opportunities</p>
             </div>
             <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
-              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>4,200+</h3>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>{new Set(jobs.map(j => j.companyName)).size}</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Verified Workplaces</p>
             </div>
             <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
-              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>85%</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Average Match Rate</p>
+              <h3 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>1-on-1</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Direct Recruiter Chat</p>
             </div>
           </div>
         </div>
