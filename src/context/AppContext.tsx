@@ -41,6 +41,10 @@ export interface Application {
     skills: string[];
     experience: string;
   };
+  candidateSignature?: string;
+  candidateSignedAt?: string;
+  recruiterSignature?: string;
+  recruiterSignedAt?: string;
 }
 
 export interface CandidateProfile {
@@ -92,7 +96,7 @@ interface AppContextType {
   logout: () => void;
   promoSlots: number;
   fetchPromoSlots: () => Promise<void>;
-  applyForJob: (jobId: string) => Promise<void>;
+  applyForJob: (jobId: string, candidateSignature?: string) => Promise<void>;
   createJob: (job: Omit<Job, 'id' | 'postedDate' | 'recruiterId' | 'logoSeed'>) => Promise<void>;
   updateApplicationStatus: (appId: string, status: Application['status']) => Promise<void>;
   sendChatMessage: (appId: string, text: string, sender: 'candidate' | 'recruiter') => Promise<void>;
@@ -376,7 +380,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setPerspective('visitor');
   };
 
-  const applyForJob = async (jobId: string) => {
+  const applyForJob = async (jobId: string, candidateSignature?: string) => {
     if (!token) return;
     try {
       const res = await fetch('/api/applications', {
@@ -385,7 +389,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ jobId })
+        body: JSON.stringify({ jobId, candidateSignature })
       });
       if (res.ok) {
         fetchApplications();

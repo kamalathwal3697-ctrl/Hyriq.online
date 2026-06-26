@@ -281,15 +281,22 @@ app.post('/api/applications', authenticateToken, (req, res) => {
     return res.status(403).json({ error: 'Only candidates can apply for jobs' });
   }
 
-  const { jobId } = req.body;
+  const { jobId, candidateSignature } = req.body;
   if (!jobId) return res.status(400).json({ error: 'Job ID is required' });
 
   const db = readData();
   const job = db.jobs.find(j => j.id === jobId);
   if (!job) return res.status(404).json({ error: 'Job not found' });
 
+  if (job.fairWorkPact && !candidateSignature) {
+    return res.status(400).json({ error: 'Candidate signature is required for Fair Work Pact verification' });
+  }
+
   const exists = db.applications.find(app => app.jobId === jobId && app.candidateId === req.user.id);
   if (exists) return res.status(400).json({ error: 'You have already applied for this job' });
+
+  const recruiter = db.users.find(u => u.id === job.recruiterId);
+  const recruiterSignature = recruiter ? recruiter.name : job.companyName;
 
   const appId = `app-${Date.now()}`;
   const newApp = {
@@ -297,7 +304,11 @@ app.post('/api/applications', authenticateToken, (req, res) => {
     jobId,
     candidateId: req.user.id,
     appliedDate: 'Just now',
-    status: 'Applied'
+    status: 'Applied',
+    candidateSignature: candidateSignature || '',
+    candidateSignedAt: candidateSignature ? new Date().toISOString() : null,
+    recruiterSignature: job.fairWorkPact ? recruiterSignature : null,
+    recruiterSignedAt: job.fairWorkPact ? new Date().toISOString() : null
   };
 
   const initialMsg = {

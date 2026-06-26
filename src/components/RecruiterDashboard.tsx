@@ -17,6 +17,8 @@ export const RecruiterDashboard: React.FC = () => {
   } = useAppState();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'post-job' | 'manage'>('overview');
+  const [showContractModal, setShowContractModal] = useState(false);
+  const [contractApp, setContractApp] = useState<any>(null);
 
   // Job post form states
   const [jobTitle, setJobTitle] = useState('');
@@ -593,6 +595,23 @@ export const RecruiterDashboard: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* View Signed Legal Pact Button */}
+                    {jobs.find(j => j.id === currentApplication.jobId)?.fairWorkPact && (
+                      <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setContractApp(currentApplication);
+                            setShowContractModal(true);
+                          }}
+                          className="btn btn-primary animate-glow"
+                          style={{ width: '100%', padding: '10px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                          🛡️ View Signed Legal Pact Agreement
+                        </button>
+                      </div>
+                    )}
+
                     {/* Quick Status Action Controls */}
                     <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '16px', flexWrap: 'wrap' }}>
                       <button
@@ -647,6 +666,173 @@ export const RecruiterDashboard: React.FC = () => {
               )}
             </div>
           </main>
+        </div>
+      )}
+
+      {/* Fair Work Pact Legal Document Modal */}
+      {showContractModal && contractApp && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(5, 3, 10, 0.85)',
+          backdropFilter: 'blur(12px)',
+          zIndex: 1001,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }} className="contract-modal-overlay">
+          <div className="glass-panel contract-printable-area animate-glow" style={{
+            width: '100%',
+            maxWidth: '700px',
+            background: '#0d0a15',
+            padding: '40px',
+            position: 'relative',
+            border: '2px solid rgba(16, 185, 129, 0.3)',
+            boxShadow: '0 0 40px rgba(16, 185, 129, 0.1)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            {/* Close / Action Buttons */}
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              display: 'flex',
+              gap: '12px'
+            }} className="no-print">
+              <button
+                onClick={() => window.print()}
+                className="btn btn-outline"
+                style={{ padding: '6px 14px', fontSize: '12px', borderColor: 'var(--success)', color: '#6ee7b7' }}
+              >
+                🖨️ Print / PDF
+              </button>
+              <button 
+                onClick={() => {
+                  setShowContractModal(false);
+                  setContractApp(null);
+                }}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Document Header */}
+            <div style={{ textAlign: 'center', borderBottom: '2px double rgba(255,255,255,0.1)', paddingBottom: '20px', marginBottom: '24px' }}>
+              <span style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 700, letterSpacing: '2px', display: 'block', marginBottom: '6px' }}>
+                MUTUAL COVENANT AGREEMENT
+              </span>
+              <h2 style={{ fontFamily: 'Outfit', fontSize: '28px', fontWeight: 800, color: '#fff', margin: 0 }}>
+                THE FAIR WORK PACT
+              </h2>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                DIGITALLY SIGNED AND EXECUTED VIA HYRIQ TRUST NETWORK • ID: Pact-{contractApp.id}
+              </p>
+            </div>
+
+            {/* Parties */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', fontWeight: 700 }}>FIRST PARTY (EMPLOYER)</span>
+                <strong style={{ fontSize: '15px', color: '#fff', display: 'block', marginTop: '4px' }}>
+                  {jobs.find(j => j.id === contractApp.jobId)?.companyName}
+                </strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Authorized Signatory: {contractApp.recruiterSignature || 'Company Representative'}
+                </span>
+              </div>
+              <div style={{ borderLeft: '1px solid rgba(255,255,255,0.05)', paddingLeft: '24px' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', fontWeight: 700 }}>SECOND PARTY (WORKER)</span>
+                <strong style={{ fontSize: '15px', color: '#fff', display: 'block', marginTop: '4px' }}>
+                  {candidateProfile.name}
+                </strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Signatory Name: {contractApp.candidateSignature || candidateProfile.name}
+                </span>
+              </div>
+            </div>
+
+            {/* Covenant Terms */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '13px', lineHeight: 1.6, color: 'var(--text-secondary)', marginBottom: '32px' }}>
+              <p style={{ margin: 0, fontStyle: 'italic', color: 'var(--text-muted)', textAlign: 'center' }}>
+                "This document records the mutual covenants entered into by the First Party and the Second Party to ensure respect, safety, and accountability in the workplace."
+              </p>
+
+              <div>
+                <strong style={{ color: '#fff', display: 'block', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                  SECTION 1: WORKER RIGHTS (Employer Commitments)
+                </strong>
+                <ul style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', margin: 0 }}>
+                  <li><strong>Fair Working Hours:</strong> Strict adherence to a standard, limited work schedule.</li>
+                  <li><strong>Overtime Pay:</strong> Guaranteed extra compensation for any hours worked beyond the daily limit.</li>
+                  <li><strong>Health & Well-being:</strong> Access to basic medical benefits and a safe working environment.</li>
+                  <li><strong>Accommodation Support:</strong> Housing allowance or safe, provided accommodation where applicable.</li>
+                  <li><strong>Job Security:</strong> Protection against unfair firing without valid cause or proper notice.</li>
+                  <li><strong>Merit-Based Growth:</strong> Guaranteed salary raises or promotions upon successfully achieving predefined work targets.</li>
+                </ul>
+              </div>
+
+              <div>
+                <strong style={{ color: '#fff', display: 'block', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                  SECTION 2: WORKER DUTIES (Employee Commitments)
+                </strong>
+                <ul style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', margin: 0 }}>
+                  <li><strong>Punctuality:</strong> Consistently arriving on time and respecting the work schedule.</li>
+                  <li><strong>Prompt Communication:</strong> Timely and professional responses to all work-related messages or requests.</li>
+                  <li><strong>Responsibility:</strong> Taking full ownership of assigned tasks and performing them diligently.</li>
+                  <li><strong>Absolute Integrity:</strong> Honesty in reporting hours, tasks, and issues.</li>
+                  <li><strong>Professional Conduct:</strong> Respectful behavior towards coworkers and clients.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Execution / Signatures */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '24px' }}>
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>First Party Signature</span>
+                <span style={{ fontFamily: 'Dancing Script, cursive, Georgia', fontSize: '22px', color: '#6366f1', display: 'block', padding: '10px 0', borderBottom: '1px dashed rgba(255,255,255,0.1)', fontStyle: 'italic' }}>
+                  {contractApp.recruiterSignature || 'Gaurav Gupta'}
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '6px' }}>
+                  Signed: {contractApp.recruiterSignedAt ? new Date(contractApp.recruiterSignedAt).toLocaleString() : 'Executed upon posting'}
+                </span>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>Second Party Signature</span>
+                <span style={{ fontFamily: 'Dancing Script, cursive, Georgia', fontSize: '22px', color: '#22d3ee', display: 'block', padding: '10px 0', borderBottom: '1px dashed rgba(255,255,255,0.1)', fontStyle: 'italic' }}>
+                  {contractApp.candidateSignature || 'Amanpreet Singh'}
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '6px' }}>
+                  Signed: {contractApp.candidateSignedAt ? new Date(contractApp.candidateSignedAt).toLocaleString() : 'Executed upon applying'}
+                </span>
+              </div>
+            </div>
+
+            {/* Digital Seal */}
+            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+              <span className="badge badge-success" style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                padding: '8px 16px',
+                fontSize: '11px',
+                color: '#10b981',
+                borderRadius: '8px'
+              }}>
+                🛡️ SECURED & VALID CONTRACT RECORDED
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -192,7 +192,11 @@ export const initDb = () => {
         jobId: 'job-1',
         candidateId: 'user-candidate-1',
         appliedDate: '1 day ago',
-        status: 'Interview'
+        status: 'Interview',
+        candidateSignature: 'Amanpreet Singh',
+        candidateSignedAt: '2026-06-25T10:00:00.000Z',
+        recruiterSignature: 'Gaurav Gupta',
+        recruiterSignedAt: '2026-06-20T10:00:00.000Z'
       }
     ];
 
