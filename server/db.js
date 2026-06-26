@@ -144,6 +144,60 @@ const defaultJobs = [
     postedDate: '5 days ago',
     recruiterId: 'user-recruiter-1',
     fairWorkPact: true
+  },
+  {
+    id: 'job-6',
+    title: 'Software Engineer III, Infrastructure',
+    companyName: 'Google',
+    logoSeed: 'G',
+    location: 'Bengaluru, Karnataka (Remote / Hybrid)',
+    type: 'Full-time',
+    mode: 'Hybrid',
+    salary: '₹2,50,000 - ₹3,50,000 / mo',
+    experience: 'Mid-level',
+    skills: ['C++', 'Go', 'Python', 'Distributed Systems', 'System Design'],
+    description: 'Google is hiring a Software Engineer III for our Cloud Infrastructure team. You will work on massive-scale distributed databases, improve TPU AI supercomputer network layers, and coordinate with engineering teams globally.',
+    requirements: [
+      'Bachelor’s degree in Computer Science, a related technical field, or equivalent practical experience.',
+      '3 years of software development experience in C++, Go, or Python.',
+      'Experience designing, building, and optimizing distributed databases or storage engines.'
+    ],
+    benefits: [
+      'Premium health, dental, and vision cover.',
+      'Free on-campus meals and micro-kitchen access.',
+      'Generous equity grant (GSUs).',
+      'Work-from-home setup support.'
+    ],
+    postedDate: 'Just now',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
+  },
+  {
+    id: 'job-7',
+    title: 'UX Designer, Workspace',
+    companyName: 'Google',
+    logoSeed: 'G',
+    location: 'Hyderabad, Telangana (Hybrid)',
+    type: 'Full-time',
+    mode: 'Hybrid',
+    salary: '₹1,80,000 - ₹2,60,000 / mo',
+    experience: 'Mid-level',
+    skills: ['Figma', 'UX Research', 'Interaction Design', 'Prototyping'],
+    description: 'Google is hiring a UX Designer for our Workspace team (Google Docs & Drive). You will design next-generation collaborative UI layouts, perform usability reviews, and translate complex user problems into sleek interactive layouts.',
+    requirements: [
+      'Portfolio demonstrating interaction design, visual design, and product thinking.',
+      'Experience designing for consumer or enterprise web platforms.',
+      'Proficiency in Figma and interactive prototyping tools.'
+    ],
+    benefits: [
+      'Comprehensive wellness programs and dental care.',
+      'Generous learning budget and conference attendance.',
+      'Shuttle transportation support.',
+      'Recreation rooms and gym access.'
+    ],
+    postedDate: '1 day ago',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
   }
 ];
 
