@@ -198,6 +198,61 @@ const defaultJobs = [
     postedDate: '1 day ago',
     recruiterId: 'user-recruiter-1',
     fairWorkPact: true
+  },
+  {
+    id: 'job-8',
+    title: 'Assistant Professor, Computer Science',
+    companyName: 'Guru Kashi University',
+    logoSeed: 'GK',
+    location: 'Talwandi Sabo, Bathinda',
+    type: 'Full-time',
+    mode: 'On-site',
+    salary: '₹45,000 - ₹60,000 / mo',
+    experience: 'Mid-level',
+    skills: ['Teaching', 'Computer Science', 'Python', 'Machine Learning', 'Academic Research'],
+    description: 'Guru Kashi University is hiring an Assistant Professor in the Department of Computer Science & Engineering. You will conduct lectures for B.Tech/M.Tech students, supervise lab coursework, design syllabi, and participate in academic research.',
+    requirements: [
+      'M.Tech or Ph.D. in Computer Science and Engineering.',
+      'Strong understanding of algorithms, data structures, and system architectures.',
+      'Prior teaching or industry experience is preferred.'
+    ],
+    benefits: [
+      'On-campus accommodation support.',
+      'Research funding and travel allowance for conferences.',
+      'Standard university health benefits.',
+      'Paid summer and winter vacations.'
+    ],
+    postedDate: 'Just now',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
+  },
+  {
+    id: 'job-9',
+    title: 'Branch Sales Manager',
+    companyName: 'Asian Paints',
+    logoSeed: 'AP',
+    location: 'Bathinda, Punjab',
+    type: 'Full-time',
+    mode: 'On-site',
+    salary: '₹35,000 - ₹50,000 / mo',
+    experience: 'Mid-level',
+    skills: ['B2B Sales', 'Channel Management', 'Client Relationships', 'Lead Generation'],
+    description: 'Asian Paints is seeking a Branch Sales Manager to drive commercial relationships, oversee dealer networks, execute paint contractor loyalty campaigns, and expand our market presence in the Malwa region.',
+    requirements: [
+      'MBA or Graduate degree in Marketing/Business.',
+      '2+ years of sales experience in paints, building materials, or FMCG.',
+      'Comfortable traveling across Bathinda and nearby Malwa territories.',
+      'Fluent in Punjabi and Hindi.'
+    ],
+    benefits: [
+      'Attractive performance-based sales incentives.',
+      'Travel allowance and fuel reimbursement.',
+      'Comprehensive corporate medical coverage.',
+      'Annual performance bonuses.'
+    ],
+    postedDate: '2 days ago',
+    recruiterId: 'user-recruiter-1',
+    fairWorkPact: true
   }
 ];
 
