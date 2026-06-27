@@ -466,3 +466,41 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+/* Scraped Govt Jobs Table Styling */
+.govt-details-content {
+  color: #1a3e62 !important;
+  font-family: inherit;
+}
+.govt-details-content table.scrollable-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-bottom: 20px !important;
+  background: rgba(26, 62, 98, 0.01) !important;
+  border: 1px solid rgba(26, 62, 98, 0.15) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+.govt-details-content table.scrollable-table th, 
+.govt-details-content table.scrollable-table td {
+  padding: 10px 12px !important;
+  border: 1px solid rgba(26, 62, 98, 0.12) !important;
+  text-align: left !important;
+  font-size: 13px !important;
+  color: #475569 !important;
+  word-break: break-word !important;
+}
+.govt-details-content table.scrollable-table th {
+  background: rgba(26, 62, 98, 0.08) !important;
+  color: #1a3e62 !important;
+  font-weight: 600 !important;
+}
+.govt-details-content a {
+  color: #f2994a !important;
+  text-decoration: underline !important;
+  font-weight: 600 !important;
+}
+.govt-details-content a:hover {
+  color: #e28532 !important;
+}
+
+

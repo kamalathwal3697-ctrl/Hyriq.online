@@ -144,6 +144,51 @@ app.get('/api/govt-jobs', async (req, res) => {
   }
 });
 
+// Get detailed page of a specific government job notification
+app.get('/api/govt-jobs/details', async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required.' });
+  }
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch detailed job page');
+    
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    const htmlBlocks = [];
+    $('.scrollable-table').each((i, el) => {
+      // Make all links absolute and target="_blank"
+      $(el).find('a').each((idx, a) => {
+        let href = $(a).attr('href');
+        if (href && href.startsWith('/')) {
+          href = 'https://www.freejobalert.com' + href;
+        }
+        $(a).attr('href', href);
+        $(a).attr('target', '_blank');
+        $(a).attr('rel', 'noopener noreferrer');
+      });
+      
+      // Clean HTML contents
+      const tableHtml = $(el).html();
+      if (tableHtml) {
+        htmlBlocks.push(`<table class="scrollable-table" style="width: 100%; border-collapse: collapse; border: 1px solid rgba(26, 62, 98, 0.1); margin-bottom: 16px; font-size: 14px;">${tableHtml}</table>`);
+      }
+    });
+
+    if (htmlBlocks.length === 0) {
+      throw new Error('No detailed info tables matched (.scrollable-table)');
+    }
+
+    res.json({ html: htmlBlocks.join('\n') });
+  } catch (err) {
+    console.error('Govt job details scraping failed:', err);
+    res.status(500).json({ error: 'Failed to retrieve detailed information for this job. Please try again later.' });
+  }
+});
+
 // --- PAYMENT ROUTES ---
 
 // Debug: Razorpay status

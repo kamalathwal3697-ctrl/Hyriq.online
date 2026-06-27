@@ -28,6 +28,31 @@ export const CandidateDashboard: React.FC = () => {
   const [selectedGovtJob, setSelectedGovtJob] = useState<any | null>(null);
   const [govtJobsLoading, setGovtJobsLoading] = useState(false);
   const [govtJobsError, setGovtJobsError] = useState('');
+  const [selectedGovtJobDetails, setSelectedGovtJobDetails] = useState('');
+  const [govtJobDetailsLoading, setgovtJobDetailsLoading] = useState(false);
+
+  // Fetch Government Job Details when a card is selected
+  useEffect(() => {
+    if (selectedGovtJob) {
+      setSelectedGovtJobDetails('');
+      setgovtJobDetailsLoading(true);
+      fetch(`/api/govt-jobs/details?url=${encodeURIComponent(selectedGovtJob.applyLink)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Details not found');
+          return res.json();
+        })
+        .then(data => {
+          setSelectedGovtJobDetails(data.html);
+          setgovtJobDetailsLoading(false);
+        })
+        .catch(() => {
+          setSelectedGovtJobDetails('');
+          setgovtJobDetailsLoading(false);
+        });
+    } else {
+      setSelectedGovtJobDetails('');
+    }
+  }, [selectedGovtJob]);
 
   // Fetch Government Jobs on tab activation
   useEffect(() => {
@@ -884,52 +909,69 @@ export const CandidateDashboard: React.FC = () => {
                   </h3>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(26, 62, 98, 0.1)', borderBottom: '1px solid rgba(26, 62, 98, 0.1)', padding: '16px 0' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                    <span style={{ color: '#64748b', fontWeight: 600 }}>Advt No:</span>
-                    <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.advtNo || '—'}</span>
+                {govtJobDetailsLoading ? (
+                  <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--corporate-blue)', fontWeight: 600 }}>
+                    <div className="animate-pulse">
+                      ⏳ Loading full notifications, fee details & vacancy tables from FreeJobAlert...
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                    <span style={{ color: '#64748b', fontWeight: 600 }}>Qualification:</span>
-                    <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.qualification}</span>
+                ) : selectedGovtJobDetails ? (
+                  <div 
+                    className="govt-details-content"
+                    dangerouslySetInnerHTML={{ __html: selectedGovtJobDetails }} 
+                    style={{ 
+                      maxHeight: '450px', 
+                      overflowY: 'auto', 
+                      padding: '16px', 
+                      background: 'rgba(26, 62, 98, 0.02)', 
+                      borderRadius: '12px', 
+                      border: '1px solid rgba(26, 62, 98, 0.08)',
+                      color: 'var(--corporate-blue)'
+                    }}
+                  />
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(26, 62, 98, 0.1)', borderBottom: '1px solid rgba(26, 62, 98, 0.1)', padding: '16px 0' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
+                      <span style={{ color: '#64748b', fontWeight: 600 }}>Advt No:</span>
+                      <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.advtNo || '—'}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
+                      <span style={{ color: '#64748b', fontWeight: 600 }}>Qualification:</span>
+                      <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.qualification}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
+                      <span style={{ color: '#64748b', fontWeight: 600 }}>Last Date:</span>
+                      <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.lastDate || '—'}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
+                      <span style={{ color: '#64748b', fontWeight: 600 }}>Posted On:</span>
+                      <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.postDate}</span>
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                    <span style={{ color: '#64748b', fontWeight: 600 }}>Last Date:</span>
-                    <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.lastDate || '—'}</span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                    <span style={{ color: '#64748b', fontWeight: 600 }}>Posted On:</span>
-                    <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.postDate}</span>
-                  </div>
-                </div>
-
-                <div style={{ background: 'rgba(242, 153, 74, 0.05)', border: '1px dashed rgba(242, 153, 74, 0.3)', borderRadius: '12px', padding: '16px', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
-                  <strong>📢 Notice:</strong> This is a public sector vacancy. Application procedures vary (some require online submission on official department websites, while others require speed-post offline forms). Use the button below to view detailed procedures.
-                </div>
+                )}
 
                 <a
                   href={selectedGovtJob.applyLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary"
+                  className="btn btn-outline"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    background: 'var(--tech-orange)',
-                    borderColor: 'var(--tech-orange)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    padding: '12px',
-                    borderRadius: '10px',
+                    borderColor: 'var(--corporate-blue)',
+                    color: 'var(--corporate-blue)',
+                    fontWeight: 600,
+                    padding: '10px',
+                    borderRadius: '8px',
                     textDecoration: 'none',
                     textAlign: 'center',
-                    boxShadow: '0 4px 12px rgba(242, 153, 74, 0.2)',
+                    fontSize: '13px',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  Apply & View Official Details 🏛️
+                  Open Original Page on FreeJobAlert 🌐
                 </a>
               </div>
             ) : (
