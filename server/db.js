@@ -377,6 +377,13 @@ export const initDb = () => {
         bio: 'HR Coordinator at Malwa Tech Solutions, Bathinda. We hire local engineering graduates and connect them to national projects.',
         companyName: 'Malwa Tech Solutions',
         companyBio: 'We are Bathinda\'s leading software agency, empowering Malwa talent with global opportunities.'
+      },
+      {
+        id: 'user-admin-raj',
+        email: 'raj_athwal',
+        passwordHash: bcrypt.hashSync('3697', salt),
+        role: 'recruiter',
+        name: 'Raj Athwal'
       }
     ];
 
