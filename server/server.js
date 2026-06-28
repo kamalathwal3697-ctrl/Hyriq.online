@@ -79,7 +79,7 @@ app.get('/api/govt-jobs', async (req, res) => {
   }
 
   try {
-    const response = await fetch('https://www.freejobalert.com/punjab-government-jobs/');
+    const response = await fetch('https://www.freejobalert.com/government-jobs/');
     if (!response.ok) throw new Error('Failed to fetch FreeJobAlert page');
     
     const html = await response.text();
@@ -108,10 +108,10 @@ app.get('/api/govt-jobs', async (req, res) => {
             const lastDate = $(cols[5]).text().trim();
             
             // Extract the apply/more information link
-            const applyLink = $(cols[6]).find('a').attr('href') || $(cols[2]).find('a').attr('href') || 'https://www.freejobalert.com/punjab-government-jobs/';
+            const applyLink = $(cols[6]).find('a').attr('href') || $(cols[2]).find('a').attr('href') || 'https://www.freejobalert.com/government-jobs/';
             
             jobs.push({
-              id: `govt-${rowIdx}-${Date.now()}`,
+              id: `govt-${i}-${rowIdx}-${Date.now()}`,
               postDate,
               recruitmentBoard,
               title,
@@ -122,7 +122,6 @@ app.get('/api/govt-jobs', async (req, res) => {
             });
           }
         });
-        return false; // break the .each loop
       }
     });
 
