@@ -598,8 +598,18 @@ export const RecruiterDashboard: React.FC = () => {
                         <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{candidateProfile.email} • {candidateProfile.phone}</p>
                         <p style={{ color: 'var(--primary)', fontSize: '12px', fontWeight: 600, marginTop: '4px' }}>Experience: {candidateProfile.experience}</p>
                       </div>
-                      <div className="avatar" style={{ width: '50px', height: '50px', fontSize: '18px', background: 'var(--primary-gradient)' }}>
-                        {candidateProfile.name.split(' ').map(n => n[0]).join('')}
+                      <div className="avatar" style={{
+                        width: '50px',
+                        height: '50px',
+                        fontSize: '24px',
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '50%'
+                      }}>
+                        {candidateProfile.logoSeed || '🧑‍💻'}
                       </div>
                     </div>
 
@@ -616,6 +626,51 @@ export const RecruiterDashboard: React.FC = () => {
                         ))}
                       </div>
                     </div>
+
+                    {/* Academics */}
+                    {candidateProfile.academicsList && candidateProfile.academicsList.length > 0 && (
+                      <div style={{ marginBottom: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+                        <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>ACADEMICS & QUALIFICATIONS</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {candidateProfile.academicsList.map((acad, idx) => (
+                             <div key={idx} style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                               🎓 <strong>{acad.degree}</strong>
+                               <p style={{ color: 'var(--text-muted)', fontSize: '11px', paddingLeft: '16px' }}>{acad.school} ({acad.year}) — {acad.grade}</p>
+                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Past Work Experience */}
+                    {candidateProfile.workExperiences && candidateProfile.workExperiences.length > 0 && (
+                      <div style={{ marginBottom: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+                        <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>PAST WORK EXPERIENCE</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {candidateProfile.workExperiences.map((work, idx) => (
+                             <div key={idx} style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                               💼 <strong>{work.role} at {work.company}</strong>
+                               <span style={{ fontSize: '10px', color: 'var(--tech-orange)', display: 'block', paddingLeft: '16px' }}>{work.duration}</span>
+                               <p style={{ color: 'var(--text-muted)', fontSize: '11px', paddingLeft: '16px', marginTop: '2px' }}>{work.description}</p>
+                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Certifications */}
+                    {candidateProfile.certifications && candidateProfile.certifications.length > 0 && (
+                      <div style={{ marginBottom: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+                        <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>CERTIFICATIONS & CREDENTIALS</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {candidateProfile.certifications.map((cert, idx) => (
+                             <div key={idx} style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                               🏆 <strong>{cert.name}</strong> ({cert.issuer} - {cert.year})
+                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* View Signed Legal Pact Button */}
                     {jobs.find(j => j.id === currentApplication.jobId)?.fairWorkPact && (

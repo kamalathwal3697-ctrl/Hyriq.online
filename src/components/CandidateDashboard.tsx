@@ -147,15 +147,21 @@ export const CandidateDashboard: React.FC = () => {
 
   // Extended Resume States
   const [profileAvatar, setProfileAvatar] = useState(candidateProfile.logoSeed || '🧑‍💻');
-  const [academics, setAcademics] = useState<Array<{ degree: string; school: string; year: string; grade: string }>>([
-    { degree: 'B.Tech in Computer Science', school: 'Thapar University, Patiala', year: '2025', grade: '8.5 CGPA' }
-  ]);
-  const [workExperiences, setWorkExperiences] = useState<Array<{ role: string; company: string; duration: string; description: string }>>([
-    { role: 'Frontend Intern', company: 'Google Development Group', duration: '3 Months (2025)', description: 'Assisted in designing clean UI panels for GDG portals using React.' }
-  ]);
-  const [certifications, setCertifications] = useState<Array<{ name: string; issuer: string; year: string }>>([
-    { name: 'AWS Certified Cloud Practitioner', issuer: 'Amazon Web Services', year: '2025' }
-  ]);
+  const [academics, setAcademics] = useState<Array<{ degree: string; school: string; year: string; grade: string }>>(
+    candidateProfile.academicsList || [
+      { degree: 'B.Tech in Computer Science', school: 'Thapar University, Patiala', year: '2025', grade: '8.5 CGPA' }
+    ]
+  );
+  const [workExperiences, setWorkExperiences] = useState<Array<{ role: string; company: string; duration: string; description: string }>>(
+    candidateProfile.workExperiences || [
+      { role: 'Frontend Intern', company: 'Google Development Group', duration: '3 Months (2025)', description: 'Assisted in designing clean UI panels for GDG portals using React.' }
+    ]
+  );
+  const [certifications, setCertifications] = useState<Array<{ name: string; issuer: string; year: string }>>(
+    candidateProfile.certifications || [
+      { name: 'AWS Certified Cloud Practitioner', issuer: 'Amazon Web Services', year: '2025' }
+    ]
+  );
 
   // Form helpers
   const [newDegree, setNewDegree] = useState('');
@@ -264,7 +270,10 @@ export const CandidateDashboard: React.FC = () => {
       skills: candidateProfile.skills,
       experience: profileExperience,
       resumeName: candidateProfile.resumeName,
-      logoSeed: profileAvatar
+      logoSeed: profileAvatar,
+      academicsList: academics,
+      workExperiences: workExperiences,
+      certifications: certifications
     });
     setProfileSaved(true);
     setTimeout(() => setProfileSaved(false), 3000);

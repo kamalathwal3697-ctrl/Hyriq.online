@@ -59,6 +59,9 @@ export interface CandidateProfile {
   onboardingCompleted?: boolean;
   subscriptionExpiry?: string;
   logoSeed?: string;
+  academicsList?: Array<{ degree: string; school: string; year: string; grade: string }>;
+  workExperiences?: Array<{ role: string; company: string; duration: string; description: string }>;
+  certifications?: Array<{ name: string; issuer: string; year: string }>;
   preferences?: {
     type: string[];
     mode: string[];
@@ -145,6 +148,16 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     experience: 'Entry-level',
     resumeName: '',
     onboardingCompleted: true, // Default to true so seeded user doesn't get modal
+    logoSeed: '🧑‍💻',
+    academicsList: [
+      { degree: 'B.Tech in Computer Science', school: 'Thapar University, Patiala', year: '2025', grade: '8.5 CGPA' }
+    ],
+    workExperiences: [
+      { role: 'Frontend Intern', company: 'Google Development Group', duration: '3 Months (2025)', description: 'Assisted in designing clean UI panels for GDG portals using React.' }
+    ],
+    certifications: [
+      { name: 'AWS Certified Cloud Practitioner', issuer: 'Amazon Web Services', year: '2025' }
+    ],
     preferences: {
       type: [],
       mode: [],
