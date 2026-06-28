@@ -772,7 +772,7 @@ export const CandidateDashboard: React.FC = () => {
                   )}
 
                   {/* Apply Actions */}
-                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', gap: '12px' }}>
+                  <div className="mobile-fixed-bottom-actions" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', gap: '12px' }}>
                     {applications.some(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1') ? (
                       <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
                         <button className="btn btn-outline" style={{ flex: 1 }} disabled>

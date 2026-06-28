@@ -541,7 +541,21 @@ input, textarea {
 
   /* Padding for bottom nav bar override */
   body, .container, main, .explore-grid, .recruiter-grid {
-    padding-bottom: 74px !important;
+    padding-bottom: 120px !important; /* increased to prevent blocking action buttons */
+  }
+
+  .mobile-fixed-bottom-actions {
+    position: fixed !important;
+    bottom: 84px !important;
+    left: 16px !important;
+    right: 16px !important;
+    background: rgba(11, 14, 20, 0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    border-radius: 24px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5) !important;
+    z-index: 999 !important;
   }
 }
 
