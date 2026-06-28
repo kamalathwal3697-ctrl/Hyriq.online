@@ -22,6 +22,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.hyriq.theme.HyriqTheme
 
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebResourceRequest
+
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -53,7 +57,26 @@ fun HyriqWebView(url: String) {
   AndroidView(
     factory = { context ->
       WebView(context).apply {
-        webViewClient = WebViewClient()
+        webViewClient = object : WebViewClient() {
+          override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+            val requestUrl = request?.url?.toString() ?: return false
+            
+            // If standard HTTP/HTTPS, let the webview load it
+            if (requestUrl.startsWith("http://") || requestUrl.startsWith("https://")) {
+              return false
+            }
+            
+            // For custom URI schemes (like upi://, intent://, paytm://, phonepe://, bank apps)
+            try {
+              val intent = Intent(Intent.ACTION_VIEW, Uri.parse(requestUrl))
+              context.startActivity(intent)
+              return true // handled override loader
+            } catch (e: Exception) {
+              // App not installed
+              return true
+            }
+          }
+        }
         webChromeClient = WebChromeClient()
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
