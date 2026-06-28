@@ -953,50 +953,46 @@ export const CandidateDashboard: React.FC = () => {
               </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {govtJobs.map((job) => {
-                const isSelected = selectedGovtJob?.id === job.id;
-                return (
-                  <div
-                    key={job.id}
-                    className={`seeker-light-card ${isSelected ? 'active' : ''}`}
-                    onClick={() => setSelectedGovtJob(job)}
-                    style={{
-                      padding: '16px',
-                      cursor: 'pointer',
-                      border: isSelected ? '2px solid var(--tech-orange)' : '1px solid rgba(26, 62, 98, 0.1)',
-                      boxShadow: isSelected ? '0 4px 12px rgba(26, 62, 98, 0.08)' : 'none',
-                      transition: 'all 0.2s ease',
-                      position: 'relative'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
-                      <span className="seeker-tag" style={{ background: 'rgba(26, 62, 98, 0.08)', color: 'var(--corporate-blue)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        {job.recruitmentBoard}
-                      </span>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}>
-                        Posted: {job.postDate}
-                      </span>
-                    </div>
-
-                    <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--corporate-blue)', marginBottom: '8px', lineHeight: '1.4' }}>
-                      {job.title}
-                    </h4>
-
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '13px', color: '#475569' }}>
-                      <div>
-                        <strong>🎓 Qualification:</strong> {job.qualification}
-                      </div>
-                      {job.lastDate && (
-                        <div>
-                          <strong>📅 Last Date:</strong> {job.lastDate}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {!govtJobsLoading && !govtJobsError && govtJobs.length > 0 && (
+              <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '12px', border: '1px solid rgba(26, 62, 98, 0.12)', boxShadow: '0 4px 12px rgba(0,0,0,0.015)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(26, 62, 98, 0.05)', borderBottom: '2px solid rgba(26, 62, 98, 0.1)' }}>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--corporate-blue)', width: '90px' }}>Post Date</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--corporate-blue)', width: '130px' }}>Recruitment Board</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--corporate-blue)' }}>Post Name / Exam</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--corporate-blue)', width: '150px' }}>Qualification</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--corporate-blue)', width: '100px' }}>Last Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {govtJobs.map((job) => {
+                      const isSelected = selectedGovtJob?.id === job.id;
+                      return (
+                        <tr
+                          key={job.id}
+                          onClick={() => setSelectedGovtJob(job)}
+                          style={{
+                            borderBottom: '1px solid rgba(26, 62, 98, 0.08)',
+                            background: isSelected ? 'rgba(242, 153, 74, 0.08)' : 'transparent',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            fontWeight: isSelected ? 600 : 400
+                          }}
+                          className="govt-table-row"
+                        >
+                          <td style={{ padding: '12px 16px', color: '#64748b' }}>{job.postDate}</td>
+                          <td style={{ padding: '12px 16px', color: 'var(--corporate-blue)', fontWeight: 600 }}>{job.recruitmentBoard}</td>
+                          <td style={{ padding: '12px 16px', color: '#1e293b', lineHeight: '1.4' }}>{job.title}</td>
+                          <td style={{ padding: '12px 16px', color: '#475569' }}>{job.qualification}</td>
+                          <td style={{ padding: '12px 16px', color: isSelected ? 'var(--tech-orange)' : '#ef4444', fontWeight: 600 }}>{job.lastDate || '—'}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </main>
 
           {/* Right Column: Sticky Detail Panel */}
