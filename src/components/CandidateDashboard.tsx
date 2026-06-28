@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, IndianRupee, Briefcase, Filter, UserCheck, MessageCircle, FileText, Plus, X, Sparkles, ArrowLeft } from 'lucide-react';
+import { Search, MapPin, IndianRupee, Briefcase, Filter, UserCheck, MessageCircle, FileText, Plus, X, Sparkles, ArrowLeft, Settings } from 'lucide-react';
 import { useAppState } from '../context/AppContext';
 import type { Job, Application } from '../context/AppContext';
 import { ChatWindow } from './ChatWindow';
@@ -419,6 +419,14 @@ export const CandidateDashboard: React.FC = () => {
               <FileText size={16} />
               My Profile
             </button>
+            <button 
+              className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+              style={{ color: activeTab === 'settings' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'settings' ? 'var(--corporate-blue)' : 'transparent' }}
+            >
+              <Settings size={16} />
+              Settings
+            </button>
           </div>
         </div>
 
@@ -530,6 +538,7 @@ export const CandidateDashboard: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '10px 14px', gap: '8px' }}>
                     <Search size={16} color="var(--corporate-blue)" />
                     <input
+                      id="dashboard-search-input"
                       type="text"
                       placeholder="Title or skill..."
                       value={searchQuery}
@@ -1822,6 +1831,169 @@ export const CandidateDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* SETTINGS VIEW */}
+      {activeTab === 'settings' && (
+        <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          {/* Account Settings Header */}
+          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', fontFamily: 'Outfit' }}>⚙️ App Settings</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px' }}>Manage your account, privacy, notifications, and app preferences.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+             {/* Section 1: Account & Profile */}
+             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
+                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>1. Account & Profile</h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Account Type Perspective</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const { setPerspective } = useAppState();
+                        setPerspective('candidate');
+                      }}
+                      className="btn"
+                      style={{ flex: 1, padding: '10px', fontSize: '12px', background: 'var(--corporate-blue)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                      Job Seeker
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const { setPerspective } = useAppState();
+                        setPerspective('recruiter');
+                      }}
+                      className="btn"
+                      style={{ flex: 1, padding: '10px', fontSize: '12px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                      Recruiter
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Region/Location (Punjab Specifics)</label>
+                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                    <option>Bathinda, Punjab</option>
+                    <option>Patiala, Punjab</option>
+                    <option>Amritsar, Punjab</option>
+                    <option>Ludhiana, Punjab</option>
+                    <option>Jalandhar, Punjab</option>
+                    <option>Mohali, Punjab</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Portfolio & Website Link</label>
+                  <input type="url" placeholder="https://myportfolio.com" className="glass-input" style={{ fontSize: '13px' }} />
+                </div>
+             </div>
+
+             {/* Section 2: Notifications */}
+             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
+                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>2. Notifications</h4>
+                
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Direct Messages (Chat)</span>
+                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                </label>
+
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Application status updates</span>
+                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                </label>
+
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Interview requests</span>
+                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                </label>
+
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Daily email job matches</span>
+                  <input type="checkbox" style={{ width: '16px', height: '16px' }} />
+                </label>
+             </div>
+
+             {/* Section 3: Privacy & Visibility */}
+             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
+                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>3. Privacy & Visibility</h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Profile Status</label>
+                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                    <option>Actively Looking</option>
+                    <option>Open to Offers</option>
+                    <option>Not Looking</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Resume Visibility</label>
+                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                    <option>Public to all recruiters</option>
+                    <option>Visible only to applied jobs</option>
+                    <option>Completely hidden</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Block Companies</label>
+                  <input type="text" placeholder="Enter company names to block..." className="glass-input" style={{ fontSize: '13px' }} />
+                </div>
+             </div>
+
+             {/* Section 4: Security & Access */}
+             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
+                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>4. Security & Access</h4>
+                
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Two-Factor (2FA)</span>
+                  <input type="checkbox" style={{ width: '16px', height: '16px' }} />
+                </label>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Reset Password</label>
+                  <input type="password" placeholder="New password" className="glass-input" style={{ fontSize: '13px' }} />
+                </div>
+
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  🛡️ Active Sessions: 1 (Android WebView)
+                </div>
+             </div>
+
+             {/* Section 5: App Preferences */}
+             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
+                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>5. App Preferences</h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Appearance Theme</label>
+                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                    <option>Dark Mode (Default)</option>
+                    <option>Light Mode</option>
+                    <option>System Default</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>App Language / ਬੋਲੀ</label>
+                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                    <option>English</option>
+                    <option>Punjabi (ਪੰਜਾਬੀ)</option>
+                    <option>Hindi (हिन्दी)</option>
+                  </select>
+                </div>
+
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Auto-play Wi-Fi Only</span>
+                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                </label>
+             </div>
+          </div>
+        </div>
+      )}
+
       {/* Fair Work Pact Application Intercept Modal */}
       {showApplyPactModal && selectedJob && (
         <div style={{
@@ -2174,16 +2346,27 @@ export const CandidateDashboard: React.FC = () => {
         paddingBottom: 'safe-area-inset-bottom'
       }}>
         {[
-          { id: 'explore', label: 'Jobs', icon: '💼' },
-          { id: 'govt', label: 'Govt Jobs', icon: '🏛️' },
-          { id: 'applications', label: 'Applications', icon: '📩' },
-          { id: 'profile', label: 'Profile', icon: '👤' }
+          { id: 'explore', label: 'Home', icon: '🏠' },
+          { id: 'applications', label: 'Message', icon: '📩' },
+          { id: 'search', label: 'Search', icon: '🔍', action: () => {
+              setActiveTab('explore');
+              setTimeout(() => {
+                const el = document.getElementById('dashboard-search-input');
+                if (el) {
+                  el.focus();
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 150);
+            }
+          },
+          { id: 'profile', label: 'Profile', icon: '👤' },
+          { id: 'settings', label: 'Settings', icon: '⚙️' }
         ].map(item => {
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
+              onClick={item.action ? item.action : () => setActiveTab(item.id as any)}
               style={{
                 background: 'transparent',
                 border: 'none',
