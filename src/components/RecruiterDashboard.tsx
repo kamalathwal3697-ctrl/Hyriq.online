@@ -631,9 +631,14 @@ export const RecruiterDashboard: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '38px'
+                          fontSize: candidateProfile.logoSeed && candidateProfile.logoSeed.length > 4 ? '18px' : '38px',
+                          overflow: 'hidden'
                         }}>
-                          {candidateProfile.logoSeed || '🧑‍💻'}
+                          {candidateProfile.logoSeed && (candidateProfile.logoSeed.startsWith('data:image/') || candidateProfile.logoSeed.startsWith('http')) ? (
+                            <img src={candidateProfile.logoSeed} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            candidateProfile.logoSeed || '🧑‍💻'
+                          )}
                         </div>
                       </div>
                     </div>

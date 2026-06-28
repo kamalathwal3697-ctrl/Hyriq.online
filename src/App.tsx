@@ -87,8 +87,12 @@ const AppContent: React.FC = () => {
         >
           {token && user?.name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '18px' }}>
-                {perspective === 'candidate' ? (candidateProfile?.logoSeed || '🧑‍💻') : '💼'}
+              <span style={{ fontSize: '18px', width: '22px', height: '22px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {perspective === 'candidate' && candidateProfile?.logoSeed && (candidateProfile.logoSeed.startsWith('data:image/') || candidateProfile.logoSeed.startsWith('http')) ? (
+                  <img src={candidateProfile.logoSeed} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  perspective === 'candidate' ? (candidateProfile?.logoSeed || '🧑‍💻') : '💼'
+                )}
               </span>
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>
                 {user.name.split(' ')[0]}
@@ -171,9 +175,14 @@ const AppContent: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '20px'
+                fontSize: '20px',
+                overflow: 'hidden'
               }}>
-                {perspective === 'candidate' ? (candidateProfile?.logoSeed || '🧑‍💻') : '💼'}
+                {perspective === 'candidate' && candidateProfile?.logoSeed && (candidateProfile.logoSeed.startsWith('data:image/') || candidateProfile.logoSeed.startsWith('http')) ? (
+                  <img src={candidateProfile.logoSeed} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  perspective === 'candidate' ? (candidateProfile?.logoSeed || '🧑‍💻') : '💼'
+                )}
               </div>
               <div>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: '#fff', display: 'block' }}>

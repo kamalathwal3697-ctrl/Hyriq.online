@@ -1321,7 +1321,7 @@ export const CandidateDashboard: React.FC = () => {
               {/* Avatar / DP Picker */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '10px' }}>Select App Display Picture (DP)</label>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
                   {['🧑‍💻', '🚀', '🤖', '🎨', '💼', '🎓', '🦖', '🌟', '🦄'].map(emoji => (
                     <button
                       key={emoji}
@@ -1344,6 +1344,46 @@ export const CandidateDashboard: React.FC = () => {
                       {emoji}
                     </button>
                   ))}
+
+                  {/* Custom Upload Button */}
+                  <label 
+                    htmlFor="profile-image-upload-input"
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '50%',
+                      fontSize: '18px',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px dashed var(--tech-orange)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s',
+                      color: 'var(--tech-orange)'
+                    }}
+                    title="Upload Custom Image"
+                  >
+                    📸
+                  </label>
+                  <input
+                    type="file"
+                    id="profile-image-upload-input"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          if (typeof reader.result === 'string') {
+                            setProfileAvatar(reader.result);
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    style={{ display: 'none' }}
+                  />
                 </div>
               </div>
 
@@ -1676,9 +1716,14 @@ export const CandidateDashboard: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '44px'
+                    fontSize: profileAvatar && profileAvatar.length > 4 ? '18px' : '44px',
+                    overflow: 'hidden'
                   }}>
-                    {profileAvatar}
+                    {profileAvatar && (profileAvatar.startsWith('data:image/') || profileAvatar.startsWith('http')) ? (
+                      <img src={profileAvatar} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      profileAvatar
+                    )}
                   </div>
                 </div>
               </div>
