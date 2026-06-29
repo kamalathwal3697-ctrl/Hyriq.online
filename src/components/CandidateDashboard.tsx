@@ -2402,7 +2402,8 @@ export const CandidateDashboard: React.FC = () => {
         </div>
       )}
       {/* Mobile Bottom Navigation Bar – Icon Only */}
-      <div className="mobile-bottom-nav" style={{
+      {!selectedJob && (
+        <div className="mobile-bottom-nav" style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
@@ -2474,6 +2475,7 @@ export const CandidateDashboard: React.FC = () => {
           );
         })}
       </div>
+      )}
     </div>
   );
 };
