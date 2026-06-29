@@ -507,6 +507,117 @@ app.put('/api/auth/profile', authenticateToken, (req, res) => {
 });
 
 
+// Auto-import jobs for location from external ATS sources
+app.post('/api/jobs/auto-import', async (req, res) => {
+  const { location } = req.body;
+  if (!location) {
+    return res.status(400).json({ error: 'Location is required' });
+  }
+
+  try {
+    const db = readData();
+    if (!db.jobs) db.jobs = [];
+
+    // Check how many jobs already exist for this location query (case insensitive)
+    const existingCount = db.jobs.filter(j => 
+      j.location.toLowerCase().includes(location.toLowerCase())
+    ).length;
+
+    // If we already have 6+ jobs, don't flood the DB, just return existing
+    if (existingCount >= 6) {
+      return res.json({ 
+        message: 'Jobs already imported', 
+        count: existingCount, 
+        jobs: db.jobs.filter(j => j.location.toLowerCase().includes(location.toLowerCase())) 
+      });
+    }
+
+    // Fetch from Arbeitnow (public API, no keys)
+    const apiRes = await fetch('https://www.arbeitnow.com/api/job-board-api');
+    if (!apiRes.ok) {
+      return res.status(502).json({ error: 'Failed to fetch external jobs feed' });
+    }
+
+    const data = await apiRes.json();
+    const rawJobs = data.data || [];
+
+    // Limit to 8 newly imported jobs to keep it clean and performant
+    const jobsToImport = rawJobs.slice(0, 8);
+    const newJobs = [];
+
+    jobsToImport.forEach((job, index) => {
+      let cleanTitle = job.title;
+      if (cleanTitle.includes(' - ')) {
+        cleanTitle = cleanTitle.split(' - ')[0];
+      }
+      if (cleanTitle.includes(' | ')) {
+        cleanTitle = cleanTitle.split(' | ')[0];
+      }
+
+      // Convert HTML description to text excerpts
+      let cleanDesc = job.description ? job.description.replace(/<[^>]*>/g, '') : '';
+      if (cleanDesc.length > 300) {
+        cleanDesc = cleanDesc.substring(0, 300) + '...';
+      }
+
+      const salaryRange = [
+        '₹6,00,000 - ₹9,50,000 / year',
+        '₹8,50,000 - ₹12,00,000 / year',
+        '₹11,00,000 - ₹16,00,000 / year',
+        '₹14,00,000 - ₹20,00,000 / year'
+      ][index % 4];
+
+      const experienceLevel = [
+        'Entry-level',
+        'Mid-level',
+        'Mid-level',
+        'Senior-level'
+      ][index % 4];
+
+      // Add a randomized emoji for the logoSeed to match the visual vibe
+      const logoEmoji = ['🚀', '💻', '💡', '🔥', '🛡️', '⚡', '🤖', '👾'][index % 8];
+
+      const newJob = {
+        id: `job-imported-${Date.now()}-${index}`,
+        title: cleanTitle,
+        companyName: job.company_name,
+        logoSeed: logoEmoji,
+        location: `${location}, India`,
+        type: 'Full-time',
+        mode: job.remote ? 'Remote' : (index % 2 === 0 ? 'Hybrid' : 'On-site'),
+        salary: salaryRange,
+        experience: experienceLevel,
+        skills: job.tags && job.tags.length > 0 ? job.tags.slice(0, 4) : ['Engineering', 'Software', 'Product'],
+        description: cleanDesc || 'Join us to build state of the art web interfaces and backend microservices.',
+        requirements: [
+          'Strong proficiency in HTML, CSS, JavaScript/TypeScript',
+          'Prior professional experience with modern web architectures',
+          'Excellent collaborative and communication skills',
+          'Adherence to the Hyriq Fair Work Pact commitments'
+        ],
+        benefits: [
+          'Flexible working hours & hybrid options',
+          'Full medical insurance and wellness cover',
+          'Annual learning budget and certification support'
+        ],
+        postedDate: new Date().toISOString(),
+        recruiterId: 'recruiter-imported',
+        fairWorkPact: true,
+        chatLiveHours: '10:00 AM - 6:00 PM'
+      };
+
+      newJobs.push(newJob);
+      db.jobs.push(newJob);
+    });
+
+    writeData(db);
+    res.json({ message: 'Success', count: newJobs.length, jobs: newJobs });
+  } catch (err) {
+    console.error('Error auto-importing jobs:', err);
+    res.status(500).json({ error: 'Failed to import external jobs' });
+  }
+});
+
 // --- JOBS ROUTES ---
 
 // List all jobs

@@ -331,6 +331,23 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
     return () => clearInterval(interval);
   }, [token]);
 
+  // Auto-import external jobs when location changes
+  useEffect(() => {
+    if (currentLocation) {
+      fetch('/api/jobs/auto-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location: currentLocation })
+      })
+      .then(res => {
+        if (res.ok) {
+          fetchJobs();
+        }
+      })
+      .catch(err => console.error('Failed to trigger background auto-import:', err));
+    }
+  }, [currentLocation]);
+
   // Handle Candidate Profile Updates on the backend
   useEffect(() => {
     if (!token || user?.role !== 'candidate' || !candidateProfile.name) return;
