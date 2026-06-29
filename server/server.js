@@ -220,40 +220,53 @@ app.get('/api/govt-jobs/details', async (req, res) => {
     }
 
     let directApplyLink = null;
-    // Scan all table rows for "apply online"
+    const resourceLinks = [];
+
+    // Scan all table rows for links
     $('tr').each((i, el) => {
       const cells = $(el).find('td');
-      let hasApplyOnlineLabel = false;
-      cells.each((idx, td) => {
-        const text = $(td).text().toLowerCase();
-        if (text.includes('apply online') || text === 'apply' || text.includes('registration')) {
-          hasApplyOnlineLabel = true;
-        }
-      });
+      if (cells.length >= 2) {
+        const anchor = $(el).find('a');
+        if (anchor.length > 0) {
+          const href = anchor.attr('href');
+          let label = $(cells[0]).text().trim();
+          if (!label) {
+            label = anchor.text().trim();
+          }
+          label = label.replace(/\s+/g, ' ');
 
-      if (hasApplyOnlineLabel) {
-        // Find link in this row
-        const link = $(el).find('a').attr('href');
-        if (link && !link.includes('freejobalert.com') && !link.includes('javascript:')) {
-          directApplyLink = link;
-          return false; // break tr loop
+          if (href && !href.includes('freejobalert.com') && !href.includes('javascript:') && href.startsWith('http')) {
+            if (!resourceLinks.some(rl => rl.url === href)) {
+              resourceLinks.push({ label, url: href });
+            }
+            if (label.toLowerCase().includes('apply online') || label.toLowerCase() === 'apply' || label.toLowerCase().includes('registration')) {
+              directApplyLink = href;
+            }
+          }
         }
       }
     });
 
     // Fallback: If no direct link was found, scan all links in the tables that are not freejobalert
-    if (!directApplyLink) {
+    if (resourceLinks.length === 0) {
       $('.scrollable-table a').each((i, el) => {
         const href = $(el).attr('href');
+        let label = $(el).text().trim() || 'Official Link';
         if (href && !href.includes('freejobalert.com') && !href.includes('javascript:') && href.startsWith('http')) {
-          directApplyLink = href;
-          return false; // break loop
+          if (!resourceLinks.some(rl => rl.url === href)) {
+            resourceLinks.push({ label, url: href });
+          }
         }
       });
     }
 
+    if (!directApplyLink && resourceLinks.length > 0) {
+      directApplyLink = resourceLinks[0].url;
+    }
+
     res.json({ 
       html: htmlBlocks.join('\n'),
+      resourceLinks: resourceLinks,
       directApplyLink: directApplyLink || url
     });
   } catch (err) {

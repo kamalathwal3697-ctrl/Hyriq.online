@@ -66,12 +66,16 @@ export const CandidateDashboard: React.FC = () => {
   }, [savedGovtJobs]);
 
   const [currentGovtApplyLink, setCurrentGovtApplyLink] = useState('');
+  const [govtResourceLinks, setGovtResourceLinks] = useState<{ label: string, url: string }[]>([]);
+  const [showLinksDropdown, setShowLinksDropdown] = useState(false);
 
   // Fetch Government Job Details when a card is selected
   useEffect(() => {
     if (selectedGovtJob) {
       setSelectedGovtJobDetails('');
       setCurrentGovtApplyLink(selectedGovtJob.applyLink); // default fallback
+      setGovtResourceLinks([]);
+      setShowLinksDropdown(false);
       setgovtJobDetailsLoading(true);
       fetch(`/api/govt-jobs/details?url=${encodeURIComponent(selectedGovtJob.applyLink)}`)
         .then(res => {
@@ -83,6 +87,9 @@ export const CandidateDashboard: React.FC = () => {
           if (data.directApplyLink) {
             setCurrentGovtApplyLink(data.directApplyLink);
           }
+          if (data.resourceLinks) {
+            setGovtResourceLinks(data.resourceLinks);
+          }
           setgovtJobDetailsLoading(false);
         })
         .catch(() => {
@@ -91,6 +98,8 @@ export const CandidateDashboard: React.FC = () => {
         });
     } else {
       setSelectedGovtJobDetails('');
+      setGovtResourceLinks([]);
+      setShowLinksDropdown(false);
     }
   }, [selectedGovtJob]);
 
@@ -1083,29 +1092,103 @@ export const CandidateDashboard: React.FC = () => {
                   >
                     {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
                   </button>
-                  <a
-                    href={currentGovtApplyLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{
-                      flex: 1.5,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      background: 'var(--corporate-blue)',
-                      color: '#fff',
-                      fontWeight: 700,
-                      padding: '10px',
-                      borderRadius: '8px',
-                      textAlign: 'center',
-                      fontSize: '13px',
-                      textDecoration: 'none'
-                    }}
-                  >
-                    Apply Online ↗
-                  </a>
+                  <div style={{ flex: 1.5, position: 'relative' }}>
+                    {govtResourceLinks.length > 1 ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setShowLinksDropdown(!showLinksDropdown)}
+                          className="btn btn-primary"
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            background: 'var(--corporate-blue)',
+                            color: '#fff',
+                            fontWeight: 700,
+                            padding: '10px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Apply Online ▾
+                        </button>
+                        
+                        {showLinksDropdown && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '100%',
+                            right: 0,
+                            marginBottom: '8px',
+                            background: '#0B0E14',
+                            border: '1px solid rgba(26,62,98,0.2)',
+                            borderRadius: '8px',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                            zIndex: 100,
+                            width: '240px',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}>
+                            <div style={{ padding: '8px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600 }}>
+                              SELECT LINK:
+                            </div>
+                            {govtResourceLinks.map((link, idx) => (
+                              <a
+                                key={idx}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setShowLinksDropdown(false)}
+                                style={{
+                                  padding: '10px 12px',
+                                  fontSize: '12px',
+                                  color: '#fff',
+                                  textDecoration: 'none',
+                                  borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                                  display: 'block',
+                                  textAlign: 'left',
+                                  transition: 'background 0.2s',
+                                  fontWeight: 500
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(26,62,98,0.2)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                              >
+                                🔗 {link.label || 'Link'}
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <a
+                        href={currentGovtApplyLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          background: 'var(--corporate-blue)',
+                          color: '#fff',
+                          fontWeight: 700,
+                          padding: '10px',
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          fontSize: '13px',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        Apply Online ↗
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -2431,15 +2514,87 @@ export const CandidateDashboard: React.FC = () => {
               >
                 {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
               </button>
-              <a 
-                href={currentGovtApplyLink} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ flex: 2, padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--corporate-blue)', color: '#fff' }}
-              >
-                Apply Online ↗
-              </a>
+              <div style={{ flex: 2, position: 'relative' }}>
+                {govtResourceLinks.length > 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowLinksDropdown(!showLinksDropdown)}
+                      className="btn btn-primary"
+                      style={{ 
+                        width: '100%',
+                        padding: '12px', 
+                        borderRadius: '12px', 
+                        fontSize: '13px', 
+                        textAlign: 'center', 
+                        fontWeight: 700, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        border: 'none',
+                        background: 'var(--corporate-blue)',
+                        color: '#fff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Apply Online ▾
+                    </button>
+                    
+                    {showLinksDropdown && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '100%',
+                        right: 0,
+                        marginBottom: '12px',
+                        background: '#0B0E14',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                        zIndex: 1200,
+                        width: '260px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                      }}>
+                        <div style={{ padding: '10px 14px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600 }}>
+                          SELECT LINK:
+                        </div>
+                        {govtResourceLinks.map((link, idx) => (
+                          <a
+                            key={idx}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowLinksDropdown(false)}
+                            style={{
+                              padding: '12px 14px',
+                              fontSize: '12.5px',
+                              color: '#fff',
+                              textDecoration: 'none',
+                              borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                              display: 'block',
+                              textAlign: 'left',
+                              fontWeight: 500
+                            }}
+                          >
+                            🔗 {link.label || 'Link'}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <a 
+                    href={currentGovtApplyLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                    style={{ display: 'flex', width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--corporate-blue)', color: '#fff' }}
+                  >
+                    Apply Online ↗
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
