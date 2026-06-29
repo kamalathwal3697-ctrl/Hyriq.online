@@ -236,35 +236,8 @@ export const CandidateDashboard: React.FC = () => {
     setDetailsTab('info');
   }, [selectedJob]);
 
-  // Handle browser/webview popstate back gesture to close job details overlay on mobile
-  useEffect(() => {
-    const handlePopState = () => {
-      if (selectedJob) {
-        setIsClosingExplore(true);
-        setTimeout(() => {
-          setSelectedJob(null);
-          setIsClosingExplore(false);
-        }, 280);
-      }
-      if (selectedGovtJob) {
-        setIsClosingGovt(true);
-        setTimeout(() => {
-          setSelectedGovtJob(null);
-          setIsClosingGovt(false);
-        }, 280);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [selectedJob, selectedGovtJob]);
-
   const handleSelectJob = (job: Job) => {
     setSelectedJob(job);
-    if (window.innerWidth <= 1024) {
-      window.history.pushState({ jobDetailOpen: true }, '');
-    }
   };
 
   const handleCloseJobDetails = () => {
@@ -273,16 +246,10 @@ export const CandidateDashboard: React.FC = () => {
       setSelectedJob(null);
       setIsClosingExplore(false);
     }, 280);
-    if (window.innerWidth <= 1024 && window.history.state?.jobDetailOpen) {
-      window.history.back();
-    }
   };
 
   const handleSelectGovtJob = (job: any) => {
     setSelectedGovtJob(job);
-    if (window.innerWidth <= 1024) {
-      window.history.pushState({ govtJobDetailOpen: true }, '');
-    }
   };
 
   const handleCloseGovtJobDetails = () => {
@@ -291,9 +258,6 @@ export const CandidateDashboard: React.FC = () => {
       setSelectedGovtJob(null);
       setIsClosingGovt(false);
     }, 280);
-    if (window.innerWidth <= 1024 && window.history.state?.govtJobDetailOpen) {
-      window.history.back();
-    }
   };
 
   // Keep selected application updated with latest chat from global state
