@@ -48,6 +48,7 @@ export const CandidateDashboard: React.FC = () => {
   const [govtJobDetailsLoading, setgovtJobDetailsLoading] = useState(false);
   const [selectedGovtCategory, setSelectedGovtCategory] = useState('all');
   const [selectedGovtState, setSelectedGovtState] = useState('all');
+  const [inAppBrowserUrl, setInAppBrowserUrl] = useState<string | null>(null);
 
   // Fetch Government Job Details when a card is selected
   useEffect(() => {
@@ -985,10 +986,9 @@ export const CandidateDashboard: React.FC = () => {
                   </div>
                 )}
 
-                <a
-                  href={selectedGovtJob.applyLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => setInAppBrowserUrl(selectedGovtJob.applyLink)}
                   className="btn btn-outline"
                   style={{
                     display: 'flex',
@@ -1000,14 +1000,14 @@ export const CandidateDashboard: React.FC = () => {
                     fontWeight: 600,
                     padding: '10px',
                     borderRadius: '8px',
-                    textDecoration: 'none',
                     textAlign: 'center',
                     fontSize: '13px',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer'
                   }}
                 >
                   Open Official Application Portal 🏛️
-                </a>
+                </button>
               </div>
             ) : (
               <div className="seeker-light-card" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>
@@ -2323,15 +2323,14 @@ export const CandidateDashboard: React.FC = () => {
               >
                 Close Details
               </button>
-              <a 
-                href={selectedGovtJob.applyLink} 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <button 
+                type="button"
+                onClick={() => setInAppBrowserUrl(selectedGovtJob.applyLink)}
                 className="btn btn-primary"
-                style={{ flex: 2, padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', textDecoration: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ flex: 2, padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: 'none' }}
               >
                 Apply Online 🏛️
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -2679,6 +2678,87 @@ export const CandidateDashboard: React.FC = () => {
           setActiveTab={setActiveTab}
           onComplete={() => setShowTour(false)}
         />
+      )}
+
+      {/* In-App Browser / Iframe Modal for Government Portals */}
+      {inAppBrowserUrl && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: '#0B0E14',
+          zIndex: 3000,
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Browser Header Bar */}
+          <div style={{
+            height: '56px',
+            background: 'rgba(26, 62, 98, 0.95)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            color: '#fff'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button 
+                onClick={() => setInAppBrowserUrl(null)}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: 'none',
+                  color: '#fff',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '16px'
+                }}
+              >
+                ✕
+              </button>
+              <div style={{ textAlign: 'left' }}>
+                <strong style={{ fontSize: '14px', display: 'block' }}>Official Portal</strong>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', display: 'block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {inAppBrowserUrl}
+                </span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <a 
+                href={inAppBrowserUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline"
+                style={{ padding: '6px 12px', fontSize: '11px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', textDecoration: 'none' }}
+              >
+                Open External ↗
+              </a>
+            </div>
+          </div>
+
+          {/* Iframe Viewport */}
+          <div style={{ flex: 1, position: 'relative', background: '#fff' }}>
+            <iframe 
+              src={inAppBrowserUrl} 
+              title="Official Portal Viewport"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: '#fff'
+              }}
+            />
+          </div>
+        </div>
       )}
     </>
   );
