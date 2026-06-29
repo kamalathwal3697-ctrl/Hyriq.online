@@ -198,16 +198,45 @@ export const CandidateDashboard: React.FC = () => {
     }
   }, []);
 
-  // Update details panel selection if jobs list changes
+  // Update details panel selection if jobs list changes (only on desktop layout)
   useEffect(() => {
-    if (jobs.length > 0 && !selectedJob) {
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop && jobs.length > 0 && !selectedJob) {
       setSelectedJob(jobs[0]);
     }
-  }, [jobs, selectedJob]);
+  }, [jobs]);
 
   useEffect(() => {
     setDetailsTab('info');
   }, [selectedJob]);
+
+  // Handle browser/webview popstate back gesture to close job details overlay on mobile
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedJob) {
+        setSelectedJob(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [selectedJob]);
+
+  const handleSelectJob = (job: Job) => {
+    setSelectedJob(job);
+    if (window.innerWidth <= 768) {
+      window.history.pushState({ jobDetailOpen: true }, '');
+    }
+  };
+
+  const handleCloseJobDetails = () => {
+    if (window.innerWidth <= 768) {
+      window.history.back();
+    } else {
+      setSelectedJob(null);
+    }
+  };
 
   // Keep selected application updated with latest chat from global state
   const currentApp = applications.find(app => app.id === selectedApp?.id) || null;
@@ -588,7 +617,7 @@ export const CandidateDashboard: React.FC = () => {
                   return (
                     <div 
                       key={job.id}
-                      onClick={() => setSelectedJob(job)}
+                      onClick={() => handleSelectJob(job)}
                       className="seeker-light-card"
                       style={{
                         padding: '20px',
@@ -669,7 +698,7 @@ export const CandidateDashboard: React.FC = () => {
               {/* Header */}
               <div>
                 <button
-                  onClick={() => setSelectedJob(null)}
+                  onClick={handleCloseJobDetails}
                   style={{
                         background: 'transparent',
                         border: 'none',
