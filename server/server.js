@@ -66,6 +66,45 @@ app.get('/api/promo/slots', (req, res) => {
   });
 });
 
+// Log visitor hit
+app.post('/api/visitor/hit', (req, res) => {
+  const db = readData();
+  if (!db.visitors) {
+    db.visitors = { total: 0, hits: [] };
+  }
+  db.visitors.total += 1;
+  db.visitors.hits.push({
+    timestamp: Date.now(),
+    ip: req.ip || req.headers['x-forwarded-for'] || 'unknown'
+  });
+  
+  if (db.visitors.hits.length > 200) {
+    db.visitors.hits = db.visitors.hits.slice(-200);
+  }
+  
+  writeData(db);
+  res.json({ success: true, total: db.visitors.total });
+});
+
+// Get real visitor stats for admin
+app.get('/api/visitor/stats', (req, res) => {
+  const db = readData();
+  const total = db.visitors?.total || 0;
+  const hits = db.visitors?.hits || [];
+  
+  const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+  const liveHits = hits.filter(h => h.timestamp > fiveMinutesAgo);
+  const liveCount = Math.max(1, liveHits.length);
+  
+  const registeredCount = db.users.length;
+  
+  res.json({
+    total,
+    live: liveCount,
+    registered: registeredCount
+  });
+});
+
 // Cache maps for government jobs
 const govtJobsCache = new Map();
 const govtJobsCacheTime = new Map();

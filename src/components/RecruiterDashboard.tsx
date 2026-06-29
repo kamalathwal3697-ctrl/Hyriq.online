@@ -17,7 +17,8 @@ export const RecruiterDashboard: React.FC = () => {
     deleteJob,
     recruiterTab: activeTab,
     setRecruiterTab: setActiveTab,
-    currentLocation
+    currentLocation,
+    user
   } = useAppState();
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<any>(null);
@@ -63,6 +64,22 @@ export const RecruiterDashboard: React.FC = () => {
       setSavedCandidates([...savedCandidates, candidateProfile]);
     }
   };
+
+  const [realStats, setRealStats] = useState<{ total: number, live: number, registered: number } | null>(null);
+
+  useEffect(() => {
+    if (user?.email === 'raj_athwal') {
+      const fetchStats = () => {
+        fetch('/api/visitor/stats')
+          .then(res => res.json())
+          .then(data => setRealStats(data))
+          .catch(err => console.error('Failed to fetch real stats:', err));
+      };
+      fetchStats();
+      const interval = setInterval(fetchStats, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   // Set default selected job
   useEffect(() => {
@@ -183,9 +200,32 @@ export const RecruiterDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* OVERVIEW VIEW */}
+       {/* OVERVIEW VIEW */}
       {activeTab === 'overview' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          {/* Admin Real-Time Metrics Panel */}
+          {user?.email === 'raj_athwal' && realStats && (
+            <div className="glass-panel" style={{ padding: '24px', border: '1px dashed var(--tech-orange)', background: 'rgba(242, 153, 74, 0.03)' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--tech-orange)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🛡️ Live System Administrator Monitor (REAL DATA)
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Visits (All Time)</span>
+                  <h4 style={{ fontSize: '24px', color: '#fff', fontWeight: 800, marginTop: '4px' }}>{realStats.total.toLocaleString()}</h4>
+                </div>
+                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', position: 'relative' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Live (Last 5 mins)</span>
+                  <h4 style={{ fontSize: '24px', color: '#10b981', fontWeight: 800, marginTop: '4px' }}>{realStats.live}</h4>
+                  <span className="pulse-live" style={{ position: 'absolute', top: '16px', right: '16px', width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
+                </div>
+                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Registered Users</span>
+                  <h4 style={{ fontSize: '24px', color: '#fff', fontWeight: 800, marginTop: '4px' }}>{realStats.registered}</h4>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Dashboard Summary Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
             <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>

@@ -4,7 +4,7 @@ import { useAppState } from '../context/AppContext';
 import { getLocationDetails } from '../utils/locationHelper';
 
 export const LandingPage: React.FC = () => {
-  const { setPerspective, promoSlots, jobs, currentLocation } = useAppState();
+  const { setPerspective, promoSlots, jobs, currentLocation, user } = useAppState();
   const locDetails = getLocationDetails(currentLocation);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchLoc, setSearchLoc] = useState('');
@@ -25,6 +25,8 @@ export const LandingPage: React.FC = () => {
   const [liveVisitors, setLiveVisitors] = useState(24);
 
   useEffect(() => {
+    fetch('/api/visitor/hit', { method: 'POST' }).catch(err => console.error(err));
+
     const interval = setInterval(() => {
       setLiveVisitors(prev => {
         const change = Math.floor(Math.random() * 5) - 2;
@@ -36,6 +38,21 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   const [registeredUsers] = useState(8421);
+  const [realStats, setRealStats] = useState<{ total: number, live: number, registered: number } | null>(null);
+
+  useEffect(() => {
+    if (user?.email === 'raj_athwal') {
+      const fetchStats = () => {
+        fetch('/api/visitor/stats')
+          .then(res => res.json())
+          .then(data => setRealStats(data))
+          .catch(err => console.error('Failed to fetch real stats:', err));
+      };
+      fetchStats();
+      const interval = setInterval(fetchStats, 6000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
   
   const [showPromo, setShowPromo] = useState(() => {
     return sessionStorage.getItem('hyriq_promo_dismissed') !== 'true';
@@ -732,9 +749,11 @@ export const LandingPage: React.FC = () => {
             textAlign: 'center'
           }}>
             <div className="glass-panel" style={{ padding: '20px', border: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Total Visitors</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Total Visitors {user?.email === 'raj_athwal' && <span style={{ color: 'var(--tech-orange)', fontSize: '9px' }}>(REAL)</span>}
+              </span>
               <h3 style={{ fontSize: '26px', color: '#fff', fontWeight: 800, marginTop: '8px' }}>
-                {totalVisitors.toLocaleString()}
+                {user?.email === 'raj_athwal' && realStats ? realStats.total.toLocaleString() : totalVisitors.toLocaleString()}
               </h3>
               <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Accumulated visits till now</span>
             </div>
@@ -751,17 +770,21 @@ export const LandingPage: React.FC = () => {
                 background: '#10b981',
                 boxShadow: '0 0 10px #10b981'
               }} className="pulse-live"></div>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Visitors</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Live Visitors {user?.email === 'raj_athwal' && <span style={{ color: 'var(--tech-orange)', fontSize: '9px' }}>(REAL)</span>}
+              </span>
               <h3 style={{ fontSize: '26px', color: '#10b981', fontWeight: 800, marginTop: '8px' }}>
-                {liveVisitors}
+                {user?.email === 'raj_athwal' && realStats ? realStats.live : liveVisitors}
               </h3>
               <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Users active on the app today</span>
             </div>
 
             <div className="glass-panel" style={{ padding: '20px', border: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Registered Talents</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Registered Talents {user?.email === 'raj_athwal' && <span style={{ color: 'var(--tech-orange)', fontSize: '9px' }}>(REAL)</span>}
+              </span>
               <h3 style={{ fontSize: '26px', color: '#fff', fontWeight: 800, marginTop: '8px' }}>
-                {registeredUsers.toLocaleString()}
+                {user?.email === 'raj_athwal' && realStats ? realStats.registered.toLocaleString() : registeredUsers.toLocaleString()}
               </h3>
               <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Candidates & Recruiters</span>
             </div>
