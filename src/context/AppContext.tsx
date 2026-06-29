@@ -99,6 +99,7 @@ interface AppContextType {
     phone?: string;
     bio?: string;
     paymentId?: string;
+    couponCode?: string;
   }) => Promise<void>;
   logout: () => void;
   promoSlots: number;
@@ -417,6 +418,7 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
     phone?: string;
     bio?: string;
     paymentId?: string;
+    couponCode?: string;
   }) => {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
@@ -429,7 +431,8 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
         name: details.name,
         phone: details.phone,
         bio: details.bio,
-        paymentId: details.paymentId
+        paymentId: details.paymentId,
+        couponCode: details.couponCode
       })
     });
 

@@ -18,6 +18,7 @@ interface AuthPageProps {
     phone?: string;
     bio?: string;
     paymentId?: string;
+    couponCode?: string;
   }) => Promise<void>;
 }
 
@@ -40,6 +41,61 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup }) => {
   const [showPayment, setShowPayment] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Coupon flow states
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponSuccessMsg, setCouponSuccessMsg] = useState('');
+  const [couponChecking, setCouponChecking] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponChecking(true);
+    setErrorMsg('');
+    setCouponSuccessMsg('');
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ couponCode: couponCode.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to validate coupon code.');
+      }
+      setCouponApplied(true);
+      setCouponSuccessMsg(data.message);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Invalid coupon code.');
+      setCouponApplied(false);
+    } finally {
+      setCouponChecking(false);
+    }
+  };
+
+  const handleCouponSignup = async () => {
+    setPaymentProcessing(true);
+    setErrorMsg('');
+    try {
+      setPaymentSuccess(true);
+      await onSignup({
+        email,
+        username,
+        pass: password,
+        role,
+        name,
+        phone,
+        bio,
+        couponCode: couponCode.trim()
+      });
+      setShowPayment(false);
+      setPaymentProcessing(false);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Signup failed. Please try again.');
+      setPaymentProcessing(false);
+      setPaymentSuccess(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,28 +340,79 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup }) => {
             </div>
           )}
 
-          {/* Pay button */}
-          <button
-            type="button"
-            onClick={handleRazorpayPayment}
-            className="btn btn-secondary animate-glow"
-            style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700, position: 'relative', overflow: 'hidden' }}
-            disabled={paymentProcessing || paymentSuccess}
-          >
-            {paymentProcessing ? (
-              <>Processing Payment...</>
-            ) : paymentSuccess ? (
-              <>
-                <CheckCircle size={16} style={{ marginRight: '6px' }} />
-                Payment Successful — Creating Account...
-              </>
-            ) : (
-              <>
-                <Shield size={16} style={{ marginRight: '6px' }} />
-                Pay ₹99 & Register
-              </>
+          {/* Coupon Code Input */}
+          <div className="glass-panel" style={{
+            padding: '16px',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.02)',
+            marginBottom: '20px',
+            textAlign: 'left'
+          }}>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Have a Coupon Code?
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                placeholder="e.g. FREE100"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={couponApplied || paymentProcessing}
+                className="glass-input"
+                style={{ flex: 1, padding: '8px 12px', fontSize: '13px', textTransform: 'uppercase', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={couponApplied || paymentProcessing || couponChecking || !couponCode.trim()}
+                className="btn btn-outline"
+                style={{ padding: '0 16px', fontSize: '12px', borderRadius: '8px' }}
+              >
+                {couponChecking ? 'Checking...' : 'Apply'}
+              </button>
+            </div>
+            {couponSuccessMsg && (
+              <div style={{ color: '#22c55e', fontSize: '12px', marginTop: '8px', fontWeight: 600 }}>
+                ✓ {couponSuccessMsg}
+              </div>
             )}
-          </button>
+          </div>
+
+          {/* Action button */}
+          {couponApplied ? (
+            <button
+              type="button"
+              onClick={handleCouponSignup}
+              className="btn animate-glow"
+              style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700, background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
+              disabled={paymentProcessing}
+            >
+              {paymentProcessing ? 'Registering...' : 'Avail Free Registration & Register'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleRazorpayPayment}
+              className="btn btn-secondary animate-glow"
+              style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700, position: 'relative', overflow: 'hidden' }}
+              disabled={paymentProcessing || paymentSuccess}
+            >
+              {paymentProcessing ? (
+                <>Processing Payment...</>
+              ) : paymentSuccess ? (
+                <>
+                  <CheckCircle size={16} style={{ marginRight: '6px' }} />
+                  Payment Successful — Creating Account...
+                </>
+              ) : (
+                <>
+                  <Shield size={16} style={{ marginRight: '6px' }} />
+                  Pay ₹99 & Register
+                </>
+              )}
+            </button>
+          )}
 
           {/* Security badges */}
           <div style={{

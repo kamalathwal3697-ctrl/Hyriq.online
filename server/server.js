@@ -313,11 +313,40 @@ app.get('/api/payments/key', (req, res) => {
   res.json({ keyId: razorpayKeyId });
 });
 
+// Validate coupon code for free registration
+app.post('/api/coupons/validate', (req, res) => {
+  const { couponCode } = req.body;
+  if (!couponCode) {
+    return res.status(400).json({ error: 'Coupon code is required' });
+  }
+
+  const code = couponCode.toUpperCase();
+  const VALID_COUPONS = ['FREE100', 'HYRIQ100', 'FIRST100'];
+  if (!VALID_COUPONS.includes(code)) {
+    return res.status(400).json({ error: 'Invalid coupon code' });
+  }
+
+  const db = readData();
+  const uses = db.users.filter(u => u.usedCouponCode === code).length;
+  const remaining = Math.max(0, 100 - uses);
+
+  if (remaining <= 0) {
+    return res.status(400).json({ error: 'This coupon code has already been used 100 times.' });
+  }
+
+  res.json({
+    valid: true,
+    code,
+    remaining,
+    message: `Coupon code applied! ${remaining} of 100 free slots remaining.`
+  });
+});
+
 // --- AUTHENTICATION ROUTES ---
 
 // Sign Up
 app.post('/api/auth/signup', (req, res) => {
-  const { email, username, password, role, name, phone, bio, paymentId } = req.body;
+  const { email, username, password, role, name, phone, bio, paymentId, couponCode } = req.body;
   if (!email || !password || !role || !name) {
     return res.status(400).json({ error: 'Email, password, role, and name are required' });
   }
@@ -331,31 +360,50 @@ app.post('/api/auth/signup', (req, res) => {
     if (existsUsername) return res.status(400).json({ error: 'Username already taken' });
   }
 
-  // Role-based pricing: Recruiters are FREE, Candidates pay ₹99
+  // Role-based pricing: Recruiters are FREE, Candidates pay ₹99 or use a free coupon code
+  let couponApplied = false;
   if (role === 'candidate') {
-    if (!paymentId) {
-      return res.status(402).json({
-        error: 'Registration fee required for job seekers.',
-        requiresPayment: true,
-        amount: 99,
-        message: 'A one-time registration fee of ₹99 is required for job seekers. Valid for 1 year.'
-      });
+    if (couponCode) {
+      const code = couponCode.toUpperCase();
+      const VALID_COUPONS = ['FREE100', 'HYRIQ100', 'FIRST100'];
+      
+      if (VALID_COUPONS.includes(code)) {
+        const uses = db.users.filter(u => u.usedCouponCode === code).length;
+        if (uses < 100) {
+          couponApplied = true;
+        } else {
+          return res.status(400).json({ error: 'Coupon code limit reached. Only 100 free slots were available.' });
+        }
+      } else {
+        return res.status(400).json({ error: 'Invalid coupon code.' });
+      }
     }
 
-    // Verify payment exists in our records
-    if (!db.payments) db.payments = [];
-    const payment = db.payments.find(p => p.razorpayPaymentId === paymentId && p.status === 'verified');
-    if (!payment) {
-      return res.status(402).json({
-        error: 'Payment verification failed. Please complete the payment first.',
-        requiresPayment: true,
-        amount: 99
-      });
-    }
+    if (!couponApplied) {
+      if (!paymentId) {
+        return res.status(402).json({
+          error: 'Registration fee required for job seekers.',
+          requiresPayment: true,
+          amount: 99,
+          message: 'A one-time registration fee of ₹99 is required for job seekers. Valid for 1 year.'
+        });
+      }
 
-    // Mark payment as used
-    payment.status = 'used';
-    payment.usedByEmail = email;
+      // Verify payment exists in our records
+      if (!db.payments) db.payments = [];
+      const payment = db.payments.find(p => p.razorpayPaymentId === paymentId && p.status === 'verified');
+      if (!payment) {
+        return res.status(402).json({
+          error: 'Payment verification failed. Please complete the payment first.',
+          requiresPayment: true,
+          amount: 99
+        });
+      }
+
+      // Mark payment as used
+      payment.status = 'used';
+      payment.usedByEmail = email;
+    }
   }
 
   const salt = bcrypt.genSaltSync(10);
@@ -380,6 +428,7 @@ app.post('/api/auth/signup', (req, res) => {
     resumeName: role === 'candidate' ? 'No resume uploaded' : undefined,
     onboardingCompleted: role === 'candidate' ? false : undefined,
     subscriptionExpiry,
+    usedCouponCode: couponApplied ? couponCode.toUpperCase() : undefined,
     preferences: role === 'candidate' ? { type: [], mode: [], minSalary: 0, experience: 'Entry-level' } : undefined,
     companyName: role === 'recruiter' ? `${name}'s Organization` : undefined,
     companyBio: role === 'recruiter' ? 'We are hiring progressive talent.' : undefined

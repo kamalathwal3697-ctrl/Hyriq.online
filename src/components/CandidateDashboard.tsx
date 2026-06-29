@@ -20,7 +20,8 @@ export const CandidateDashboard: React.FC = () => {
     selectedJobId,
     setSelectedJobId,
     currentLocation,
-    setCurrentLocation
+    setCurrentLocation,
+    setPerspective
   } = useAppState();
   const [detailsTab, setDetailsTab] = useState<'info' | 'pact'>('info');
   const [showApplyPactModal, setShowApplyPactModal] = useState(false);
@@ -1669,7 +1670,6 @@ export const CandidateDashboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        const { setPerspective } = useAppState();
                         setPerspective('candidate');
                       }}
                       className="btn"
@@ -1680,7 +1680,6 @@ export const CandidateDashboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        const { setPerspective } = useAppState();
                         setPerspective('recruiter');
                       }}
                       className="btn"
