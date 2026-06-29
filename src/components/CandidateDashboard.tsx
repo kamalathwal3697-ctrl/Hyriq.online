@@ -51,11 +51,27 @@ export const CandidateDashboard: React.FC = () => {
   const [inAppBrowserUrl, setInAppBrowserUrl] = useState<string | null>(null);
   const [isClosingExplore, setIsClosingExplore] = useState(false);
   const [isClosingGovt, setIsClosingGovt] = useState(false);
+  
+  // Saved Government Jobs full objects
+  const [savedGovtJobs, setSavedGovtJobs] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('hyriq_saved_govt_job_objects') || '[]');
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('hyriq_saved_govt_job_objects', JSON.stringify(savedGovtJobs));
+  }, [savedGovtJobs]);
+
+  const [currentGovtApplyLink, setCurrentGovtApplyLink] = useState('');
 
   // Fetch Government Job Details when a card is selected
   useEffect(() => {
     if (selectedGovtJob) {
       setSelectedGovtJobDetails('');
+      setCurrentGovtApplyLink(selectedGovtJob.applyLink); // default fallback
       setgovtJobDetailsLoading(true);
       fetch(`/api/govt-jobs/details?url=${encodeURIComponent(selectedGovtJob.applyLink)}`)
         .then(res => {
@@ -64,6 +80,9 @@ export const CandidateDashboard: React.FC = () => {
         })
         .then(data => {
           setSelectedGovtJobDetails(data.html);
+          if (data.directApplyLink) {
+            setCurrentGovtApplyLink(data.directApplyLink);
+          }
           setgovtJobDetailsLoading(false);
         })
         .catch(() => {
@@ -78,9 +97,19 @@ export const CandidateDashboard: React.FC = () => {
   // Fetch Government Jobs based on state & category filters
   useEffect(() => {
     if (activeTab === 'govt') {
+      setSelectedGovtJob(null);
+      
+      if (selectedGovtCategory === 'saved') {
+        setGovtJobsLoading(true);
+        setGovtJobs(savedGovtJobs);
+        if (savedGovtJobs.length > 0) setSelectedGovtJob(savedGovtJobs[0]);
+        setGovtJobsLoading(false);
+        setGovtJobsError('');
+        return;
+      }
+
       setGovtJobsLoading(true);
       setGovtJobsError('');
-      setSelectedGovtJob(null);
       
       const query = new URLSearchParams();
       if (selectedGovtCategory !== 'all') query.append('category', selectedGovtCategory);
@@ -102,7 +131,7 @@ export const CandidateDashboard: React.FC = () => {
           setGovtJobsLoading(false);
         });
     }
-  }, [activeTab, selectedGovtCategory, selectedGovtState]);
+  }, [activeTab, selectedGovtCategory, selectedGovtState, savedGovtJobs]);
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -314,6 +343,15 @@ export const CandidateDashboard: React.FC = () => {
     // Safely pop history state to keep browser back stack in sync
     if (window.innerWidth <= 1024 && window.history.state?.govtJobDetailOpen) {
       window.history.back();
+    }
+  };
+
+  const handleToggleSaveGovtJob = (job: any) => {
+    const exists = savedGovtJobs.some(sj => sj.id === job.id);
+    if (exists) {
+      setSavedGovtJobs(savedGovtJobs.filter(sj => sj.id !== job.id));
+    } else {
+      setSavedGovtJobs([...savedGovtJobs, job]);
     }
   };
 
@@ -789,7 +827,8 @@ export const CandidateDashboard: React.FC = () => {
                 { id: 'teaching', label: 'Teaching Jobs' },
                 { id: 'engineering', label: 'Engineering Jobs' },
                 { id: 'railway', label: 'Railway Jobs' },
-                { id: 'defence', label: 'Police/Defence Jobs' }
+                { id: 'defence', label: 'Police/Defence Jobs' },
+                { id: 'saved', label: '❤️ Saved' }
               ].map(cat => {
                 const isActive = selectedGovtCategory === cat.id && selectedGovtState === 'all';
                 return (
@@ -989,12 +1028,10 @@ export const CandidateDashboard: React.FC = () => {
                     </div>
                   </div>
                 ) : selectedGovtJobDetails ? (
-                  <div 
+                   <div 
                     className="govt-details-content"
                     dangerouslySetInnerHTML={{ __html: selectedGovtJobDetails }} 
                     style={{ 
-                      maxHeight: '450px', 
-                      overflowY: 'auto', 
                       padding: '16px', 
                       background: 'rgba(26, 62, 98, 0.02)', 
                       borderRadius: '12px', 
@@ -1023,28 +1060,53 @@ export const CandidateDashboard: React.FC = () => {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => setInAppBrowserUrl(selectedGovtJob.applyLink)}
-                  className="btn btn-outline"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    borderColor: 'var(--corporate-blue)',
-                    color: 'var(--corporate-blue)',
-                    fontWeight: 600,
-                    padding: '10px',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Open Official Application Portal 🏛️
-                </button>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleSaveGovtJob(selectedGovtJob)}
+                    className="btn btn-outline"
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--corporate-blue)',
+                      color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--corporate-blue)',
+                      background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'rgba(242,153,74,0.08)' : 'transparent',
+                      fontWeight: 600,
+                      padding: '10px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
+                  </button>
+                  <a
+                    href={currentGovtApplyLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                    style={{
+                      flex: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      background: 'var(--corporate-blue)',
+                      color: '#fff',
+                      fontWeight: 700,
+                      padding: '10px',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      fontSize: '13px',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Apply Online ↗
+                  </a>
+                </div>
               </div>
             ) : (
               <div className="seeker-light-card" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>
@@ -2334,8 +2396,6 @@ export const CandidateDashboard: React.FC = () => {
                 className="govt-details-content"
                 dangerouslySetInnerHTML={{ __html: selectedGovtJobDetails }} 
                 style={{ 
-                  maxHeight: '400px', 
-                  overflowY: 'auto', 
                   padding: '16px', 
                   background: 'rgba(255,255,255,0.03)', 
                   borderRadius: '12px', 
@@ -2354,20 +2414,22 @@ export const CandidateDashboard: React.FC = () => {
             {/* Bottom Actions */}
             <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px' }} className="mobile-fixed-bottom-actions">
               <button 
-                className="btn btn-outline" 
-                onClick={handleCloseGovtJobDetails}
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', fontSize: '13px' }}
-              >
-                Close Details
-              </button>
-              <button 
                 type="button"
-                onClick={() => setInAppBrowserUrl(selectedGovtJob.applyLink)}
-                className="btn btn-primary"
-                style={{ flex: 2, padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: 'none' }}
+                onClick={() => handleToggleSaveGovtJob(selectedGovtJob)}
+                className="btn btn-outline" 
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--text-secondary)', borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'rgba(255,255,255,0.15)', background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'rgba(242,153,74,0.08)' : 'transparent', cursor: 'pointer' }}
               >
-                Apply Online 🏛️
+                {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
               </button>
+              <a 
+                href={currentGovtApplyLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ flex: 2, padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--corporate-blue)', color: '#fff' }}
+              >
+                Apply Online ↗
+              </a>
             </div>
           </div>
         </div>

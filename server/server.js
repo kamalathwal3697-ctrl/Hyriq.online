@@ -219,7 +219,43 @@ app.get('/api/govt-jobs/details', async (req, res) => {
       throw new Error('No detailed info tables matched (.scrollable-table)');
     }
 
-    res.json({ html: htmlBlocks.join('\n') });
+    let directApplyLink = null;
+    // Scan all table rows for "apply online"
+    $('tr').each((i, el) => {
+      const cells = $(el).find('td');
+      let hasApplyOnlineLabel = false;
+      cells.each((idx, td) => {
+        const text = $(td).text().toLowerCase();
+        if (text.includes('apply online') || text === 'apply' || text.includes('registration')) {
+          hasApplyOnlineLabel = true;
+        }
+      });
+
+      if (hasApplyOnlineLabel) {
+        // Find link in this row
+        const link = $(el).find('a').attr('href');
+        if (link && !link.includes('freejobalert.com') && !link.includes('javascript:')) {
+          directApplyLink = link;
+          return false; // break tr loop
+        }
+      }
+    });
+
+    // Fallback: If no direct link was found, scan all links in the tables that are not freejobalert
+    if (!directApplyLink) {
+      $('.scrollable-table a').each((i, el) => {
+        const href = $(el).attr('href');
+        if (href && !href.includes('freejobalert.com') && !href.includes('javascript:') && href.startsWith('http')) {
+          directApplyLink = href;
+          return false; // break loop
+        }
+      });
+    }
+
+    res.json({ 
+      html: htmlBlocks.join('\n'),
+      directApplyLink: directApplyLink || url
+    });
   } catch (err) {
     console.error('Govt job details scraping failed:', err);
     res.status(500).json({ error: 'Failed to retrieve detailed information for this job. Please try again later.' });
