@@ -605,6 +605,18 @@ input, textarea {
   }
 }
 
+/* Slide-in page transition keyframes */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Job Detail Full-Page Overlay on Mobile */
 @media (max-width: 1024px) {
   .job-detail-panel {
@@ -631,6 +643,7 @@ input, textarea {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 0 !important;
+    animation: slideInFromRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   .job-detail-panel.job-detail-open > .glass-panel {
@@ -653,5 +666,21 @@ input, textarea {
     width: calc(100% + 48px);
     z-index: 10;
     border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Slide-out page transition keyframe and class */
+  @keyframes slideOutToRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0.5;
+    }
+  }
+
+  .job-detail-panel.job-detail-open.job-detail-closing {
+    animation: slideOutToRight 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
   }
 }

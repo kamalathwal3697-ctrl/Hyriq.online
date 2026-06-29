@@ -49,6 +49,8 @@ export const CandidateDashboard: React.FC = () => {
   const [selectedGovtCategory, setSelectedGovtCategory] = useState('all');
   const [selectedGovtState, setSelectedGovtState] = useState('all');
   const [inAppBrowserUrl, setInAppBrowserUrl] = useState<string | null>(null);
+  const [isClosingExplore, setIsClosingExplore] = useState(false);
+  const [isClosingGovt, setIsClosingGovt] = useState(false);
 
   // Fetch Government Job Details when a card is selected
   useEffect(() => {
@@ -238,10 +240,18 @@ export const CandidateDashboard: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       if (selectedJob) {
-        setSelectedJob(null);
+        setIsClosingExplore(true);
+        setTimeout(() => {
+          setSelectedJob(null);
+          setIsClosingExplore(false);
+        }, 280);
       }
       if (selectedGovtJob) {
-        setSelectedGovtJob(null);
+        setIsClosingGovt(true);
+        setTimeout(() => {
+          setSelectedGovtJob(null);
+          setIsClosingGovt(false);
+        }, 280);
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -258,10 +268,13 @@ export const CandidateDashboard: React.FC = () => {
   };
 
   const handleCloseJobDetails = () => {
-    if (window.innerWidth <= 1024) {
-      window.history.back();
-    } else {
+    setIsClosingExplore(true);
+    setTimeout(() => {
       setSelectedJob(null);
+      setIsClosingExplore(false);
+    }, 280);
+    if (window.innerWidth <= 1024 && window.history.state?.jobDetailOpen) {
+      window.history.back();
     }
   };
 
@@ -273,10 +286,13 @@ export const CandidateDashboard: React.FC = () => {
   };
 
   const handleCloseGovtJobDetails = () => {
-    if (window.innerWidth <= 1024) {
-      window.history.back();
-    } else {
+    setIsClosingGovt(true);
+    setTimeout(() => {
       setSelectedGovtJob(null);
+      setIsClosingGovt(false);
+    }, 280);
+    if (window.innerWidth <= 1024 && window.history.state?.govtJobDetailOpen) {
+      window.history.back();
     }
   };
 
@@ -1937,7 +1953,7 @@ export const CandidateDashboard: React.FC = () => {
 
       {/* Standalone full-page overlay details view rendered outside .container to bypass Android WebView transform rendering context bugs */}
       {activeTab === 'explore' && selectedJob && (
-        <div className="job-detail-panel job-detail-open">
+        <div className={`job-detail-panel job-detail-open ${isClosingExplore ? 'job-detail-closing' : ''}`}>
           <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
             {/* Header */}
             <div>
@@ -2211,7 +2227,7 @@ export const CandidateDashboard: React.FC = () => {
 
       {/* Standalone full-page overlay details view for Government Jobs rendered outside .container to bypass Android WebView transform rendering context bugs */}
       {activeTab === 'govt' && selectedGovtJob && (
-        <div className="job-detail-panel job-detail-open">
+        <div className={`job-detail-panel job-detail-open ${isClosingGovt ? 'job-detail-closing' : ''}`}>
           <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
             {/* Header */}
             <div>
