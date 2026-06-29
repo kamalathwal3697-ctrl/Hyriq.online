@@ -114,6 +114,8 @@ interface AppContextType {
   setRecruiterTab: (tab: 'overview' | 'post-job' | 'manage' | 'settings') => void;
   selectedJobId: string | null;
   setSelectedJobId: (id: string | null) => void;
+  currentLocation: string;
+  setCurrentLocation: (loc: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -138,6 +140,14 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [recruiterTab, setRecruiterTab] = useState<'overview' | 'post-job' | 'manage' | 'settings'>('overview');
 const [promoSlots, setPromoSlots] = useState<number>(100);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [currentLocation, setCurrentLocationState] = useState<string>(() => {
+    return localStorage.getItem('hyriq_selected_location') || 'Bathinda';
+  });
+
+  const setCurrentLocation = (loc: string) => {
+    setCurrentLocationState(loc);
+    localStorage.setItem('hyriq_selected_location', loc);
+  };
    
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
 
@@ -569,7 +579,9 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
         recruiterTab,
         setRecruiterTab,
         selectedJobId,
-        setSelectedJobId
+        setSelectedJobId,
+        currentLocation,
+        setCurrentLocation
       }}
     >
       {children}

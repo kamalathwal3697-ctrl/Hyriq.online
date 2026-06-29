@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, ArrowRight, X } from 'lucide-react';
 import { useAppState } from '../context/AppContext';
+import { getLocationDetails } from '../utils/locationHelper';
 
 export const LandingPage: React.FC = () => {
-  const { setPerspective, promoSlots, jobs } = useAppState();
+  const { setPerspective, promoSlots, jobs, currentLocation } = useAppState();
+  const locDetails = getLocationDetails(currentLocation);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchLoc, setSearchLoc] = useState('');
   
@@ -234,7 +236,7 @@ export const LandingPage: React.FC = () => {
             maxWidth: '850px',
             margin: '0 auto 24px auto'
           }}>
-            Find Your Next <span className="text-gradient-primary">Vibe in Bathinda</span>.<br />
+            Find Your Next <span className="text-gradient-primary">{locDetails.vibeTitle}</span>.<br />
             Hire Your Next <span className="text-gradient-secondary">Rockstar Locally</span>.
           </h1>
 
@@ -245,7 +247,7 @@ export const LandingPage: React.FC = () => {
             margin: '0 auto 40px auto',
             lineHeight: 1.6
           }}>
-            Connecting local talent with verified workplaces in Bathinda... zero broker fees. Direct chat, direct applications, zero hiring noise.
+            {locDetails.tagline}
           </p>
 
           {/* Search Form */}
@@ -283,7 +285,7 @@ export const LandingPage: React.FC = () => {
               <MapPin size={18} color="var(--text-muted)" />
               <input
                 type="text"
-                placeholder="Location (e.g. Bathinda, Remote)..."
+                placeholder={`Location (e.g. ${locDetails.city}, Remote)...`}
                 value={searchLoc}
                 onChange={(e) => setSearchLoc(e.target.value)}
                 style={{

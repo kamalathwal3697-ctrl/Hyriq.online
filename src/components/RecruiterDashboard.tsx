@@ -3,6 +3,7 @@ import { Briefcase, Users, MessageSquare, Plus, Check, X, Calendar, Award, Trash
 import { useAppState } from '../context/AppContext';
 import type { Application } from '../context/AppContext';
 import { ChatWindow } from './ChatWindow';
+import { getLocationDetails } from '../utils/locationHelper';
 
 export const RecruiterDashboard: React.FC = () => {
   const {
@@ -15,7 +16,8 @@ export const RecruiterDashboard: React.FC = () => {
     sendChatMessage,
     deleteJob,
     recruiterTab: activeTab,
-    setRecruiterTab: setActiveTab
+    setRecruiterTab: setActiveTab,
+    currentLocation
   } = useAppState();
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<any>(null);
@@ -753,7 +755,7 @@ export const RecruiterDashboard: React.FC = () => {
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✉️ <strong>{candidateProfile.email}</strong></div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📞 <strong>{candidateProfile.phone}</strong></div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📍 <strong>Bathinda, Punjab</strong></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📍 <strong>{currentLocation}, {getLocationDetails(currentLocation).state}</strong></div>
                     </div>
 
                     {/* View Signed Legal Pact Button */}

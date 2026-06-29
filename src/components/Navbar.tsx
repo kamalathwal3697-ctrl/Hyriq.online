@@ -2,9 +2,10 @@ import React from 'react';
 import { Briefcase, User, Shield, Compass, LogOut } from 'lucide-react';
 import { useAppState } from '../context/AppContext';
 import type { Perspective } from '../context/AppContext';
+import { SUPPORTED_LOCATIONS } from '../utils/locationHelper';
 
 export const Navbar: React.FC = () => {
-  const { perspective, setPerspective, token, user, logout } = useAppState();
+  const { perspective, setPerspective, token, user, logout, currentLocation, setCurrentLocation } = useAppState();
 
   const handleRoleChange = (role: Perspective) => {
     setPerspective(role);
@@ -114,6 +115,39 @@ export const Navbar: React.FC = () => {
 
         {/* Perspective Switcher & Session Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Location Switcher dropdown */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '6px', 
+            background: 'rgba(255, 255, 255, 0.04)', 
+            border: '1px solid var(--border-color)', 
+            padding: '5px 12px', 
+            borderRadius: '24px' 
+          }}>
+            <span style={{ fontSize: '13px' }}>📍</span>
+            <select 
+              value={currentLocation} 
+              onChange={(e) => setCurrentLocation(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                fontSize: '12px',
+                fontWeight: 650,
+                outline: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Outfit, var(--sans-font)'
+              }}
+            >
+              {Object.keys(SUPPORTED_LOCATIONS).map(loc => (
+                <option key={loc} value={loc} style={{ background: '#090714', color: '#fff' }}>
+                  {loc}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Switcher */}
           <div style={{
             display: 'flex',

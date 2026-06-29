@@ -5,6 +5,7 @@ import type { Job, Application } from '../context/AppContext';
 import { ChatWindow } from './ChatWindow';
 import { OnboardingModal } from './OnboardingModal';
 import { AppTour } from './AppTour';
+import { SUPPORTED_LOCATIONS, getLocationDetails } from '../utils/locationHelper';
 
 export const CandidateDashboard: React.FC = () => {
   const {
@@ -17,7 +18,9 @@ export const CandidateDashboard: React.FC = () => {
     candidateTab: activeTab,
     setCandidateTab: setActiveTab,
     selectedJobId,
-    setSelectedJobId
+    setSelectedJobId,
+    currentLocation,
+    setCurrentLocation
   } = useAppState();
   const [detailsTab, setDetailsTab] = useState<'info' | 'pact'>('info');
   const [showApplyPactModal, setShowApplyPactModal] = useState(false);
@@ -26,6 +29,7 @@ export const CandidateDashboard: React.FC = () => {
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<Application | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const locDetails = getLocationDetails(currentLocation);
 
   useEffect(() => {
     const tourCompleted = localStorage.getItem('hyriq_tour_completed');
@@ -98,8 +102,12 @@ export const CandidateDashboard: React.FC = () => {
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState(currentLocation);
   const [categoryFilter, setCategoryFilter] = useState('');
+
+  useEffect(() => {
+    setLocationQuery(currentLocation);
+  }, [currentLocation]);
   const [typeFilter, setTypeFilter] = useState<string[]>([]);
   const [modeFilter, setModeFilter] = useState<string[]>([]);
   const [experienceFilter, setExperienceFilter] = useState<string[]>([]);
@@ -415,10 +423,10 @@ export const CandidateDashboard: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h2 style={{ fontSize: '24px', fontWeight: 700, color: isLightMode ? 'var(--corporate-blue)' : '#fff' }}>
-              Welcome back, {candidateProfile.name}
+              {locDetails.greeting} Welcome back, {candidateProfile.name}
             </h2>
             <p style={{ color: isLightMode ? '#475569' : 'var(--text-secondary)', fontSize: '14px' }}>
-              Let's land your dream workspace.
+              Let's land your dream workspace in {locDetails.city}.
             </p>
           </div>
 
@@ -1614,7 +1622,7 @@ export const CandidateDashboard: React.FC = () => {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✉️ <strong>{profileEmail}</strong></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📞 <strong>{profilePhone}</strong></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📍 <strong>Bathinda, Punjab</strong></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📍 <strong>{currentLocation}, {locDetails.state}</strong></div>
               </div>
             </div>
 
@@ -1684,14 +1692,18 @@ export const CandidateDashboard: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Region/Location (Punjab Specifics)</label>
-                  <select className="glass-input" style={{ fontSize: '13px' }}>
-                    <option>Bathinda, Punjab</option>
-                    <option>Patiala, Punjab</option>
-                    <option>Amritsar, Punjab</option>
-                    <option>Ludhiana, Punjab</option>
-                    <option>Jalandhar, Punjab</option>
-                    <option>Mohali, Punjab</option>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Region/Location (National)</label>
+                  <select 
+                    className="glass-input" 
+                    style={{ fontSize: '13px', background: '#090714', color: '#fff' }}
+                    value={currentLocation}
+                    onChange={(e) => setCurrentLocation(e.target.value)}
+                  >
+                    {Object.keys(SUPPORTED_LOCATIONS).map(loc => (
+                      <option key={loc} value={loc} style={{ background: '#090714', color: '#fff' }}>
+                        {loc} ({SUPPORTED_LOCATIONS[loc].state})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
