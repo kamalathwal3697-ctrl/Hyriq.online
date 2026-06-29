@@ -76,7 +76,7 @@ export interface RecruiterProfile {
   bio: string;
 }
 
-export type Perspective = 'visitor' | 'candidate' | 'recruiter';
+export type Perspective = 'visitor' | 'candidate' | 'recruiter' | 'job-detail';
 
 interface AppContextType {
   perspective: Perspective;
@@ -112,6 +112,8 @@ interface AppContextType {
   setCandidateTab: (tab: 'explore' | 'govt' | 'applications' | 'profile' | 'settings') => void;
   recruiterTab: 'overview' | 'post-job' | 'manage' | 'settings';
   setRecruiterTab: (tab: 'overview' | 'post-job' | 'manage' | 'settings') => void;
+  selectedJobId: string | null;
+  setSelectedJobId: (id: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -134,8 +136,9 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [applications, setApplications] = useState<Application[]>([]);
   const [candidateTab, setCandidateTab] = useState<'explore' | 'govt' | 'applications' | 'profile' | 'settings'>('explore');
   const [recruiterTab, setRecruiterTab] = useState<'overview' | 'post-job' | 'manage' | 'settings'>('overview');
-  const [promoSlots, setPromoSlots] = useState<number>(100);
-  
+const [promoSlots, setPromoSlots] = useState<number>(100);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+   
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
 
   // Request browser notification permissions on token activation
@@ -564,7 +567,9 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         candidateTab,
         setCandidateTab,
         recruiterTab,
-        setRecruiterTab
+        setRecruiterTab,
+        selectedJobId,
+        setSelectedJobId
       }}
     >
       {children}

@@ -423,6 +423,7 @@ export const CandidateDashboard: React.FC = () => {
 
         {/* EXPLORE JOBS VIEW */}
         {activeTab === 'explore' && (
+          <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="explore-grid">
             {/* Compact Inline Filter Bar */}
             <aside className="seeker-light-card" style={{ padding: '10px 16px', borderRadius: '14px' }}>
@@ -658,16 +659,18 @@ export const CandidateDashboard: React.FC = () => {
                 })
               )}
             </div>
+          </main>
+        </div>
 
-            {/* Job Details Panel — full-page overlay on mobile */}
-            <div className={`job-detail-panel ${selectedJob ? 'job-detail-open' : ''}`} style={{ position: 'sticky', top: '80px', maxHeight: 'calc(100vh - 100px)', overflowY: 'auto', paddingRight: '4px' }}>
-              {selectedJob ? (
-                <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  {/* Header */}
-                  <div>
-                    <button
-                      onClick={() => setSelectedJob(null)}
-                      style={{
+        {/* Job Details Panel — full-page overlay on mobile, sticky side panel on desktop */}
+        {selectedJob && (
+          <div className="job-detail-panel job-detail-open">
+            <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
+              {/* Header */}
+              <div>
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  style={{
                         background: 'transparent',
                         border: 'none',
                         color: 'var(--text-secondary)',
@@ -928,17 +931,12 @@ export const CandidateDashboard: React.FC = () => {
                         Apply Now
                       </button>
                     )}
-                  </div>
                 </div>
-              ) : (
-                <div className="glass-panel" style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  Select a job card to view its full details.
-                </div>
-              )}
+              </div>
             </div>
-          </main>
-        </div>
-      )}
+          )}
+          </>
+        )}
 
       {/* GOVT JOBS VIEW */}
       {activeTab === 'govt' && (
