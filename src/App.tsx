@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppStateProvider, useAppState } from './context/AppContext';
 import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
@@ -25,6 +25,59 @@ const AppContent: React.FC = () => {
     selectedJobId
   } = useAppState();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Pull-to-Refresh States
+  const [pullStart, setPullStart] = useState<number | null>(null);
+  const [pullChange, setPullChange] = useState<number>(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (window.scrollY === 0) {
+        setPullStart(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (pullStart === null || isRefreshing) return;
+      const currentY = e.touches[0].clientY;
+      const diff = currentY - pullStart;
+
+      if (diff > 0) {
+        const frictionDiff = Math.min(diff * 0.4, 80);
+        setPullChange(frictionDiff);
+        
+        if (diff > 10) {
+          if (e.cancelable) e.preventDefault();
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (pullStart === null || isRefreshing) return;
+      
+      if (pullChange >= 50) {
+        setIsRefreshing(true);
+        setPullChange(50);
+        setTimeout(() => {
+          window.location.reload();
+        }, 850);
+      } else {
+        setPullChange(0);
+      }
+      setPullStart(null);
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [pullStart, pullChange, isRefreshing]);
 
   const showBackButton = (() => {
     if (!token) return false;
@@ -76,6 +129,45 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app-container">
+      {/* Instagram-style Pull-to-Refresh Spinner */}
+      {(pullChange > 0 || isRefreshing) && (
+        <div style={{
+          position: 'fixed',
+          top: `${Math.max(10, pullChange - 20)}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '38px',
+          height: '38px',
+          borderRadius: '50%',
+          background: '#1e293b',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          transition: pullStart === null ? 'all 0.3s ease' : 'none',
+          opacity: Math.min(pullChange / 40, 1)
+        }}>
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="var(--tech-orange)" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className={isRefreshing ? "pull-refresh-spin" : ""}
+            style={{
+              transform: `rotate(${isRefreshing ? 0 : pullChange * 4}deg)`
+            }}
+          >
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+        </div>
+      )}
+
       <Navbar />
       
       {/* Mobile Top Branding Bar */}

@@ -722,3 +722,17 @@ input, textarea {
 .pulse-live {
   animation: pulseLiveDot 2s infinite ease-in-out;
 }
+
+/* Pull-to-refresh spinner rotation animation */
+@keyframes spinRefresh {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pull-refresh-spin {
+  animation: spinRefresh 0.8s linear infinite !important;
+}
