@@ -9,6 +9,7 @@ const isMobileLayout = () => {
 
 export const CandidateExplorer: React.FC = () => {
   const { token, user, setPerspective, setVisitorRole } = useAppState();
+  
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -108,6 +109,10 @@ export const CandidateExplorer: React.FC = () => {
       </span>
     ));
   };
+
+  if (user && user.role === 'candidate') {
+    return null;
+  }
 
   return (
     <div style={{ minHeight: 'calc(100vh - 80px)' }}>

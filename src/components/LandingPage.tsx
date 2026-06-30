@@ -127,7 +127,8 @@ export const LandingPage: React.FC = () => {
     { name: 'Sales & Operations', count: getCategoryCount('Sales & Operations'), icon: <MessageSquare size={20} color="#22d3ee" /> }
   ];
 
-  if (visitorRole === null) {
+  const isCandidateUser = user && user.role === 'candidate';
+  if (visitorRole === null && !isCandidateUser) {
     return (
       <div className="animate-fade-in" style={{
         minHeight: 'calc(100vh - 80px)',
@@ -248,54 +249,56 @@ export const LandingPage: React.FC = () => {
     );
   }
 
-  if (visitorRole === 'recruiter') {
+  if (visitorRole === 'recruiter' && !isCandidateUser) {
     return <CandidateExplorer />;
   }
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '80px', position: 'relative' }}>
       {/* Dynamic Visitor Sub-Header Selector for Mobile App */}
-      <div className="visitor-role-header" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '12px 16px',
-        background: 'rgba(255, 255, 255, 0.02)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-        gap: '12px'
-      }}>
-        <button 
-          onClick={() => setVisitorRole('seeker')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 700,
-            background: 'var(--primary)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
-          }}
-        >
-          🔍 Find a Job (Option 1)
-        </button>
-        <button 
-          onClick={() => setVisitorRole('recruiter')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 700,
-            background: 'rgba(255,255,255,0.03)',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: 'none'
-          }}
-        >
-          💼 Search Candidates (Option 2)
-        </button>
-      </div>
+      {!isCandidateUser && (
+        <div className="visitor-role-header" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '12px 16px',
+          background: 'rgba(255, 255, 255, 0.02)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          gap: '12px'
+        }}>
+          <button 
+            onClick={() => setVisitorRole('seeker')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 700,
+              background: 'var(--primary)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
+            }}
+          >
+            🔍 Find a Job (Option 1)
+          </button>
+          <button 
+            onClick={() => setVisitorRole('recruiter')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 700,
+              background: 'rgba(255,255,255,0.03)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: 'none'
+            }}
+          >
+            💼 Search Candidates (Option 2)
+          </button>
+        </div>
+      )}
       {/* Launch Offer Promo Popup Overlay */}
       {showPromo && (
         <div style={{
