@@ -10,7 +10,7 @@ import Razorpay from 'razorpay';
 import * as cheerio from 'cheerio';
 import https from 'https';
 import url from 'url';
-import { initDb, readData, writeData } from './db.js';
+import { initDb, readData, writeData, syncFromGCS } from './db.js';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
@@ -1188,7 +1188,14 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-// Start listening
-app.listen(PORT, () => {
-  console.log(`Hyriq backend server running at http://localhost:${PORT}`);
+// Start listening after GCS sync completes
+syncFromGCS().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Hyriq backend server running at http://localhost:${PORT}`);
+  });
+}).catch(err => {
+  console.error('[GCS Sync] Startup sync failed, launching server fallback:', err.message);
+  app.listen(PORT, () => {
+    console.log(`Hyriq backend server running at http://localhost:${PORT}`);
+  });
 });

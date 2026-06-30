@@ -1,8 +1,77 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+import { Storage } from '@google-cloud/storage';
+
+dotenv.config();
 
 const DB_FILE = path.join(process.cwd(), 'db.json');
+
+// Initialize Google Cloud Storage if config is provided
+const bucketName = process.env.GCS_BUCKET_NAME;
+const projectId = process.env.GCS_PROJECT_ID;
+const keyFilePath = process.env.GCS_KEY_FILE_PATH;
+const credentialsJson = process.env.GCS_CREDENTIALS_JSON;
+
+let storage;
+let bucket;
+
+if (bucketName) {
+  try {
+    const storageOptions = { projectId };
+    if (keyFilePath) {
+      storageOptions.keyFilename = keyFilePath;
+    } else if (credentialsJson) {
+      storageOptions.credentials = JSON.parse(credentialsJson);
+    }
+    storage = new Storage(storageOptions);
+    bucket = storage.bucket(bucketName);
+    console.log(`[GCS Sync] Configured for bucket: ${bucketName}`);
+  } catch (err) {
+    console.error('[GCS Sync] Initialization error:', err.message);
+  }
+} else {
+  console.log('[GCS Sync] GCS_BUCKET_NAME not set. Falling back to local db.json file.');
+}
+
+const downloadDbFromGCS = async () => {
+  if (!bucket) return false;
+  try {
+    const file = bucket.file('db.json');
+    const [exists] = await file.exists();
+    if (exists) {
+      console.log('[GCS Sync] Downloading latest db.json from GCS...');
+      await file.download({ destination: DB_FILE });
+      console.log('[GCS Sync] Successfully synchronized database from Google Cloud Storage.');
+      return true;
+    } else {
+      console.log('[GCS Sync] db.json does not exist in GCS bucket yet.');
+    }
+  } catch (err) {
+    console.error('[GCS Sync] Failed to download from GCS:', err.message);
+  }
+  return false;
+};
+
+let gcsSyncCompleted = false;
+let gcsSyncPromise = null;
+
+export const syncFromGCS = async () => {
+  if (gcsSyncCompleted) return;
+  if (!gcsSyncPromise) {
+    gcsSyncPromise = (async () => {
+      const downloaded = await downloadDbFromGCS();
+      gcsSyncCompleted = true;
+      if (downloaded) {
+        console.log('[GCS Sync] Startup GCS sync finished.');
+      } else {
+        initDb();
+      }
+    })();
+  }
+  return gcsSyncPromise;
+};
 
 const defaultJobs = [
   {
@@ -591,4 +660,16 @@ export const readData = () => {
 
 export const writeData = (data) => {
   fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  if (bucket) {
+    bucket.upload(DB_FILE, {
+      destination: 'db.json',
+      metadata: {
+        cacheControl: 'no-cache',
+      }
+    }).then(() => {
+      console.log('[GCS Sync] Successfully backed up database (db.json) to Google Cloud Storage.');
+    }).catch(err => {
+      console.error('[GCS Sync] Failed to upload database backup to GCS:', err.message);
+    });
+  }
 };
