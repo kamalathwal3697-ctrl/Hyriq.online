@@ -118,6 +118,8 @@ interface AppContextType {
   setSelectedJobId: (id: string | null) => void;
   currentLocation: string;
   setCurrentLocation: (loc: string) => void;
+  visitorRole: 'seeker' | 'recruiter' | null;
+  setVisitorRole: (role: 'seeker' | 'recruiter' | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -126,6 +128,19 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [perspective, setPerspective] = useState<Perspective>(() => {
     return (localStorage.getItem('hyriq_perspective') as Perspective) || 'visitor';
   });
+
+  const [visitorRole, setVisitorRoleState] = useState<'seeker' | 'recruiter' | null>(() => {
+    return (localStorage.getItem('hyriq_visitor_role') as 'seeker' | 'recruiter' | null) || null;
+  });
+
+  const setVisitorRole = (role: 'seeker' | 'recruiter' | null) => {
+    setVisitorRoleState(role);
+    if (role) {
+      localStorage.setItem('hyriq_visitor_role', role);
+    } else {
+      localStorage.removeItem('hyriq_visitor_role');
+    }
+  };
 
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('hyriq_token');
@@ -493,6 +508,8 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
     localStorage.removeItem('hyriq_user');
     localStorage.removeItem('hyriq_candidate_tab');
     localStorage.removeItem('hyriq_recruiter_tab');
+    localStorage.removeItem('hyriq_visitor_role');
+    setVisitorRoleState(null);
     setPerspective('visitor');
   };
 
@@ -618,7 +635,9 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
         selectedJobId,
         setSelectedJobId,
         currentLocation,
-        setCurrentLocation
+        setCurrentLocation,
+        visitorRole,
+        setVisitorRole
       }}
     >
       {children}

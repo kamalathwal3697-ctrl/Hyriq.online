@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, ArrowRight, X } from 'lucide-react';
+import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, ArrowRight, X, Compass, Briefcase } from 'lucide-react';
 import { useAppState } from '../context/AppContext';
 import { getLocationDetails } from '../utils/locationHelper';
+import { CandidateExplorer } from './CandidateExplorer';
 
 export const LandingPage: React.FC = () => {
-  const { setPerspective, promoSlots, jobs, currentLocation, user } = useAppState();
+  const { setPerspective, promoSlots, jobs, currentLocation, user, visitorRole, setVisitorRole } = useAppState();
   const locDetails = getLocationDetails(currentLocation);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchLoc, setSearchLoc] = useState('');
@@ -125,6 +126,131 @@ export const LandingPage: React.FC = () => {
     { name: 'Marketing & Content', count: getCategoryCount('Marketing & Content'), icon: <TrendingUp size={20} color="#fb7185" /> },
     { name: 'Sales & Operations', count: getCategoryCount('Sales & Operations'), icon: <MessageSquare size={20} color="#22d3ee" /> }
   ];
+
+  if (visitorRole === null) {
+    return (
+      <div className="animate-fade-in" style={{
+        minHeight: 'calc(100vh - 80px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 20px',
+        background: 'radial-gradient(circle at top right, rgba(249, 115, 22, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.05), transparent 40%)'
+      }}>
+        <div style={{ maxWidth: '900px', width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          
+          {/* Headline */}
+          <div>
+            <span className="badge badge-warning" style={{ fontSize: '11px', padding: '4px 12px', marginBottom: '16px' }}>
+              ✨ Welcome to Hyriq Bathinda
+            </span>
+            <h1 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1.2, fontFamily: 'Outfit' }}>
+              How would you like to use <span className="text-gradient">Hyriq</span> today?
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '15px', marginTop: '12px', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
+              Select your path to browse local job opportunities or connect with verified job seekers instantly.
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', margin: '12px 0' }}>
+            
+            {/* Option 1: Job Seeker */}
+            <div 
+              onClick={() => setVisitorRole('seeker')}
+              className="glass-panel hover-card" 
+              style={{
+                padding: '40px 32px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                border: '1px solid rgba(99, 102, 241, 0.15)',
+                background: 'rgba(99, 102, 241, 0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                height: '320px',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
+              <div>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '16px',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '24px',
+                  border: '1px solid rgba(99, 102, 241, 0.2)'
+                }}>
+                  <Compass size={32} color="var(--primary)" />
+                </div>
+                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: '0 0 10px 0', fontFamily: 'Outfit' }}>
+                  Job Seeker
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.5, margin: 0 }}>
+                  Browse local listings in Bathinda, complete your preference quiz, and chat directly with verified recruiters.
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+                Explore Available Jobs <ArrowRight size={16} />
+              </div>
+            </div>
+
+            {/* Option 2: Recruiter */}
+            <div 
+              onClick={() => setVisitorRole('recruiter')}
+              className="glass-panel hover-card" 
+              style={{
+                padding: '40px 32px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                border: '1px solid rgba(249, 115, 22, 0.15)',
+                background: 'rgba(249, 115, 22, 0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                height: '320px',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
+              <div>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '16px',
+                  background: 'rgba(249, 115, 22, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '24px',
+                  border: '1px solid rgba(249, 115, 22, 0.2)'
+                }}>
+                  <Briefcase size={30} color="var(--tech-orange)" />
+                </div>
+                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: '0 0 10px 0', fontFamily: 'Outfit' }}>
+                  Recruiter / Employer
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.5, margin: 0 }}>
+                  Search verified candidate profiles, post active listings, review academic / work backgrounds, and recruit instantly.
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+                Search Candidate Profiles <ArrowRight size={16} />
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  if (visitorRole === 'recruiter') {
+    return <CandidateExplorer />;
+  }
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '80px', position: 'relative' }}>

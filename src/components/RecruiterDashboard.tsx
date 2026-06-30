@@ -18,10 +18,12 @@ export const RecruiterDashboard: React.FC = () => {
     recruiterTab: activeTab,
     setRecruiterTab: setActiveTab,
     currentLocation,
-    user
+    user,
+    token
   } = useAppState();
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<any>(null);
+  const [allCandidates, setAllCandidates] = useState<any[]>([]);
 
   // Job post form states
   const [jobTitle, setJobTitle] = useState('');
@@ -80,6 +82,90 @@ export const RecruiterDashboard: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?.email === 'raj_athwal' && activeTab === 'overview' && token) {
+      fetch('/api/admin/candidates', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => {
+          if (res.ok) return res.json();
+          throw new Error('Unauthorized');
+        })
+        .then(data => setAllCandidates(data))
+        .catch(err => console.error('Failed to load registered candidates:', err));
+    }
+  }, [user, activeTab, token]);
+
+  const [sheetUrl, setSheetUrl] = useState('');
+
+  // Fetch sheets configuration on mount
+  useEffect(() => {
+    if (user?.email === 'raj_athwal' && activeTab === 'overview' && token) {
+      fetch('/api/admin/sheets-config', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.googleSheetWebappUrl) {
+            setSheetUrl(data.googleSheetWebappUrl);
+          }
+        })
+        .catch(err => console.error('Failed to load sheets config:', err));
+    }
+  }, [user, activeTab, token]);
+
+  const handleSaveSheetConfig = () => {
+    if (!token) return;
+    fetch('/api/admin/sheets-config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ googleSheetWebappUrl: sheetUrl })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Google Sheet Web App URL updated successfully!');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to save sheets config:', err);
+        alert('Failed to save configuration.');
+      });
+  };
+
+  const handleSyncAllSheets = () => {
+    if (!token) return;
+    if (!confirm('Are you sure you want to sync all registered candidates and recruiters to the Google Sheet? This will append all records.')) return;
+    
+    fetch('/api/admin/sync-sheets', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to trigger sheets sync:', err);
+        alert('Failed to trigger synchronization.');
+      });
+  };
 
   // Set default selected job
   useEffect(() => {
@@ -412,6 +498,274 @@ export const RecruiterDashboard: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Admin section: All Registered Candidates */}
+          {user?.email === 'raj_athwal' && (
+            <div className="glass-panel" style={{ padding: '24px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                👥 Registered Candidates ({allCandidates.length})
+              </h3>
+              {allCandidates.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)' }}>
+                  No candidates registered yet.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {allCandidates.map((cand, idx) => (
+                    <div key={idx} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', textAlign: 'left' }}>
+                      
+                      {/* Candidate Header Summary */}
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'start', flexWrap: 'wrap' }}>
+                        <div className="avatar" style={{
+                          width: '50px',
+                          height: '50px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, var(--tech-orange) 0%, #1A3E62 100%)',
+                          padding: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <div style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '50%',
+                            background: '#0B0E14',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '14px',
+                            overflow: 'hidden'
+                          }}>
+                            {cand.logoSeed && (cand.logoSeed.startsWith('data:image/') || cand.logoSeed.startsWith('http')) ? (
+                              <img src={cand.logoSeed} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              cand.logoSeed || '🧑‍💻'
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                          <h4 style={{ color: '#fff', fontSize: '16px', fontWeight: 600, margin: 0 }}>{cand.name || 'Anonymous User'}</h4>
+                          <span style={{ fontSize: '11px', color: 'var(--tech-orange)', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginTop: '4px' }}>
+                            ⚡ {cand.experience || 'Entry-level'}
+                          </span>
+                          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: '6px 0 0 0', lineHeight: 1.4 }}>
+                            {cand.bio || 'No biography details provided.'}
+                          </p>
+                        </div>
+                        
+                        {/* Contact details badge card */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          <div>✉️ <strong>{cand.email}</strong></div>
+                          <div>📞 <strong>{cand.phone || 'No phone number'}</strong></div>
+                          <div>📄 <strong>{cand.resumeName || 'No resume uploaded'}</strong></div>
+                        </div>
+                      </div>
+
+                      {/* Detailed sections: Skills, Academics, Work History, Certifications */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
+                        
+                        {/* Column 1: Skills & Preferences */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <div>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Key Skills</span>
+                            {cand.skills && cand.skills.length > 0 ? (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {cand.skills.map((s: string) => (
+                                  <span key={s} className="badge" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '10px', padding: '3px 8px', borderRadius: '4px' }}>
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>None selected</span>
+                            )}
+                          </div>
+                          
+                          {cand.preferences && (
+                            <div style={{ marginTop: '4px' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Preferences</span>
+                              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                <div>🏡 Mode: {cand.preferences.mode?.join(', ') || 'Any'}</div>
+                                <div>💼 Type: {cand.preferences.type?.join(', ') || 'Any'}</div>
+                                <div>💰 Target: ₹{cand.preferences.minSalary?.toLocaleString()}/mo</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Column 2: Academics */}
+                        <div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Education / Academics</span>
+                          {cand.academicsList && cand.academicsList.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {cand.academicsList.map((ac: any, i: number) => (
+                                <div key={i} style={{ fontSize: '12px', background: 'rgba(255,255,255,0.01)', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                  <strong style={{ color: '#fff' }}>{ac.degree}</strong>
+                                  <div style={{ color: 'var(--text-secondary)', fontSize: '11px', marginTop: '2px' }}>{ac.school} ({ac.year}) • {ac.grade}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No education data provided.</span>
+                          )}
+                        </div>
+
+                        {/* Column 3: Work Experiences */}
+                        <div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Work Experience</span>
+                          {cand.workExperiences && cand.workExperiences.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {cand.workExperiences.map((we: any, i: number) => (
+                                <div key={i} style={{ fontSize: '12px', background: 'rgba(255,255,255,0.01)', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                  <strong style={{ color: '#fff' }}>{we.role}</strong> at <span style={{ color: 'var(--tech-orange)' }}>{we.company}</span>
+                                  <div style={{ color: 'var(--text-muted)', fontSize: '10.5px', margin: '2px 0 4px 0' }}>{we.duration}</div>
+                                  <div style={{ color: 'var(--text-secondary)', fontSize: '11px', lineHeight: 1.4 }}>{we.description}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No work experiences provided.</span>
+                          )}
+                        </div>
+
+                        {/* Column 4: Certifications */}
+                        <div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Certifications</span>
+                          {cand.certifications && cand.certifications.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {cand.certifications.map((cer: any, i: number) => (
+                                <div key={i} style={{ fontSize: '12px', background: 'rgba(255,255,255,0.01)', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                  <strong style={{ color: '#fff' }}>{cer.name}</strong>
+                                  <div style={{ color: 'var(--text-secondary)', fontSize: '11px', marginTop: '2px' }}>Issuer: {cer.issuer} ({cer.year})</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No certifications provided.</span>
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Admin section: Google Sheet Integration */}
+          {user?.email === 'raj_athwal' && (
+            <div className="glass-panel" style={{ padding: '24px', marginTop: '24px', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                📊 Google Sheets Integration
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  Automatically stream registered candidate and recruiter data to a Google Sheet. Follow the instructions below to configure.
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <input
+                    type="url"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    value={sheetUrl}
+                    onChange={(e) => setSheetUrl(e.target.value)}
+                    className="glass-input"
+                    style={{ flex: 1, minWidth: '280px' }}
+                  />
+                  <button onClick={handleSaveSheetConfig} className="btn btn-primary" style={{ padding: '10px 20px' }}>
+                    Save Configuration
+                  </button>
+                  {sheetUrl && (
+                    <button onClick={handleSyncAllSheets} className="btn btn-outline" style={{ padding: '10px 20px' }}>
+                      Sync All Existing Users
+                    </button>
+                  )}
+                </div>
+
+                {/* Setup Instructions Accordion */}
+                <details style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '8px', padding: '12px 16px' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#fff', fontSize: '13.5px' }}>
+                    📖 Step-by-Step Configuration Guide & Apps Script Code
+                  </summary>
+                  <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px', lineHeight: 1.6 }}>
+                    <div>
+                      1. Create a new Google Sheet. Rename the first sheet tab to <strong>Candidates</strong> and create a second sheet tab named <strong>Recruiters</strong>.
+                    </div>
+                    <div>
+                      2. From the top menu, go to <strong>Extensions &gt; Apps Script</strong>.
+                    </div>
+                    <div>
+                      3. Delete any default code in the editor, and paste the following Google Apps Script code:
+                      <pre style={{ background: '#090714', padding: '14px', borderRadius: '6px', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--tech-orange)', fontSize: '11px', marginTop: '6px' }}>
+{`function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var sheetName = data.role === 'candidate' ? 'Candidates' : 'Recruiters';
+    
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName);
+    
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      if (data.role === 'candidate') {
+        sheet.appendRow(['Registered At', 'ID', 'Name', 'Email', 'Phone', 'Experience', 'Bio', 'Skills']);
+      } else {
+        sheet.appendRow(['Registered At', 'ID', 'Name', 'Email', 'Phone', 'Company Name', 'Bio']);
+      }
+    }
+    
+    var timestamp = new Date();
+    if (data.role === 'candidate') {
+      sheet.appendRow([
+        timestamp,
+        data.id || '',
+        data.name || '',
+        data.email || '',
+        data.phone || '',
+        data.experience || 'Entry-level',
+        data.bio || '',
+        (data.skills || []).join(', ')
+      ]);
+    } else {
+      sheet.appendRow([
+        timestamp,
+        data.id || '',
+        data.name || '',
+        data.email || '',
+        data.phone || '',
+        data.companyName || '',
+        data.bio || ''
+      ]);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`}
+                      </pre>
+                    </div>
+                    <div>
+                      4. Click the <strong>Save</strong> icon. Then click <strong>Deploy &gt; New Deployment</strong>.
+                    </div>
+                    <div>
+                      5. Select gear icon ⚙️ next to Select type, choose <strong>Web App</strong>. Set description, set "Execute as" to <strong>Me</strong>, and set "Who has access" to <strong>Anyone</strong> (critical so the server can push registrations).
+                    </div>
+                    <div>
+                      6. Click <strong>Deploy</strong>, authorize Google permissions if prompted, copy the generated <strong>Web App URL</strong>, paste it into the field above, and click <strong>Save Configuration</strong>.
+                    </div>
+                  </div>
+                </details>
+
+              </div>
+            </div>
+          )}
         </div>
       )}
 

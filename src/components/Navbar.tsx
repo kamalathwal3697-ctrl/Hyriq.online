@@ -5,7 +5,7 @@ import type { Perspective } from '../context/AppContext';
 import { SUPPORTED_LOCATIONS } from '../utils/locationHelper';
 
 export const Navbar: React.FC = () => {
-  const { perspective, setPerspective, token, user, logout, currentLocation, setCurrentLocation } = useAppState();
+  const { perspective, setPerspective, token, user, logout, currentLocation, setCurrentLocation, visitorRole, setVisitorRole } = useAppState();
 
   const handleRoleChange = (role: Perspective) => {
     setPerspective(role);
@@ -30,7 +30,10 @@ export const Navbar: React.FC = () => {
       }}>
         {/* Brand Logo */}
         <div 
-          onClick={() => handleRoleChange('visitor')}
+          onClick={() => {
+            setPerspective('visitor');
+            setVisitorRole(null);
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -80,18 +83,24 @@ export const Navbar: React.FC = () => {
           {perspective === 'visitor' && (
             <>
               <a 
-                onClick={() => handleRoleChange('candidate')} 
-                style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '14px', cursor: 'pointer', transition: 'color 0.2s' }}
+                onClick={() => {
+                  setPerspective('visitor');
+                  setVisitorRole('seeker');
+                }} 
+                style={{ color: visitorRole === 'seeker' ? '#fff' : 'var(--text-secondary)', textDecoration: 'none', fontWeight: visitorRole === 'seeker' ? 700 : 500, fontSize: '14px', cursor: 'pointer', transition: 'color 0.2s' }}
                 onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
-                onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                onMouseOut={(e) => (e.currentTarget.style.color = visitorRole === 'seeker' ? '#fff' : 'var(--text-secondary)')}
               >
                 Find a Job
               </a>
               <a 
-                onClick={() => handleRoleChange('recruiter')}
-                style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '14px', cursor: 'pointer', transition: 'color 0.2s' }}
+                onClick={() => {
+                  setPerspective('visitor');
+                  setVisitorRole('recruiter');
+                }}
+                style={{ color: visitorRole === 'recruiter' ? '#fff' : 'var(--text-secondary)', textDecoration: 'none', fontWeight: visitorRole === 'recruiter' ? 700 : 500, fontSize: '14px', cursor: 'pointer', transition: 'color 0.2s' }}
                 onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
-                onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                onMouseOut={(e) => (e.currentTarget.style.color = visitorRole === 'recruiter' ? '#fff' : 'var(--text-secondary)')}
               >
                 Post a Job
               </a>
@@ -158,7 +167,10 @@ export const Navbar: React.FC = () => {
             position: 'relative'
           }}>
             <button
-              onClick={() => handleRoleChange('visitor')}
+              onClick={() => {
+                setPerspective('visitor');
+                setVisitorRole(null);
+              }}
               style={{
                 padding: '6px 12px',
                 borderRadius: '20px',

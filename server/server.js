@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import * as cheerio from 'cheerio';
+import https from 'https';
+import url from 'url';
 import { initDb, readData, writeData } from './db.js';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
@@ -29,6 +31,82 @@ try {
 } catch (e) {
   console.warn('Razorpay initialization skipped (missing keys). Payment features will not work.');
 }
+
+// Google Sheets synchronization helper
+const syncUserToGoogleSheet = (user) => {
+  const db = readData();
+  const webappUrl = db.config?.googleSheetWebappUrl || process.env.GOOGLE_SHEET_WEBAPP_URL;
+  if (!webappUrl) {
+    console.log('[Google Sheet Sync] GOOGLE_SHEET_WEBAPP_URL not set, skipping sync.');
+    return;
+  }
+
+  const payload = {
+    role: user.role,
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || '',
+    experience: user.experience || 'Entry-level',
+    bio: user.bio || '',
+    skills: user.skills || [],
+    companyName: user.companyName || ''
+  };
+
+  if (typeof fetch !== 'undefined') {
+    fetch(webappUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json().catch(() => ({ status: 'raw' })))
+      .then(data => console.log('[Google Sheet Sync] Sync successful via fetch:', data))
+      .catch(err => console.error('[Google Sheet Sync] Fetch error:', err.message));
+  } else {
+    try {
+      const parsedUrl = url.parse(webappUrl);
+      const postData = JSON.stringify(payload);
+
+      const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+        path: parsedUrl.path,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        if (res.statusCode === 302 || res.statusCode === 301 || res.statusCode === 307) {
+          const redirectUrl = res.headers.location;
+          if (redirectUrl) {
+            const parsedRedirect = url.parse(redirectUrl);
+            const redirectOptions = {
+              hostname: parsedRedirect.hostname,
+              path: parsedRedirect.path,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+              }
+            };
+            const redirectReq = https.request(redirectOptions);
+            redirectReq.write(postData);
+            redirectReq.end();
+            return;
+          }
+        }
+      });
+      req.on('error', (err) => console.error('[Google Sheet Sync] Fallback error:', err.message));
+      req.write(postData);
+      req.end();
+    } catch (e) {
+      console.error('[Google Sheet Sync] Fallback exception:', e.message);
+    }
+  }
+};
 
 app.use(cors());
 app.use(express.json());
@@ -589,6 +667,7 @@ app.post('/api/auth/signup', (req, res) => {
 
   db.users.push(newUser);
   writeData(db);
+  syncUserToGoogleSheet(newUser);
 
   // Generate Token
   const token = jwt.sign({ id: userId, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
@@ -632,6 +711,77 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 
   const { passwordHash, ...userProfile } = user;
   res.json(userProfile);
+});
+
+// Get all registered candidates (Admin Raj only)
+app.get('/api/admin/candidates', authenticateToken, (req, res) => {
+  if (req.user.email !== 'raj_athwal') {
+    return res.status(403).json({ error: 'Only administrator Raj can view all registered candidates' });
+  }
+
+  const db = readData();
+  const candidates = db.users.filter(u => u.role === 'candidate').map(u => {
+    const { passwordHash, ...safeCandidate } = u;
+    return safeCandidate;
+  });
+
+  res.json(candidates);
+});
+
+// Get sheets config (Admin Raj only)
+app.get('/api/admin/sheets-config', authenticateToken, (req, res) => {
+  if (req.user.email !== 'raj_athwal') {
+    return res.status(403).json({ error: 'Only administrator Raj can access configurations' });
+  }
+  const db = readData();
+  res.json({ googleSheetWebappUrl: db.config?.googleSheetWebappUrl || '' });
+});
+
+// Update sheets config (Admin Raj only)
+app.post('/api/admin/sheets-config', authenticateToken, (req, res) => {
+  if (req.user.email !== 'raj_athwal') {
+    return res.status(403).json({ error: 'Only administrator Raj can modify configurations' });
+  }
+  const { googleSheetWebappUrl } = req.body;
+  const db = readData();
+  db.config = db.config || {};
+  db.config.googleSheetWebappUrl = googleSheetWebappUrl;
+  writeData(db);
+  res.json({ success: true, message: 'Google Sheet Web App URL updated successfully.' });
+});
+
+// Sync all existing users to sheets (Admin Raj only)
+app.post('/api/admin/sync-sheets', authenticateToken, (req, res) => {
+  if (req.user.email !== 'raj_athwal') {
+    return res.status(403).json({ error: 'Only administrator Raj can trigger batch synchronization' });
+  }
+  const db = readData();
+  const webappUrl = db.config?.googleSheetWebappUrl || process.env.GOOGLE_SHEET_WEBAPP_URL;
+  if (!webappUrl) {
+    return res.status(400).json({ error: 'Google Sheet Web App URL has not been configured yet.' });
+  }
+
+  db.users.forEach(u => {
+    syncUserToGoogleSheet(u);
+  });
+
+  res.json({ success: true, message: `Queued synchronization for ${db.users.length} registered users.` });
+});
+
+// Get all registered candidates (Public/Visitor Recruiter View)
+app.get('/api/visitor/candidates', (req, res) => {
+  const db = readData();
+  const candidates = db.users.filter(u => u.role === 'candidate').map(u => {
+    const { passwordHash, email, phone, ...safeCandidate } = u;
+    // Keep email and phone hidden or optional for visitors until they sign in
+    return {
+      ...safeCandidate,
+      email: '[Hidden until signed in]',
+      phone: '[Hidden until signed in]'
+    };
+  });
+
+  res.json(candidates);
 });
 
 // Update Profile details
