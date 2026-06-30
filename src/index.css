@@ -528,7 +528,7 @@ input, textarea {
   display: none !important;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 767px), (max-width: 1024px) and (orientation: portrait) {
   /* Hide standard scrollbars on mobile */
   ::-webkit-scrollbar {
     display: none !important;
@@ -594,7 +594,7 @@ input, textarea {
 }
 
 /* Responsive Grid Overrides for Mobile WebView */
-@media (max-width: 1024px) {
+@media (max-width: 767px), (max-width: 1024px) and (orientation: portrait) {
   .profile-grid, .explore-grid {
     grid-template-columns: 1fr !important;
     gap: 24px !important;
@@ -618,7 +618,7 @@ input, textarea {
 }
 
 /* Job Detail Full-Page Overlay on Mobile */
-@media (max-width: 1024px) {
+@media (max-width: 767px), (max-width: 1024px) and (orientation: portrait) {
   .job-detail-panel {
     display: none !important;
   }
@@ -735,4 +735,16 @@ input, textarea {
 
 .pull-refresh-spin {
   animation: spinRefresh 0.8s linear infinite !important;
+}
+
+/* Desktop overrides to hide mobile job detail overlays */
+.job-detail-panel {
+  display: none !important;
+}
+
+/* Mobile overrides for explore sidebar */
+@media (max-width: 767px), (max-width: 1024px) and (orientation: portrait) {
+  .explore-sidebar {
+    display: none !important;
+  }
 }

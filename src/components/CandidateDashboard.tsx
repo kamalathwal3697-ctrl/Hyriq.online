@@ -7,6 +7,11 @@ import { OnboardingModal } from './OnboardingModal';
 import { AppTour } from './AppTour';
 import { SUPPORTED_LOCATIONS, getLocationDetails } from '../utils/locationHelper';
 
+const isMobileLayout = () => {
+  const isPortrait = window.innerHeight > window.innerWidth;
+  return window.innerWidth <= 767 || (window.innerWidth <= 1024 && isPortrait);
+};
+
 export const CandidateDashboard: React.FC = () => {
   const {
     jobs,
@@ -150,7 +155,7 @@ export const CandidateDashboard: React.FC = () => {
       if (selectedGovtCategory === 'saved') {
         setGovtJobsLoading(true);
         setGovtJobs(savedGovtJobs);
-        if (savedGovtJobs.length > 0 && window.innerWidth > 1024) {
+        if (savedGovtJobs.length > 0 && !isMobileLayout()) {
           setSelectedGovtJob(savedGovtJobs[0]);
         }
         setGovtJobsLoading(false);
@@ -172,7 +177,7 @@ export const CandidateDashboard: React.FC = () => {
         })
         .then(data => {
           setGovtJobs(data);
-          if (data.length > 0 && window.innerWidth > 1024) {
+          if (data.length > 0 && !isMobileLayout()) {
             setSelectedGovtJob(data[0]);
           }
           setGovtJobsLoading(false);
@@ -307,7 +312,7 @@ export const CandidateDashboard: React.FC = () => {
 
   // Update details panel selection if jobs list changes (only on desktop layout)
   useEffect(() => {
-    const isDesktop = window.innerWidth > 1024;
+    const isDesktop = !isMobileLayout();
     if (isDesktop && jobs.length > 0 && !selectedJob) {
       setSelectedJob(jobs[0]);
     }
@@ -360,7 +365,7 @@ export const CandidateDashboard: React.FC = () => {
 
   const handleSelectJob = (job: Job) => {
     setSelectedJob(job);
-    if (window.innerWidth <= 1024) {
+    if (isMobileLayout()) {
       window.history.pushState({ jobDetailOpen: true }, '');
     }
   };
@@ -373,14 +378,14 @@ export const CandidateDashboard: React.FC = () => {
       setIsClosingExplore(false);
     }, 280);
     // Safely pop history state to keep browser back stack in sync
-    if (window.innerWidth <= 1024 && window.history.state?.jobDetailOpen) {
+    if (isMobileLayout() && window.history.state?.jobDetailOpen) {
       window.history.back();
     }
   };
 
   const handleSelectGovtJob = (job: any) => {
     setSelectedGovtJob(job);
-    if (window.innerWidth <= 1024) {
+    if (isMobileLayout()) {
       window.history.pushState({ govtJobDetailOpen: true }, '');
     }
   };
@@ -393,7 +398,7 @@ export const CandidateDashboard: React.FC = () => {
       setIsClosingGovt(false);
     }, 280);
     // Safely pop history state to keep browser back stack in sync
-    if (window.innerWidth <= 1024 && window.history.state?.govtJobDetailOpen) {
+    if (isMobileLayout() && window.history.state?.govtJobDetailOpen) {
       window.history.back();
     }
   };
@@ -436,7 +441,26 @@ export const CandidateDashboard: React.FC = () => {
     return matchesSearch && matchesLocation && matchesCategory && matchesType && matchesMode && matchesExperience && matchesPreferenceQuiz;
   });
 
+  const getJobTimestamp = (job: any) => {
+    if (job.id.startsWith('job-')) {
+      const parts = job.id.split('-');
+      const timestampStr = parts[1];
+      if (timestampStr && /^\d+$/.test(timestampStr)) {
+        const ts = parseInt(timestampStr, 10);
+        if (ts > 1000000000000) {
+          return ts;
+        }
+      }
+    }
+    return 0;
+  };
+
   const sortedJobs = [...filteredJobs].sort((a, b) => {
+    const timeA = getJobTimestamp(a);
+    const timeB = getJobTimestamp(b);
+    if (timeA !== timeB) {
+      return timeB - timeA;
+    }
     if (candidateProfile.onboardingCompleted) {
       return calculateMatchScore(b) - calculateMatchScore(a);
     }
@@ -782,7 +806,6 @@ export const CandidateDashboard: React.FC = () => {
                 </div>
               ) : (
                 sortedJobs.map(job => {
-                  const hasApplied = applications.some(app => app.jobId === job.id && app.candidateId === 'cand-1');
                   const isSelected = selectedJob?.id === job.id;
                   return (
                     <div 
@@ -847,17 +870,268 @@ export const CandidateDashboard: React.FC = () => {
                         ))}
                         {job.skills.length > 3 && <span style={{ fontSize: '10px', color: '#64748b', alignSelf: 'center', fontWeight: 600 }}>+{job.skills.length - 3} more</span>}
                       </div>
-
-                      {hasApplied && (
-                        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success)', fontSize: '12px', fontWeight: 700 }}>
-                          <UserCheck size={12} /> Applied
-                        </div>
-                      )}
                     </div>
                   );
                 })
               )}
             </div>
+
+            {/* Right Column: Sticky Detail Panel for Explore Jobs */}
+            <aside className="explore-sidebar" style={{ position: 'sticky', top: '24px', flexShrink: 0 }}>
+              {selectedJob ? (
+                <div className="seeker-light-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid rgba(26, 62, 98, 0.1)', borderRadius: '14px', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto', textAlign: 'left' }}>
+                  {/* Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    <div>
+                      <span className="badge badge-primary" style={{ marginBottom: '8px', background: 'rgba(242,153,74,0.15)', color: 'var(--tech-orange)', border: '1px solid rgba(242,153,74,0.3)', display: 'inline-block' }}>{selectedJob.experience}</span>
+                      <h3 style={{ color: 'var(--corporate-blue)', fontSize: '18px', fontWeight: 800, marginBottom: '4px', marginTop: 0 }}>{selectedJob.title}</h3>
+                      <p style={{ color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', margin: 0 }}>{selectedJob.companyName}</p>
+                    </div>
+                    <div className="avatar" style={{
+                      width: '45px',
+                      height: '45px',
+                      fontSize: '16px',
+                      flexShrink: 0,
+                      background: `linear-gradient(135deg, #${selectedJob.logoSeed.charCodeAt(0).toString(16)}6df2 0%, #F2994A 100%)`
+                    }}>
+                      {selectedJob.logoSeed}
+                    </div>
+                  </div>
+
+                  {/* Basic Info */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(26,62,98,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(26,62,98,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
+                      <MapPin size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Location:</strong> {selectedJob.location} ({selectedJob.mode})</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
+                      <IndianRupee size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Compensation:</strong> {selectedJob.salary}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
+                      <Briefcase size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Job Type:</strong> {selectedJob.type}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#10b981', fontWeight: 600, borderTop: '1px solid rgba(26,62,98,0.05)', paddingTop: '8px', marginTop: '4px' }}>
+                      <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+                      <span>💬 Chat Live Hours: {selectedJob.chatLiveHours || '10:00 AM - 1:00 PM'}</span>
+                    </div>
+                  </div>
+
+                  {/* Compatibility Score Widget */}
+                  {candidateProfile.onboardingCompleted && (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #132B45 0%, #1A3E62 100%)',
+                      border: '1.5px solid rgba(242, 153, 74, 0.4)',
+                      borderRadius: '16px',
+                      padding: '16px',
+                      color: '#fff',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      boxShadow: '0 8px 24px rgba(26, 62, 98, 0.15)'
+                    }}>
+                      <div style={{ flex: 1, zIndex: 2 }}>
+                        <h5 style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1px', color: 'var(--tech-orange)', textTransform: 'uppercase', marginBottom: '4px', marginTop: 0 }}>
+                          Compatibility Score
+                        </h5>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '24px', fontWeight: 800, color: '#fff' }}>
+                            {calculateMatchScore(selectedJob)}%
+                          </span>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            background: 'rgba(242, 153, 74, 0.2)',
+                            color: 'var(--tech-orange)',
+                            padding: '1px 6px',
+                            borderRadius: '20px'
+                          }}>
+                            {calculateMatchScore(selectedJob) >= 80 ? 'High Vibe 🔥' : calculateMatchScore(selectedJob) >= 50 ? 'Good Vibe' : 'Low Alignment'}
+                          </span>
+                        </div>
+                      </div>
+                      <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', zIndex: 1 }} />
+                    </div>
+                  )}
+
+                  {/* Job details tab control */}
+                  <div style={{ display: 'flex', borderBottom: '1px solid rgba(26,62,98,0.1)', gap: '16px', marginBottom: '4px' }}>
+                    <button
+                      onClick={() => setDetailsTab('info')}
+                      style={{
+                        padding: '8px 0',
+                        background: 'transparent',
+                        border: 'none',
+                        color: detailsTab === 'info' ? 'var(--tech-orange)' : 'var(--text-muted)',
+                        borderBottom: detailsTab === 'info' ? '2px solid var(--tech-orange)' : 'none',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: 600
+                      }}
+                    >
+                      Job Details
+                    </button>
+                    <button
+                      onClick={() => setDetailsTab('pact')}
+                      style={{
+                        padding: '8px 0',
+                        background: 'transparent',
+                        border: 'none',
+                        color: detailsTab === 'pact' ? 'var(--tech-orange)' : 'var(--text-muted)',
+                        borderBottom: detailsTab === 'pact' ? '2px solid var(--tech-orange)' : 'none',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      🛡️ Fair Work Pact {selectedJob.fairWorkPact && <span style={{ fontSize: '9px', color: 'var(--success)' }}>● Verified</span>}
+                    </button>
+                  </div>
+
+                  {/* Tab contents */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
+                    {detailsTab === 'info' ? (
+                      <>
+                        {/* Skills */}
+                        <div>
+                          <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>Required Skills</h4>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            {selectedJob.skills.map(skill => (
+                              <span key={skill} className="badge seeker-tag" style={{ borderRadius: '6px', fontSize: '11px', padding: '4px 8px' }}>{skill}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>Job Description</h4>
+                          <p style={{ color: '#475569', fontSize: '12.5px', lineHeight: '1.5', margin: 0 }}>{selectedJob.description}</p>
+                        </div>
+
+                        {/* Requirements */}
+                        {selectedJob.requirements && selectedJob.requirements.length > 0 && (
+                          <div>
+                            <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>What you will bring</h4>
+                            <ul style={{ paddingLeft: '16px', color: '#475569', fontSize: '12.5px', display: 'flex', flexDirection: 'column', gap: '4px', margin: 0 }}>
+                              {selectedJob.requirements.map((req, i) => (
+                                <li key={i}>{req}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Benefits */}
+                        {selectedJob.benefits && selectedJob.benefits.length > 0 && (
+                          <div>
+                            <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>Perks & Benefits</h4>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                              {selectedJob.benefits.map((benefit, i) => (
+                                <div key={i} style={{ fontSize: '11.5px', color: '#475569', background: 'rgba(26,62,98,0.03)', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(26,62,98,0.05)' }}>
+                                  ✨ {benefit}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{
+                          background: 'rgba(16, 185, 129, 0.04)',
+                          border: '1px solid rgba(16, 185, 129, 0.2)',
+                          padding: '12px',
+                          borderRadius: '8px'
+                        }}>
+                          <h4 style={{ color: '#0f766e', fontSize: '13px', fontWeight: 700, marginBottom: '4px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            🛡️ Fair Work Pact Signed
+                          </h4>
+                          <p style={{ color: '#0f766e', fontSize: '11px', lineHeight: 1.4, margin: 0 }}>
+                            Both parties commit to standard hours, overtime pay, safe conditions, and integrity.
+                          </p>
+                        </div>
+                        <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
+                          <div>
+                            <h5 style={{ color: 'var(--corporate-blue)', fontSize: '12px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>
+                              Employer Commitments
+                            </h5>
+                            <ul style={{ paddingLeft: '14px', color: '#475569', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '3px', margin: 0 }}>
+                              <li>Standard limited work schedule</li>
+                              <li>Guaranteed overtime pay</li>
+                              <li>Merit-based growth & raises</li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h5 style={{ color: 'var(--corporate-blue)', fontSize: '12px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>
+                              Employee Commitments
+                            </h5>
+                            <ul style={{ paddingLeft: '14px', color: '#475569', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '3px', margin: 0 }}>
+                              <li>Punctuality & schedules</li>
+                              <li>Prompt communication</li>
+                              <li>Ownership of tasks</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ borderTop: '1px solid rgba(26,62,98,0.1)', paddingTop: '16px', display: 'flex', gap: '8px' }}>
+                    {applications.some(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1') ? (
+                      <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                        <button className="btn btn-outline" style={{ flex: 1, padding: '10px', borderRadius: '10px', fontSize: '13px' }} disabled>
+                          Applied ✓
+                        </button>
+                        {selectedJob.fairWorkPact && (
+                          <button 
+                            onClick={() => {
+                              const matchingApp = applications.find(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1');
+                              if (matchingApp) {
+                                setContractApp(matchingApp);
+                                setShowContractModal(true);
+                              }
+                            }}
+                            className="btn btn-primary" 
+                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '10px', borderRadius: '10px', fontSize: '13px' }}
+                          >
+                            🛡️ View Pact Deed
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => {
+                          if (selectedJob.fairWorkPact) {
+                            setPactChecked(false);
+                            setTypedSignature('');
+                            setShowApplyPactModal(true);
+                          } else {
+                            handleApply(selectedJob.id);
+                          }
+                        }} 
+                        className="btn btn-seeker-active" 
+                        style={{ 
+                          flex: 1, 
+                          fontWeight: 700,
+                          padding: '10px',
+                          borderRadius: '10px',
+                          fontSize: '13px'
+                        }}
+                      >
+                        Apply Now
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center', color: '#64748b', fontWeight: 600, border: '1px solid rgba(26, 62, 98, 0.1)', borderRadius: '12px' }}>
+                  Select a job listing to view details and apply.
+                </div>
+              )}
+            </aside>
           </main>
         </div>
 
@@ -1410,7 +1684,7 @@ export const CandidateDashboard: React.FC = () => {
                     chatHistory={currentApp.chatHistory}
                     currentRole="candidate"
                     onSendMessage={(text) => sendChatMessage(currentApp.id, text, 'candidate')}
-                    title={`Sarah Jenkins (Recruiter)`}
+                    title={`${currentApp.recruiterName || currentApp.recruiterSignature || 'Recruiter'}`}
                     showReciprocalBanner={currentApp.status === 'Shortlisted' || currentApp.status === 'Interview'}
                     onConfirmProfile={() => {
                       sendChatMessage(currentApp.id, "[SYSTEM: Candidate confirmed profile and verified mutual interest.]", 'candidate');

@@ -46,6 +46,7 @@ export interface Application {
   candidateSignedAt?: string;
   recruiterSignature?: string;
   recruiterSignedAt?: string;
+  recruiterName?: string;
 }
 
 export interface CandidateProfile {

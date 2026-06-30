@@ -860,7 +860,19 @@ app.get('/api/applications', authenticateToken, (req, res) => {
     // Attach chatHistory by matching application messages
     const appsWithChat = candidateApps.map(app => {
       const chatHistory = db.messages.filter(msg => msg.applicationId === app.id);
-      return { ...app, chatHistory };
+      
+      const job = db.jobs.find(j => j.id === app.jobId);
+      let recruiterName = 'Recruiter';
+      if (job) {
+        const recruiterUser = db.users.find(u => u.id === job.recruiterId);
+        if (recruiterUser && recruiterUser.name) {
+          recruiterName = recruiterUser.name;
+        } else if (app.recruiterSignature) {
+          recruiterName = app.recruiterSignature;
+        }
+      }
+      
+      return { ...app, chatHistory, recruiterName };
     });
     
     return res.json(appsWithChat);
@@ -939,6 +951,7 @@ app.post('/api/applications', authenticateToken, (req, res) => {
 
   res.status(201).json({
     ...newApp,
+    recruiterName: recruiter ? recruiter.name : (job.fairWorkPact ? recruiterSignature : 'Recruiter'),
     chatHistory: [initialMsg]
   });
 });

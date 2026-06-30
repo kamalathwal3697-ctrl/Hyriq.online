@@ -83,14 +83,14 @@ export const RecruiterDashboard: React.FC = () => {
 
   // Set default selected job
   useEffect(() => {
-    const recruiterJobs = jobs.filter(j => j.recruiterId === 'rec-1');
+    const recruiterJobs = jobs.filter(j => j.recruiterId === (user?.id || 'rec-1'));
     if (recruiterJobs.length > 0 && !selectedJobId) {
       setSelectedJobId(recruiterJobs[0].id);
     }
-  }, [jobs, selectedJobId]);
+  }, [jobs, selectedJobId, user]);
 
   // Recruiter posted jobs
-  const myJobs = jobs.filter(job => job.recruiterId === 'rec-1');
+  const myJobs = jobs.filter(job => job.recruiterId === (user?.id || 'rec-1'));
   const activeApplications = applications.filter(app => 
     myJobs.some(j => j.id === app.jobId)
   );
