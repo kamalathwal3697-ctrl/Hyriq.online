@@ -29,3 +29,5 @@ server/db.json
 
 # Environment secrets
 .env
+
+.vercel

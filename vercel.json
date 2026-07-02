@@ -9,7 +9,7 @@
       "destination": "https://hyriq.onrender.com/hyriq.apk"
     },
     {
-      "source": "/:(path*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
