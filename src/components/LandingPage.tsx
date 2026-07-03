@@ -155,47 +155,30 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', margin: '12px 0' }}>
+          <div className="visitor-choice-grid">
             
             {/* Option 1: Job Seeker */}
             <div 
               onClick={() => setVisitorRole('seeker')}
-              className="glass-panel hover-card" 
+              className="glass-panel hover-card visitor-choice-card" 
               style={{
-                padding: '40px 32px',
-                cursor: 'pointer',
-                textAlign: 'left',
                 border: '1px solid rgba(99, 102, 241, 0.15)',
-                background: 'rgba(99, 102, 241, 0.02)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '320px',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                background: 'rgba(99, 102, 241, 0.02)'
               }}
             >
               <div>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '16px',
+                <div className="icon-container" style={{
                   background: 'rgba(99, 102, 241, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '24px',
                   border: '1px solid rgba(99, 102, 241, 0.2)'
                 }}>
                   <Compass size={32} color="var(--primary)" />
                 </div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: '0 0 10px 0', fontFamily: 'Outfit' }}>
-                  Job Seeker
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.5, margin: 0 }}>
+                <h2>Job Seeker</h2>
+                <p>
                   Browse local listings in Bathinda, complete your preference quiz, and chat directly with verified recruiters.
                 </p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+              <div className="action-link" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
                 Explore Available Jobs <ArrowRight size={16} />
               </div>
             </div>
@@ -203,42 +186,25 @@ export const LandingPage: React.FC = () => {
             {/* Option 2: Recruiter */}
             <div 
               onClick={() => setVisitorRole('recruiter')}
-              className="glass-panel hover-card" 
+              className="glass-panel hover-card visitor-choice-card" 
               style={{
-                padding: '40px 32px',
-                cursor: 'pointer',
-                textAlign: 'left',
                 border: '1px solid rgba(249, 115, 22, 0.15)',
-                background: 'rgba(249, 115, 22, 0.02)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '320px',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                background: 'rgba(249, 115, 22, 0.02)'
               }}
             >
               <div>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '16px',
+                <div className="icon-container" style={{
                   background: 'rgba(249, 115, 22, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '24px',
                   border: '1px solid rgba(249, 115, 22, 0.2)'
                 }}>
                   <Briefcase size={30} color="var(--tech-orange)" />
                 </div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: '0 0 10px 0', fontFamily: 'Outfit' }}>
-                  Recruiter / Employer
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.5, margin: 0 }}>
+                <h2>Recruiter / Employer</h2>
+                <p>
                   Search verified candidate profiles, post active listings, review academic / work backgrounds, and recruit instantly.
                 </p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+              <div className="action-link" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
                 Search Candidate Profiles <ArrowRight size={16} />
               </div>
             </div>
