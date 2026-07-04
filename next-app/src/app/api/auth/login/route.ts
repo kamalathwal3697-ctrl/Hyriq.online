@@ -55,7 +55,8 @@ export async function POST(req: Request) {
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
     // Set HTTP-Only Cookie
-    cookies().set('hyriq_token', token, {
+    const cookieStore = await cookies();
+    cookieStore.set('hyriq_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

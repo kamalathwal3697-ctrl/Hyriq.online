@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'production') {
 
 export async function GET() {
   try {
-    const sessionUser = getSessionUser();
+    const sessionUser = await getSessionUser();
     
     if (!sessionUser || !sessionUser.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
