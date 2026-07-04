@@ -31,3 +31,5 @@ server/db.json
 .env
 
 .vercel
+
+/src/generated/prisma

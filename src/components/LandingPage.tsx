@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Search, MapPin, Sparkles, TrendingUp, Zap, MessageSquare, ShieldCheck, ArrowRight, X, Compass, Briefcase } from 'lucide-react';
 import { useAppState } from '../context/AppContext';
 import { getLocationDetails } from '../utils/locationHelper';
@@ -55,9 +56,7 @@ export const LandingPage: React.FC = () => {
     }
   }, [user]);
   
-  const [showPromo, setShowPromo] = useState(() => {
-    return sessionStorage.getItem('hyriq_promo_dismissed') !== 'true';
-  });
+  const [showPromo, setShowPromo] = useState(false);
 
   const dismissPromo = () => {
     sessionStorage.setItem('hyriq_promo_dismissed', 'true');
@@ -139,79 +138,70 @@ export const LandingPage: React.FC = () => {
         padding: '40px 20px',
         background: 'radial-gradient(circle at top right, rgba(249, 115, 22, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.05), transparent 40%)'
       }}>
-        <div style={{ maxWidth: '900px', width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          
-          {/* Headline */}
-          <div>
-            <span className="badge badge-warning" style={{ fontSize: '11px', padding: '4px 12px', marginBottom: '16px' }}>
-              ✨ Welcome to Hyriq Bathinda
-            </span>
-            <h1 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1.2, fontFamily: 'Outfit' }}>
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 bg-gradient-to-br from-orange-950/10 to-indigo-950/10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center max-w-4xl w-full"
+        >
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
               How would you like to use <span className="text-gradient">Hyriq</span> today?
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '15px', marginTop: '12px', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
+            <p className="text-muted-foreground text-lg mt-4 max-w-2xl mx-auto">
               Select your path to browse local job opportunities or connect with verified job seekers instantly.
             </p>
           </div>
 
           {/* Cards Grid */}
-          <div className="visitor-choice-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
             
             {/* Option 1: Job Seeker */}
-            <div 
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setVisitorRole('seeker')}
-              className="glass-panel hover-card visitor-choice-card" 
-              style={{
-                border: '1px solid rgba(99, 102, 241, 0.15)',
-                background: 'rgba(99, 102, 241, 0.02)'
-              }}
+              className="glass p-8 rounded-2xl cursor-pointer hover:border-primary/50 transition-colors flex flex-col justify-between"
             >
               <div>
-                <div className="icon-container" style={{
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)'
-                }}>
-                  <Compass size={32} color="var(--primary)" />
+                <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl inline-block mb-6">
+                  <Compass size={32} className="text-primary" />
                 </div>
-                <h2>Job Seeker</h2>
-                <p>
+                <h2 className="text-2xl font-semibold mb-3">Job Seeker</h2>
+                <p className="text-muted-foreground">
                   Browse local listings in Bathinda, complete your preference quiz, and chat directly with verified recruiters.
                 </p>
               </div>
-              <div className="action-link" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+              <div className="flex items-center gap-2 text-primary font-bold mt-6">
                 Explore Available Jobs <ArrowRight size={16} />
               </div>
-            </div>
+            </motion.div>
 
             {/* Option 2: Recruiter */}
-            <div 
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setVisitorRole('recruiter')}
-              className="glass-panel hover-card visitor-choice-card" 
-              style={{
-                border: '1px solid rgba(249, 115, 22, 0.15)',
-                background: 'rgba(249, 115, 22, 0.02)'
-              }}
+              className="glass p-8 rounded-2xl cursor-pointer hover:border-orange-500/50 transition-colors flex flex-col justify-between"
             >
               <div>
-                <div className="icon-container" style={{
-                  background: 'rgba(249, 115, 22, 0.1)',
-                  border: '1px solid rgba(249, 115, 22, 0.2)'
-                }}>
-                  <Briefcase size={30} color="var(--tech-orange)" />
+                <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl inline-block mb-6">
+                  <Briefcase size={32} className="text-orange-500" />
                 </div>
-                <h2>Recruiter / Employer</h2>
-                <p>
+                <h2 className="text-2xl font-semibold mb-3">Recruiter / Employer</h2>
+                <p className="text-muted-foreground">
                   Search verified candidate profiles, post active listings, review academic / work backgrounds, and recruit instantly.
                 </p>
               </div>
-              <div className="action-link" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', marginTop: '16px' }}>
+              <div className="flex items-center gap-2 text-orange-500 font-bold mt-6">
                 Search Candidate Profiles <ArrowRight size={16} />
               </div>
-            </div>
+            </motion.div>
 
           </div>
 
-        </div>
+        </motion.div>
       </div>
     );
   }
