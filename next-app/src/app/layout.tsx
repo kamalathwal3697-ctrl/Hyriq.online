@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/context/AppContext";
 
@@ -8,9 +8,16 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-serif-editorial",
+});
+
 export const metadata: Metadata = {
-  title: "HYRIQ | Punjab's Vibe Match Career Platform",
-  description: "Create a modern hiring platform where companies can post jobs and candidates can find jobs, apply instantly, chat with recruiters, upload resumes, and receive AI-powered recommendations.",
+  title: "HYRIQ | sleep deeply, hire fully",
+  description: "A premium AI-powered vibe matching career platform designed for modern professional hiring.",
 };
 
 export default function RootLayout({
@@ -21,9 +28,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-zinc-950 text-slate-50 antialiased selection:bg-indigo-500/20">
+      <body className="min-h-full flex flex-col font-sans bg-[#f4f4f4] text-[#111111] antialiased selection:bg-neutral-800/10">
         <AppStateProvider>
           {children}
         </AppStateProvider>

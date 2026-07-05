@@ -33,21 +33,19 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, padding: '12px 20px' }}>
+    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, padding: 0 }}>
       <div 
         style={{
           margin: '0 auto',
-          maxWidth: '1400px',
-          borderRadius: '30px',
-          background: 'rgba(20, 20, 25, 0.65)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255,255,255,0.08)',
+          maxWidth: '100%',
+          background: 'rgba(244, 244, 244, 0.75)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '8px 16px',
+          padding: '12px 24px',
           transition: 'all 0.3s ease'
         }}
       >
@@ -55,33 +53,28 @@ const Navbar: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div 
             onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
           >
-            <BrainNLogo size={28} />
-            <span style={{ 
-              fontSize: '18px', 
-              fontWeight: 800, 
-              background: 'linear-gradient(135deg, #fff 0%, #a5b4fc 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              letterSpacing: '-0.5px'
-            }}>
-              Hyriq
+            <BrainNLogo size={24} variant="dark" />
+            <span 
+              className="font-serif-editorial italic text-2xl font-normal text-[#111111] tracking-tight"
+            >
+              hyriq.
             </span>
           </div>
 
-          <div style={{ height: '24px', width: '1px', background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ height: '18px', width: '1px', background: 'rgba(0,0,0,0.08)' }} />
 
           <select
             value={currentLocation}
             onChange={(e) => setCurrentLocation(e.target.value)}
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#e2e8f0',
-              padding: '6px 12px',
-              borderRadius: '16px',
-              fontSize: '13px',
+              background: 'transparent',
+              border: '1px solid rgba(0,0,0,0.1)',
+              color: '#111111',
+              padding: '4px 10px',
+              borderRadius: '9999px',
+              fontSize: '12px',
               fontWeight: 500,
               outline: 'none',
               cursor: 'pointer',
@@ -89,7 +82,7 @@ const Navbar: React.FC = () => {
             }}
           >
             {Object.entries(SUPPORTED_LOCATIONS).map(([key, label]) => (
-              <option key={key} value={key} style={{ background: '#0f172a', color: '#fff' }}>
+              <option key={key} value={key} style={{ background: '#ffffff', color: '#111111' }}>
                 {label}
               </option>
             ))}
@@ -105,14 +98,13 @@ const Navbar: React.FC = () => {
               <button 
                 onClick={() => setRecruiterTab('post-job')}
                 style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  border: 'none', padding: '6px 14px', borderRadius: '16px',
-                  color: '#fff', fontSize: '13px', fontWeight: 600,
+                  background: '#111111',
+                  border: 'none', padding: '6px 14px', borderRadius: '9999px',
+                  color: '#fff', fontSize: '12px', fontWeight: 500,
                   display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
                 }}
               >
-                <Plus size={14} /> Post Job
+                <Plus size={12} /> Post Job
               </button>
             </div>
           )}
@@ -120,34 +112,34 @@ const Navbar: React.FC = () => {
           {/* Download APK */}
           <button 
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              padding: '6px 14px', borderRadius: '16px',
-              color: '#fff', fontSize: '12px', fontWeight: 600,
+              background: 'transparent',
+              border: '1px solid rgba(0,0,0,0.1)',
+              padding: '6px 14px', borderRadius: '9999px',
+              color: '#111111', fontSize: '11px', fontWeight: 500,
               display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
               transition: 'background 0.2s'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <Download size={14} /> App
+            <Download size={12} /> App
           </button>
 
           {/* Workspace Switcher */}
           <div style={{
             display: 'flex',
-            background: 'rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(255,255,255,0.05)',
-            padding: '4px',
-            borderRadius: '20px',
+            background: 'rgba(0, 0, 0, 0.04)',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            padding: '3px',
+            borderRadius: '9999px',
           }}>
             <button
               onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
               style={{
-                padding: '6px 12px', borderRadius: '16px', border: 'none',
-                fontSize: '12px', fontWeight: 600, cursor: 'pointer',
-                background: perspective === 'visitor' ? 'rgba(255,255,255,0.15)' : 'transparent',
-                color: perspective === 'visitor' ? '#fff' : '#94a3b8',
+                padding: '6px 12px', borderRadius: '9999px', border: 'none',
+                fontSize: '11px', fontWeight: 500, cursor: 'pointer',
+                background: perspective === 'visitor' ? '#111111' : 'transparent',
+                color: perspective === 'visitor' ? '#fff' : '#767676',
                 transition: 'all 0.2s'
               }}
             >
@@ -157,29 +149,27 @@ const Navbar: React.FC = () => {
             <button
               onClick={() => handleRoleChange('candidate')}
               style={{
-                padding: '6px 12px', borderRadius: '16px', border: 'none',
-                fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center',
-                background: perspective === 'candidate' ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'transparent',
-                color: perspective === 'candidate' ? '#fff' : '#94a3b8',
-                boxShadow: perspective === 'candidate' ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none',
+                padding: '6px 12px', borderRadius: '9999px', border: 'none',
+                fontSize: '11px', fontWeight: 500, cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center',
+                background: perspective === 'candidate' ? '#111111' : 'transparent',
+                color: perspective === 'candidate' ? '#fff' : '#767676',
                 transition: 'all 0.2s'
               }}
             >
-              <User size={12} /> Talent
+              <User size={10} /> Talent
             </button>
 
             <button
               onClick={() => handleRoleChange('recruiter')}
               style={{
-                padding: '6px 12px', borderRadius: '16px', border: 'none',
-                fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center',
-                background: perspective === 'recruiter' ? 'linear-gradient(135deg, #0ea5e9, #0284c7)' : 'transparent',
-                color: perspective === 'recruiter' ? '#fff' : '#94a3b8',
-                boxShadow: perspective === 'recruiter' ? '0 2px 8px rgba(14, 165, 233, 0.4)' : 'none',
+                padding: '6px 12px', borderRadius: '9999px', border: 'none',
+                fontSize: '11px', fontWeight: 500, cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center',
+                background: perspective === 'recruiter' ? '#111111' : 'transparent',
+                color: perspective === 'recruiter' ? '#fff' : '#767676',
                 transition: 'all 0.2s'
               }}
             >
-              <Briefcase size={12} /> Recruiter
+              <Briefcase size={10} /> Recruiter
             </button>
           </div>
 
@@ -190,22 +180,22 @@ const Navbar: React.FC = () => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '8px', 
-                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
-                  padding: '4px 12px 4px 4px', borderRadius: '24px', cursor: 'pointer'
+                  background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)',
+                  padding: '4px 12px 4px 4px', borderRadius: '9999px', cursor: 'pointer'
                 }}
               >
                 <div style={{
-                  width: '28px', height: '28px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+                  width: '24px', height: '24px', borderRadius: '50%',
+                  background: '#111111',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '14px', fontWeight: 'bold', color: '#fff'
+                  fontSize: '12px', fontWeight: 'bold', color: '#fff'
                 }}>
                   {user.name.charAt(0)}
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#f8fafc' }}>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: '#111111' }}>
                   {user.name.split(' ')[0]}
                 </span>
-                <ChevronDown size={14} color="#94a3b8" />
+                <ChevronDown size={12} color="#767676" />
               </button>
 
               <AnimatePresence>
@@ -220,18 +210,18 @@ const Navbar: React.FC = () => {
                       top: 'calc(100% + 12px)',
                       right: 0,
                       width: '220px',
-                      background: 'rgba(15, 23, 42, 0.85)',
-                      backdropFilter: 'blur(24px)',
-                      WebkitBackdropFilter: 'blur(24px)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '16px',
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(0,0,0,0.06)',
+                      borderRadius: '14px',
                       padding: '8px',
-                      boxShadow: '0 10px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05)'
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
                     }}
                   >
-                    <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '4px' }}>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>{user.name}</div>
-                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>Active: {perspective.toUpperCase()}</div>
+                    <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '4px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#111111' }}>{user.name}</div>
+                      <div style={{ fontSize: '10px', color: '#767676' }}>Active: {perspective.toUpperCase()}</div>
                     </div>
                     
                     <button 
@@ -246,17 +236,17 @@ const Navbar: React.FC = () => {
                         background: 'transparent',
                         border: 'none',
                         color: '#f43f5e',
-                        fontSize: '13px',
-                        fontWeight: 600,
+                        fontSize: '12px',
+                        fontWeight: 500,
                         cursor: 'pointer',
                         borderRadius: '10px',
                         textAlign: 'left',
                         transition: 'background 0.2s'
                       }}
-                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(244, 63, 94, 0.1)'}
+                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(244, 63, 94, 0.05)'}
                       onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                     >
-                      <LogOut size={14} />
+                      <LogOut size={12} />
                       Sign Out
                     </button>
                   </motion.div>
