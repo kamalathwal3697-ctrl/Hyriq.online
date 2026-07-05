@@ -39,6 +39,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing file or userId' }, { status: 400 });
     }
 
+    // Limit file size to 5MB to prevent resource exhaustion
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 });
+    }
+
     if (file.type !== 'application/pdf') {
       return NextResponse.json({ error: 'Only PDF files are supported for now' }, { status: 400 });
     }
