@@ -7,6 +7,7 @@ import { AuthPage } from "@/components/AuthPage";
 import { CandidateDashboard } from "@/components/CandidateDashboard";
 import { RecruiterDashboard } from "@/components/RecruiterDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 export default function Home() {
   const { perspective, token, login, signup } = useAppState();
@@ -26,15 +27,27 @@ export default function Home() {
     }
 
     if (perspective === 'candidate') {
-      return <CandidateDashboard />;
+      return (
+        <DashboardLayout>
+          <CandidateDashboard />
+        </DashboardLayout>
+      );
     }
 
     if (perspective === 'recruiter') {
-      return <RecruiterDashboard />;
+      return (
+        <DashboardLayout>
+          <RecruiterDashboard />
+        </DashboardLayout>
+      );
     }
 
     if (perspective === 'admin') {
-      return <AdminDashboard />;
+      return (
+        <DashboardLayout>
+          <AdminDashboard />
+        </DashboardLayout>
+      );
     }
 
     return <LandingPage />;

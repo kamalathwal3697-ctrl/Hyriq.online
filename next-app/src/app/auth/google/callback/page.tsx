@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppState } from "@/context/AppContext";
 
-export default function GoogleCallbackPage() {
+function GoogleCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithGoogle } = useAppState();
@@ -57,8 +57,8 @@ export default function GoogleCallbackPage() {
   }, [searchParams, loginWithGoogle, router]);
 
   return (
-    <div className="min-h-screen bg-[#f4f4f4] flex flex-col items-center justify-center p-6 text-[#111111] font-sans">
-      <div className="max-w-md w-full bg-white rounded-2xl border border-neutral-200 p-8 text-center shadow-sm">
+    <div className="min-h-screen bg-[#f5f7ff] flex flex-col items-center justify-center p-6 text-slate-800 font-sans">
+      <div className="max-w-md w-full bg-white/40 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl p-8 text-center">
         <h2 className="font-serif-editorial text-3xl italic mb-4">hyriq.</h2>
         
         {loading ? (
@@ -81,7 +81,7 @@ export default function GoogleCallbackPage() {
             </p>
             <button
               onClick={() => router.push("/")}
-              className="nextsense-btn-primary w-full text-xs font-semibold uppercase tracking-wider"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4.5 py-2.5 rounded-full w-full uppercase tracking-wider cursor-pointer"
             >
               Back to Home
             </button>
@@ -89,5 +89,22 @@ export default function GoogleCallbackPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f5f7ff] flex flex-col items-center justify-center p-6 text-slate-800 font-sans">
+        <div className="max-w-md w-full bg-white/40 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl p-8 text-center flex flex-col items-center gap-4 py-8">
+          <div className="w-8 h-8 rounded-full border-2 border-neutral-200 border-t-neutral-800 animate-spin"></div>
+          <p className="text-sm text-neutral-500 font-medium font-sans-clean">
+            Loading Google Sign-in callback...
+          </p>
+        </div>
+      </div>
+    }>
+      <GoogleCallback />
+    </Suspense>
   );
 }

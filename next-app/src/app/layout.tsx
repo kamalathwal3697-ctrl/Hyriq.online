@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-[#f4f4f4] text-[#111111] antialiased selection:bg-neutral-800/10">
+      <body className="min-h-full flex flex-col font-sans mesh-bg text-slate-800 antialiased selection:bg-blue-500/10">
         <AppStateProvider>
           {children}
         </AppStateProvider>
