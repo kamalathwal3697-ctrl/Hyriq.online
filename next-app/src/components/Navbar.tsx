@@ -52,11 +52,11 @@ const Navbar: React.FC = () => {
             onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
           >
-            <BrainNLogo size={24} variant="gradient" />
+            <BrainNLogo size={26} variant="gradient" />
             <span 
-              className="font-serif-editorial italic text-2xl font-normal text-slate-800 tracking-tight"
+              className="font-bold text-slate-900 tracking-wider font-sans-clean text-lg flex items-baseline gap-0.5"
             >
-              hyriq.
+              HYRIQ<span className="text-slate-400 font-normal text-xs">.online</span>
             </span>
           </div>
 

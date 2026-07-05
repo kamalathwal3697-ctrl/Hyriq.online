@@ -363,7 +363,7 @@ export const LandingPage: React.FC = () => {
       <footer className="bg-[#0f172a] text-slate-400 py-16 mt-auto">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="col-span-1 md:col-span-1">
-            <h2 className="font-serif-editorial italic text-3xl text-white tracking-tight mb-4">hyriq.</h2>
+            <h2 className="font-bold text-xl text-white tracking-wider mb-4 font-sans-clean">HYRIQ<span className="text-slate-400 font-normal text-sm">.online</span></h2>
             <p className="text-xs text-neutral-400 mb-6 font-sans-clean leading-relaxed">
               Punjab's vibe matching career matching portal. Sourcing compatibility, elevating growth.
             </p>
@@ -394,7 +394,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-4 font-sans-clean">Hyriq</h4>
+            <h4 className="text-white text-xs font-semibold uppercase tracking-wider mb-4 font-sans-clean">HYRIQ.online</h4>
             <ul className="space-y-2.5 text-xs font-sans-clean">
               <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
