@@ -323,11 +323,14 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
         headers: { Authorization: `Bearer ${currentToken}` }
       });
       if (res.ok) {
-        const profile = await res.json();
+        const data = await res.json();
+        const profile = data.user;
+        if (!profile) return;
+
         if (profile.role === 'candidate') {
           setCandidateProfile({
-            name: profile.name,
-            email: profile.email,
+            name: profile.name || '',
+            email: profile.email || '',
             phone: profile.phone || '',
             bio: profile.bio || '',
             skills: profile.skills || [],

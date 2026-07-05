@@ -40,7 +40,22 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      user: { id: user.id, email: user.email, role: user.role, name: user.name, subscriptionExpiry: user.subscriptionExpiry }
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        role: user.role, 
+        name: user.name, 
+        phone: user.phone,
+        bio: user.bio,
+        skills: user.skills,
+        experience: user.experience,
+        resumeName: user.resumeName,
+        onboardingCompleted: user.onboardingCompleted,
+        subscriptionExpiry: user.subscriptionExpiry?.toISOString() || null,
+        preferences: user.preferences,
+        companyName: user.companyName,
+        companyBio: user.companyBio
+      }
     });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
