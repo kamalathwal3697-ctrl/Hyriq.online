@@ -166,7 +166,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
       localStorage.removeItem('hyriq_oauth_coupon');
     }
     
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1041935825227-tq62r7432j3h4l56u7m2b7q1c9d2f3s4.apps.googleusercontent.com';
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '436543530360-ep3scmucnnhf31dav2h5si1usj2jl09g.apps.googleusercontent.com';
     const redirectUri = `${window.location.origin}/auth/google/callback`;
     const scope = encodeURIComponent('openid profile email');
     const state = encodeURIComponent(role);
