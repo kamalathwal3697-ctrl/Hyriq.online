@@ -44,12 +44,12 @@ export async function POST(req: Request) {
     });
     
     if (!user) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 400 });
     }
 
     const isMatch = bcrypt.compareSync(password, user.passwordHash);
     if (!isMatch) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 400 });
     }
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
