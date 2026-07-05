@@ -119,16 +119,34 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#f4f4f4] aspect-[4/3] rounded-2xl border border-neutral-200 flex flex-col justify-center items-center p-8 relative overflow-hidden">
-            <div className="absolute top-6 left-6 text-[10px] font-mono text-neutral-400">HYRIQ GRAPH MODEL</div>
-            <div className="w-32 h-32 rounded-full border border-dashed border-neutral-300 flex items-center justify-center animate-spin-slow">
-              <div className="w-20 h-20 rounded-full border border-neutral-300 flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-[#111111] text-white flex items-center justify-center text-xs">H</div>
-              </div>
-            </div>
-            <div className="mt-8 text-center">
-              <p className="text-sm font-medium text-neutral-900">Punjab Match Engine</p>
-              <p className="text-xs text-neutral-500 mt-1">Calculating compatibility vectors...</p>
+          <div className="bg-white aspect-[4/3] rounded-2xl border border-neutral-200/80 flex flex-col justify-center items-center p-6 relative overflow-hidden shadow-sm">
+            <div className="absolute top-6 left-6 text-[10px] font-mono tracking-wider text-neutral-400">HYRIQ MATRIX V1</div>
+            
+            <motion.div
+              animate={{ 
+                y: [0, -10, 0],
+                rotate: [0, 2, -2, 0]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 6, 
+                ease: "easeInOut" 
+              }}
+              className="relative w-full h-full max-h-[220px] flex items-center justify-center"
+            >
+              <img 
+                src="/vibe-model.png" 
+                alt="AI Vibe Matching Model" 
+                className="w-auto h-full max-h-[180px] object-contain mix-blend-multiply opacity-90"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent pointer-events-none"></div>
+            </motion.div>
+
+            <div className="text-center z-10 bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full border border-neutral-100 shadow-sm mt-2">
+              <p className="text-xs font-semibold text-neutral-900 font-sans-clean tracking-wide flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Active Sourcing Match Engine
+              </p>
             </div>
           </div>
         </div>
