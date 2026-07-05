@@ -61,6 +61,19 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
       setIsLogin(false);
       setRole('candidate');
       setShowPayment(true);
+    } else {
+      const stored = localStorage.getItem('hyriq_google_autofill');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setEmail(parsed.email);
+          setName(parsed.name);
+          setIsLogin(false);
+          setRole('candidate');
+          setShowPayment(true);
+          localStorage.removeItem('hyriq_google_autofill');
+        } catch (e) {}
+      }
     }
   }, [googleAutofill]);
 
