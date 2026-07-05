@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Briefcase, Mail, Lock, Sparkles, LogIn, UserPlus, Shield, CheckCircle, CreditCard } from 'lucide-react';
+import { User, Briefcase, Sparkles, Shield, CheckCircle, CreditCard, Eye, EyeOff } from 'lucide-react';
+import { BrainNLogo } from './BrainNLogo';
 
 declare global {
   interface Window {
@@ -36,6 +37,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPasswordText, setShowPasswordText] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
@@ -472,12 +474,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
       minHeight: '80vh',
       padding: '40px 0'
     }}>
-      <div className="glass-panel animate-glow" style={{
+      <div className="card-flat" style={{
         width: '100%',
         maxWidth: '480px',
         padding: '40px',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
       }}>
         {/* Background glow bubble */}
         <div style={{
@@ -493,16 +498,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
         }}></div>
 
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <BrainNLogo />
+          </div>
           <span className="badge badge-primary" style={{ marginBottom: '12px' }}>
-            <Sparkles size={12} style={{ marginRight: '6px' }} />
-            Join the Vibe
+            {isLogin ? 'Welcome Back' : 'Get Started'}
           </span>
-          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#fff', fontFamily: 'Outfit' }}>
-            {isLogin ? 'Welcome to ' : 'Create Account on '}<span className="text-gradient-primary">Hyriq</span>
+          <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', fontFamily: 'Inter', textAlign: 'center' }}>
+            {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
-            {isLogin ? 'Sign in to access your direct career matches' : 'Choose your role and start networking instantly'}
+          <p style={{ color: '#475569', fontSize: '13px', marginTop: '6px', textAlign: 'center' }}>
+            {isLogin ? 'Enter your email and password to access your dashboard' : 'Choose your role and start networking instantly'}
           </p>
         </div>
 
@@ -652,42 +659,78 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
 
           {/* Email Field */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>Email Address / Username</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '16px', top: '15px' }} />
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="alex@domain.com or username"
-                className="glass-input"
-                style={{ paddingLeft: '44px', width: '100%' }}
-                required
-              />
-            </div>
+            <label style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>Email Address / Username</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="alex@domain.com or username"
+              className="glass-input"
+              style={{ width: '100%' }}
+              required
+            />
           </div>
 
           {/* Password Field */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>Password</label>
+            <label style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>Password</label>
             <div style={{ position: 'relative' }}>
-              <Lock size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '16px', top: '15px' }} />
               <input
-                type="password"
+                type={showPasswordText ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="glass-input"
-                style={{ paddingLeft: '44px', width: '100%' }}
+                style={{ width: '100%', paddingRight: '44px' }}
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPasswordText(!showPasswordText)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {showPasswordText ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
+            {isLogin && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2px' }}>
+                <button
+                  type="button"
+                  onClick={() => alert("Password reset link will be sent to your email.")}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#2563eb',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    padding: 0
+                  }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Bio Field (Sign Up only) */}
           {!isLogin && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+              <label style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>
                 {role === 'candidate' ? 'Short Professional Bio' : 'Company Intro'}
               </label>
               <textarea
@@ -704,7 +747,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
           {/* Phone Field (Sign Up only) */}
           {!isLogin && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>Phone Number</label>
+              <label style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>Phone Number</label>
               <input
                 type="tel"
                 value={phone}
@@ -719,32 +762,26 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', marginTop: '12px', padding: '14px' }}
+            style={{ width: '100%', marginTop: '12px', padding: '14px', fontSize: '14px' }}
             disabled={loading}
           >
             {loading ? (
               'Processing...'
             ) : isLogin ? (
-              <>
-                Sign In <LogIn size={16} />
-              </>
+              'Sign In'
             ) : role === 'recruiter' ? (
-              <>
-                Create Free Account <UserPlus size={16} />
-              </>
+              'Create Free Account'
             ) : (
-              <>
-                Continue to Payment — ₹99 <UserPlus size={16} />
-              </>
+              'Continue to Payment — ₹99'
             )}
           </button>
         </form>
 
         {/* Separator */}
         <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', gap: '10px' }}>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>or</span>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
+          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+          <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>or</span>
+          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
         </div>
 
         {/* Google Authentication Button */}
@@ -758,19 +795,19 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             alignItems: 'center',
             justifyContent: 'center',
             gap: '10px',
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: '#fff',
+            background: '#ffffff',
+            border: '1px solid #cbd5e1',
+            color: '#475569',
             padding: '12px',
-            borderRadius: '12px',
+            borderRadius: '8px',
             fontSize: '13px',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.2s',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+          onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" style={{ marginRight: '4px' }}>
             <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.68 1.34 7.6l3.85 3C6.12 7.74 8.84 5.04 12 5.04z"/>
@@ -778,7 +815,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             <path fill="#FBBC05" d="M5.19 14.4c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.34 7.6C.49 9.32 0 11.23 0 13.23s.49 3.91 1.34 5.63l3.85-3z"/>
             <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.71-2.87c-1.03.69-2.35 1.1-4.25 1.1-3.16 0-5.88-2.7-6.81-6.05L1.34 15.27C3.37 19.19 7.35 23 12 23z"/>
           </svg>
-          {isLogin ? 'Sign In with Google' : 'Sign Up with Google'}
+          Continue with Google
         </button>
 
         {/* Auth Toggle */}
