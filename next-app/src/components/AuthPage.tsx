@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Briefcase, Sparkles, Shield, CheckCircle, CreditCard, Eye, EyeOff, MessageSquare, Rocket } from 'lucide-react';
+import { User, Briefcase, Sparkles, Shield, CheckCircle, CreditCard, Eye, EyeOff, MessageSquare, Rocket, Wallet, Layers, Gavel, Landmark } from 'lucide-react';
 import { BrainNLogo } from './BrainNLogo';
 
 declare global {
@@ -295,100 +295,122 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '80vh',
-        padding: '40px 0'
+        minHeight: '100vh',
+        padding: '40px 20px',
+        backgroundColor: '#ffffff'
       }}>
-        <div className="card-flat" style={{
+        <div style={{
           width: '100%',
-          maxWidth: '480px',
-          padding: '36px',
-          position: 'relative',
-          overflow: 'hidden',
-          backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.04)'
+          maxWidth: '460px',
+          padding: '24px 16px',
+          position: 'relative'
         }}>
-          {/* Background glow orbs */}
+          {/* Top Icon */}
           <div style={{
-            position: 'absolute',
-            top: '-50px',
-            right: '-50px',
-            width: '150px',
-            height: '150px',
-            borderRadius: '50%',
-            background: 'rgba(37, 99, 235, 0.08)',
-            filter: 'blur(30px)',
-            pointerEvents: 'none'
-          }}></div>
+            width: '64px',
+            height: '64px',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            boxShadow: '0 4px 14px rgba(6, 182, 212, 0.2)'
+          }}>
+            <CreditCard size={28} color="#fff" />
+          </div>
 
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-              <BrainNLogo />
-            </div>
-            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', fontFamily: 'Inter' }}>
-              Complete Registration
-            </h3>
-            <p style={{ color: '#475569', fontSize: '13px', marginTop: '6px' }}>
-              One-time registration fee for job seekers
-            </p>
+            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, letterSpacing: '1px' }}>JOB SEEKER ACCESS</span>
+            <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px', marginTop: '4px', textTransform: 'uppercase', fontFamily: 'Inter' }}>
+              ONE-TIME REGISTRATION FEE
+            </h2>
           </div>
 
-          {/* Elevated Pricing Card */}
+          {/* Pricing Card */}
           <div style={{
-            background: 'linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            background: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%)',
+            border: '1px solid #bae6fd',
+            borderRadius: '16px',
             padding: '24px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            textAlign: 'center',
-            border: '1px solid #bfdbfe',
-            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.05)'
+            gap: '16px',
+            position: 'relative',
+            boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.08)',
+            marginBottom: '32px'
           }}>
-            <span style={{ fontSize: '11px', color: '#2563eb', display: 'block', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>REGISTRATION FEE</span>
-            <div style={{ margin: '8px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
-              <span style={{ fontSize: '42px', fontWeight: 850, color: '#0f172a', fontFamily: 'Inter' }}>₹99</span>
-              <span style={{ fontSize: '14px', color: '#475569', fontWeight: 600, marginLeft: '6px' }}>/ year</span>
-            </div>
-            <span style={{
-              display: 'inline-flex',
+            {/* Gray checked icon on the left */}
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              backgroundColor: '#94a3b8',
+              display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              fontSize: '11px',
-              fontWeight: 700,
-              color: '#047857',
-              backgroundColor: '#d1fae5',
-              padding: '4px 10px',
-              borderRadius: '6px'
+              justifyContent: 'center',
+              color: '#ffffff',
+              flexShrink: 0
             }}>
-              <CheckCircle size={12} />
-              Valid for 12 months
-            </span>
+              <CheckCircle size={18} color="#ffffff" style={{ fill: '#94a3b8' }} />
+            </div>
+            <div style={{ flex: 1, textAlign: 'center', paddingRight: '28px' }}>
+              <span style={{
+                fontSize: '9px',
+                fontWeight: 800,
+                color: '#1e40af',
+                backgroundColor: '#dbeafe',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                letterSpacing: '0.5px'
+              }}>
+                LIMITED OFFER
+              </span>
+              <div style={{ fontSize: '48px', fontWeight: 900, color: '#0f172a', lineHeight: 1.1, marginTop: '6px', fontFamily: 'Inter' }}>
+                ₹99
+              </div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', fontFamily: 'Inter' }}>
+                ₹99 / year
+              </div>
+              <div style={{ fontSize: '10px', color: '#475569', fontWeight: 800, marginTop: '4px', letterSpacing: '0.5px' }}>
+                VALID FOR 12 MONTHS
+              </div>
+            </div>
           </div>
 
-          {/* Icon-driven Feature Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
-              <div style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
-                <Briefcase size={14} />
+          {/* Feature List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px', paddingLeft: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid #e2e8f0', paddingLeft: '16px' }}>
+              <div style={{ color: '#475569', display: 'flex', alignItems: 'center' }}>
+                <Layers size={20} />
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Unlimited Listings</span>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', letterSpacing: '0.5px', fontFamily: 'Inter' }}>
+                APPLY TO UNLIMITED JOB LISTINGS
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
-              <div style={{ backgroundColor: '#ecfeff', color: '#0891b2', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
-                <MessageSquare size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid #e2e8f0', paddingLeft: '16px' }}>
+              <div style={{ color: '#475569', display: 'flex', alignItems: 'center' }}>
+                <MessageSquare size={20} />
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Recruiter Chat</span>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', letterSpacing: '0.5px', fontFamily: 'Inter' }}>
+                DIRECT CHAT WITH RECRUITERS
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
-              <div style={{ backgroundColor: '#e0e7ff', color: '#4f46e5', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
-                <Shield size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid #e2e8f0', paddingLeft: '16px' }}>
+              <div style={{ color: '#475569', display: 'flex', alignItems: 'center' }}>
+                <Gavel size={20} />
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Legal Protection</span>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', letterSpacing: '0.5px', fontFamily: 'Inter' }}>
+                FAIR WORK PACT LEGAL PROTECTION
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
-              <div style={{ backgroundColor: '#fffbeb', color: '#d97706', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
-                <Rocket size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid #e2e8f0', paddingLeft: '16px' }}>
+              <div style={{ color: '#475569', display: 'flex', alignItems: 'center' }}>
+                <Rocket size={20} />
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Priority Visibility</span>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', letterSpacing: '0.5px', fontFamily: 'Inter' }}>
+                PRIORITY VISIBILITY TO EMPLOYERS
+              </span>
             </div>
           </div>
 
@@ -413,7 +435,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             type="button"
             onClick={handleRazorpayPayment}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700 }}
+            style={{
+              width: '100%',
+              padding: '16px',
+              fontSize: '15px',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+              border: 'none',
+              color: '#ffffff',
+              borderRadius: '12px',
+              boxShadow: '0 4px 14px rgba(6, 182, 212, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer'
+            }}
             disabled={paymentProcessing || paymentSuccess}
           >
             {paymentProcessing ? (
@@ -421,29 +458,31 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             ) : paymentSuccess ? (
               'Payment Successful — Creating Account...'
             ) : (
-              'Pay ₹99 & Register'
+              <>
+                <Wallet size={18} />
+                Pay ₹99 & Register
+              </>
             )}
           </button>
 
           {/* Organized Security & Payment Badges */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            alignItems: 'center',
-            marginTop: '16px',
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '12px'
-          }}>
-            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              🔒 Secured by Razorpay Payment Gateway
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '20px' }}>
+            <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Shield size={14} color="#10b981" style={{ fill: 'rgba(16, 185, 129, 0.1)' }} />
+              Secured by <span style={{ fontWeight: 800 }}>Razorpay</span>
             </div>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
-              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>💳 CARD</span>
-              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>📱 UPI</span>
-              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>🏦 NET BANKING</span>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', fontSize: '11px', color: '#475569', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Rocket size={12} /> UPI
+              </div>
+              <span>•</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <CreditCard size={12} /> Cards
+              </div>
+              <span>•</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Landmark size={12} /> Net Banking
+              </div>
             </div>
           </div>
 
@@ -458,11 +497,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
               onClearGoogleAutofill?.();
             }}
             className="btn btn-ghost"
-            style={{ width: '100%', marginTop: '16px', padding: '12px' }}
+            style={{ width: '100%', marginTop: '16px', padding: '12px', fontSize: '13px', fontWeight: 700 }}
             disabled={paymentProcessing}
           >
             ← Back to Sign Up
           </button>
+
+          {/* Footer Logo */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px', opacity: 0.5 }}>
+            <span style={{ fontSize: '14px', fontWeight: 800, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              ⚡ logo
+            </span>
+          </div>
         </div>
       </div>
     );
