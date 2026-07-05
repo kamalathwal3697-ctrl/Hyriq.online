@@ -264,7 +264,7 @@ export const RecruiterDashboard: React.FC = () => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Managing talent for {recruiterProfile.companyName}.</p>
         </div>
 
-        <div className="tabs-header">
+        <div className="tabs-header md:hidden flex">
           <button 
             className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}

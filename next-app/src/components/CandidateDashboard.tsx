@@ -608,7 +608,7 @@ export const CandidateDashboard: React.FC = () => {
             </p>
           </div>
 
-          <div className="tabs-header" style={{ background: isLightMode ? 'rgba(26, 62, 98, 0.08)' : 'rgba(0, 0, 0, 0.2)', border: isLightMode ? '1px solid rgba(26, 62, 98, 0.1)' : '1px solid var(--border-color)' }}>
+          <div className="tabs-header md:hidden flex" style={{ background: isLightMode ? 'rgba(26, 62, 98, 0.08)' : 'rgba(0, 0, 0, 0.2)', border: isLightMode ? '1px solid rgba(26, 62, 98, 0.1)' : '1px solid var(--border-color)' }}>
             <button 
               className={`tab-btn ${activeTab === 'workspace' ? 'active' : ''}`}
               onClick={() => setActiveTab('workspace')}

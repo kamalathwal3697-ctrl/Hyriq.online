@@ -54,9 +54,9 @@ const Navbar: React.FC = () => {
           >
             <BrainNLogo size={24} variant="gradient" />
             <span 
-              className="font-bold text-lg text-slate-800 tracking-tight font-sans-clean"
+              className="font-serif-editorial italic text-2xl font-normal text-slate-800 tracking-tight"
             >
-              JobSphere <span className="text-blue-600 font-extrabold">AI</span>
+              hyriq.
             </span>
           </div>
 
