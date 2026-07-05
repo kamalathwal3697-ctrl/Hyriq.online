@@ -33,20 +33,29 @@ export async function GET() {
     });
 
     // Map Prisma jobs to match frontend expectations
-    const mappedJobs = jobs.map(job => ({
-      id: job.id,
-      title: job.title,
-      company: job.company || job.postedBy?.companyName || 'Hyriq Employer',
-      location: job.location,
-      type: job.type,
-      salary: job.salary,
-      description: job.description,
-      requirements: job.requirements,
-      responsibilities: job.responsibilities,
-      tags: job.tags,
-      logoSeed: job.logo || job.company || 'H',
-      postedDate: job.createdAt.toISOString()
-    }));
+    const mappedJobs = jobs.map(job => {
+      const isRemote = job.location.toLowerCase().includes('remote') || job.title.toLowerCase().includes('remote');
+      const isHybrid = job.location.toLowerCase().includes('hybrid') || job.title.toLowerCase().includes('hybrid');
+      const mode = isRemote ? 'Remote' : (isHybrid ? 'Hybrid' : 'On-site');
+
+      return {
+        id: job.id,
+        title: job.title,
+        company: job.company || job.postedBy?.companyName || 'Hyriq Employer',
+        location: job.location,
+        mode: mode,
+        type: job.type,
+        salary: job.salary,
+        description: job.description,
+        requirements: job.requirements,
+        responsibilities: job.responsibilities,
+        benefits: [],
+        tags: job.tags,
+        skills: job.tags || [],
+        logoSeed: job.logo || job.company || 'H',
+        postedDate: job.createdAt.toISOString()
+      };
+    });
 
     return NextResponse.json(mappedJobs);
   } catch (error: any) {

@@ -9,7 +9,7 @@ import { RecruiterDashboard } from "@/components/RecruiterDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
 
 export default function Home() {
-  const { perspective, token, login } = useAppState();
+  const { perspective, token, login, signup } = useAppState();
 
   const renderMainContent = () => {
     if (perspective === 'visitor') {
@@ -20,7 +20,7 @@ export default function Home() {
       return (
         <AuthPage 
           onLogin={login} 
-          onSignup={async () => {}} // Legacy signup not fully imported, but not needed here if AuthPage handles it internally or if we pass a stub
+          onSignup={signup}
         />
       );
     }
