@@ -24,6 +24,7 @@ model User {
   resumeName          String?
   onboardingCompleted Boolean       @default(false)
   subscriptionExpiry  DateTime?
+  paymentId           String?       @unique
   preferences         Json?
   
   // Recruiter specific

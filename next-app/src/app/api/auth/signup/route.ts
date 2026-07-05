@@ -57,6 +57,16 @@ export async function POST(req: Request) {
           message: 'A one-time registration fee of ₹99 is required for job seekers. Valid for 1 year.'
         }, { status: 402 });
       }
+
+      // Prevent payment replay attack: check if payment ID was already used
+      if (!paymentId.startsWith('pay_mock_')) {
+        const paymentExists = await prisma.user.findFirst({
+          where: { paymentId }
+        });
+        if (paymentExists) {
+          return NextResponse.json({ error: 'This Payment ID has already been used to register an account.' }, { status: 400 });
+        }
+      }
     }
 
     const salt = bcrypt.genSaltSync(10);
@@ -82,6 +92,7 @@ export async function POST(req: Request) {
         resumeName: role === 'candidate' ? 'No resume uploaded' : null,
         onboardingCompleted: false,
         subscriptionExpiry,
+        paymentId: paymentId || null,
         companyName: role === 'recruiter' ? `${name}'s Organization` : null,
         companyBio: role === 'recruiter' ? 'We are hiring progressive talent.' : null
       }
