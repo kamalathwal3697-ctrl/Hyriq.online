@@ -40,6 +40,8 @@ export async function POST(req: Request) {
       );
     }
 
+    console.log("Google Auth Debug - Client ID length:", GOOGLE_CLIENT_ID?.length, "Secret length:", GOOGLE_CLIENT_SECRET?.length);
+
     if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
       return NextResponse.json(
         { error: "Google OAuth credentials are not configured on the server." },
