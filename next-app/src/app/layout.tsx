@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "A premium AI-powered vibe matching career platform designed for modern professional hiring.",
 };
 
+import Script from "next/script";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,6 +36,7 @@ export default function RootLayout({
         <AppStateProvider>
           {children}
         </AppStateProvider>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
       </body>
     </html>
   );
