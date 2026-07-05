@@ -510,13 +510,14 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
     });
 
     const data = await res.json();
-    if (!res.ok) {
-      const err = new Error(data.error || 'Google Sign-In failed') as any;
-      if (res.status === 200 && data.requiresPayment) {
-        err.requiresPayment = true;
-        err.paymentInfo = data; // Includes email, name, picture, etc.
-      }
+    if (data.requiresPayment) {
+      const err = new Error(data.message || 'Payment required') as any;
+      err.requiresPayment = true;
+      err.paymentInfo = data;
       throw err;
+    }
+    if (!res.ok) {
+      throw new Error(data.error || 'Google Sign-In failed');
     }
 
     setToken(data.token);
