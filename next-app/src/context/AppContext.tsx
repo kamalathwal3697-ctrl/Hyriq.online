@@ -127,15 +127,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [perspective, setPerspective] = useState<Perspective>(() => {
-    if (typeof window === 'undefined') return 'visitor';
-    return (localStorage.getItem('hyriq_perspective') as Perspective) || 'visitor';
-  });
-
-  const [visitorRole, setVisitorRoleState] = useState<'seeker' | 'recruiter' | null>(() => {
-    if (typeof window === 'undefined') return null;
-    return (localStorage.getItem('hyriq_visitor_role') as 'seeker' | 'recruiter' | null) || null;
-  });
+  const [perspective, setPerspective] = useState<Perspective>('visitor');
+  const [visitorRole, setVisitorRoleState] = useState<'seeker' | 'recruiter' | null>(null);
 
   const setVisitorRole = (role: 'seeker' | 'recruiter' | null) => {
     setVisitorRoleState(role);
@@ -146,27 +139,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('hyriq_user') ? 'cookie_managed' : null;
-  });
-
-  const [user, setUser] = useState<AppContextType['user']>(() => {
-    if (typeof window === 'undefined') return null;
-    const saved = localStorage.getItem('hyriq_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<AppContextType['user']>(null);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [candidateTab, setCandidateTabState] = useState<'explore' | 'govt' | 'applications' | 'profile' | 'settings' | 'notifications' | 'workspace' | 'chats'>(() => {
-    if (typeof window === 'undefined') return 'explore';
-    return (localStorage.getItem('hyriq_candidate_tab') as any) || 'explore';
-  });
-  const [recruiterTab, setRecruiterTabState] = useState<'overview' | 'post-job' | 'manage' | 'settings' | 'notifications' | 'workspace' | 'chats'>(() => {
-    if (typeof window === 'undefined') return 'overview';
-    return (localStorage.getItem('hyriq_recruiter_tab') as any) || 'overview';
-  });
+  const [candidateTab, setCandidateTabState] = useState<'explore' | 'govt' | 'applications' | 'profile' | 'settings' | 'notifications' | 'workspace' | 'chats'>('explore');
+  const [recruiterTab, setRecruiterTabState] = useState<'overview' | 'post-job' | 'manage' | 'settings' | 'notifications' | 'workspace' | 'chats'>('overview');
 
   const setCandidateTab = (tab: 'explore' | 'govt' | 'applications' | 'profile' | 'settings' | 'notifications' | 'workspace' | 'chats') => {
     setCandidateTabState(tab);
@@ -179,10 +158,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 const [promoSlots, setPromoSlots] = useState<number>(100);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const [currentLocation, setCurrentLocationState] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'Bathinda';
-    return localStorage.getItem('hyriq_selected_location') || 'Bathinda';
-  });
+  const [currentLocation, setCurrentLocationState] = useState<string>('Bathinda');
 
   const setCurrentLocation = (loc: string) => {
     setCurrentLocationState(loc);
@@ -190,6 +166,37 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
   };
    
   const lastMessageIdsRef = useRef<Set<string>>(new Set());
+
+  // Load state from localStorage on client-side mount to prevent hydration errors
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const savedPerspective = localStorage.getItem('hyriq_perspective') as Perspective;
+    if (savedPerspective) setPerspective(savedPerspective);
+
+    const savedVisitorRole = localStorage.getItem('hyriq_visitor_role') as 'seeker' | 'recruiter' | null;
+    if (savedVisitorRole) setVisitorRoleState(savedVisitorRole);
+
+    const savedUser = localStorage.getItem('hyriq_user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
+        setToken('cookie_managed');
+      } catch (e) {
+        console.error('Failed to parse saved user from localStorage', e);
+      }
+    }
+
+    const savedCandidateTab = localStorage.getItem('hyriq_candidate_tab') as any;
+    if (savedCandidateTab) setCandidateTabState(savedCandidateTab);
+
+    const savedRecruiterTab = localStorage.getItem('hyriq_recruiter_tab') as any;
+    if (savedRecruiterTab) setRecruiterTabState(savedRecruiterTab);
+
+    const savedLocation = localStorage.getItem('hyriq_selected_location');
+    if (savedLocation) setCurrentLocationState(savedLocation);
+  }, []);
 
   // Request browser notification permissions on token activation
   useEffect(() => {
