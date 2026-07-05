@@ -33,7 +33,7 @@ export interface Application {
   jobId: string;
   candidateId: string;
   appliedDate: string;
-  status: 'Applied' | 'Reviewing' | 'Shortlisted' | 'Interview' | 'Offered' | 'Rejected';
+  status: 'Applied' | 'Reviewing' | 'Shortlisted' | 'Interview' | 'Offered' | 'Rejected' | 'Hired';
   chatHistory: ChatMessage[];
   candidateProfile?: {
     name: string;

@@ -26,6 +26,10 @@ export const RecruiterDashboard: React.FC = () => {
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<any>(null);
   const [allCandidates, setAllCandidates] = useState<any[]>([]);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [selectedKanbanCandidate, setSelectedKanbanCandidate] = useState<any>(null);
+  const [calendarDate, setCalendarDate] = useState('2026-07-06');
+  const [calendarTime, setCalendarTime] = useState('10:00');
 
   // Job post form states
   const [jobTitle, setJobTitle] = useState('');
@@ -298,86 +302,207 @@ export const RecruiterDashboard: React.FC = () => {
 
        {/* OVERVIEW VIEW */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Header Row with Create Requisition button */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: 0 }}>Command Center</h2>
+              <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>Talent sourcing pipeline and analytics overview.</p>
+            </div>
+            <button 
+              onClick={() => setActiveTab('post-job')}
+              className="btn-primary"
+            >
+              Create New Requisition
+            </button>
+          </div>
+
           {/* Admin Real-Time Metrics Panel */}
           {user?.email === 'raj_athwal' && realStats && (
-            <div className="glass-panel" style={{ padding: '24px', border: '1px dashed var(--tech-orange)', background: 'rgba(242, 153, 74, 0.03)' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--tech-orange)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="card-flat" style={{ padding: '20px', backgroundColor: '#f8fafc', borderStyle: 'dashed' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 🛡️ Live System Administrator Monitor (REAL DATA)
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Visits (All Time)</span>
-                  <h4 style={{ fontSize: '24px', color: '#fff', fontWeight: 800, marginTop: '4px' }}>{realStats.total.toLocaleString()}</h4>
+                <div className="card-flat" style={{ padding: '16px' }}>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>Real Visits (All Time)</span>
+                  <h4 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 850, marginTop: '4px' }}>{realStats.total.toLocaleString()}</h4>
                 </div>
-                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', position: 'relative' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Live (Last 5 mins)</span>
-                  <h4 style={{ fontSize: '24px', color: '#10b981', fontWeight: 800, marginTop: '4px' }}>{realStats.live}</h4>
+                <div className="card-flat" style={{ padding: '16px', position: 'relative' }}>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>Real Live (Last 5 mins)</span>
+                  <h4 style={{ fontSize: '24px', color: '#10b981', fontWeight: 850, marginTop: '4px' }}>{realStats.live}</h4>
                   <span className="pulse-live" style={{ position: 'absolute', top: '16px', right: '16px', width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
                 </div>
-                <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Real Registered Users</span>
-                  <h4 style={{ fontSize: '24px', color: '#fff', fontWeight: 800, marginTop: '4px' }}>{realStats.registered}</h4>
+                <div className="card-flat" style={{ padding: '16px' }}>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>Real Registered Users</span>
+                  <h4 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 850, marginTop: '4px' }}>{realStats.registered}</h4>
                 </div>
               </div>
             </div>
           )}
-          {/* Dashboard Summary Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
-            <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)' }}>
-                <Briefcase size={24} />
+
+          {/* Dashboard Summary Cards (Flat corporate styling) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div className="card-flat" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb' }}>
+                <Briefcase size={20} />
               </div>
               <div>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>My Listings</span>
-                <h3 style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>{myJobs.length}</h3>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>My Listings</span>
+                <h3 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 700 }}>{myJobs.length}</h3>
               </div>
             </div>
             
-            <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(6, 182, 212, 0.15)', color: 'var(--secondary)' }}>
-                <Users size={24} />
+            <div className="card-flat" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4' }}>
+                <Users size={20} />
               </div>
               <div>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Total Candidates</span>
-                <h3 style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>{activeApplications.length}</h3>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>Total Candidates</span>
+                <h3 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 700 }}>{activeApplications.length}</h3>
               </div>
             </div>
 
-            <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)' }}>
-                <MessageSquare size={24} />
+            <div className="card-flat" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+                <MessageSquare size={20} />
               </div>
               <div>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Active Chats</span>
-                <h3 style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>{activeChatsCount}</h3>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>Active Chats</span>
+                <h3 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 700 }}>{activeChatsCount}</h3>
               </div>
             </div>
 
-            <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.15)', color: 'var(--accent)' }}>
-                <Award size={24} />
+            <div className="card-flat" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}>
+                <Award size={20} />
               </div>
               <div>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Shortlisted</span>
-                <h3 style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>Shortlisted</span>
+                <h3 style={{ fontSize: '24px', color: '#0f172a', fontWeight: 700 }}>
                   {activeApplications.filter(app => app.status === 'Shortlisted' || app.status === 'Interview').length}
                 </h3>
               </div>
             </div>
           </div>
 
+          {/* Kanban Candidate Pipeline Board */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: '8px 0 0 0' }}>Candidate Pipeline</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="kanban-board-grid">
+              {/* Column 1: Sourced */}
+              <div className="kanban-column flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-1">
+                  <span className="text-xs font-bold text-slate-800 uppercase">Sourced</span>
+                  <span className="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded">
+                    {activeApplications.filter(app => app.status === 'Applied' || app.status === 'Reviewing').length}
+                  </span>
+                </div>
+                {activeApplications.filter(app => app.status === 'Applied' || app.status === 'Reviewing').map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  return (
+                    <div key={app.id} className="bg-white border border-slate-250 rounded p-3.5 shadow-sm flex flex-col gap-2">
+                      <div className="text-xs font-bold text-slate-800">{app.candidateProfile?.name || 'Candidate'}</div>
+                      <div className="text-[10px] text-slate-500 font-semibold">{job?.title || 'Job Opening'}</div>
+                      <button 
+                        onClick={() => {
+                          setSelectedKanbanCandidate(app);
+                          setShowCalendarModal(true);
+                        }}
+                        className="btn-primary py-1 px-3 text-[10px] mt-2 w-full text-center"
+                      >
+                        Schedule Interview
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Column 2: Interviewing */}
+              <div className="kanban-column flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-1">
+                  <span className="text-xs font-bold text-slate-800 uppercase">Interviewing</span>
+                  <span className="bg-[#2563eb]/10 text-[#2563eb] text-[10px] font-bold px-2 py-0.5 rounded">
+                    {activeApplications.filter(app => app.status === 'Interview' || app.status === 'Shortlisted').length}
+                  </span>
+                </div>
+                {activeApplications.filter(app => app.status === 'Interview' || app.status === 'Shortlisted').map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  return (
+                    <div key={app.id} className="bg-white border border-slate-250 rounded p-3.5 shadow-sm flex flex-col gap-2">
+                      <div className="text-xs font-bold text-slate-800">{app.candidateProfile?.name || 'Candidate'}</div>
+                      <div className="text-[10px] text-slate-500 font-semibold">{job?.title || 'Job Opening'}</div>
+                      <button 
+                        onClick={() => updateApplicationStatus(app.id, 'Offered')}
+                        className="btn-accent py-1 px-3 text-[10px] mt-2 w-full text-center border-[#2563eb] text-[#2563eb] hover:bg-blue-50"
+                      >
+                        Send Offer
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Column 3: Offered */}
+              <div className="kanban-column flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-1">
+                  <span className="text-xs font-bold text-slate-800 uppercase">Offered</span>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">
+                    {activeApplications.filter(app => app.status === 'Offered').length}
+                  </span>
+                </div>
+                {activeApplications.filter(app => app.status === 'Offered').map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  return (
+                    <div key={app.id} className="bg-white border border-slate-250 rounded p-3.5 shadow-sm flex flex-col gap-2">
+                      <div className="text-xs font-bold text-slate-800">{app.candidateProfile?.name || 'Candidate'}</div>
+                      <div className="text-[10px] text-slate-500 font-semibold">{job?.title || 'Job Opening'}</div>
+                      <button 
+                        onClick={() => updateApplicationStatus(app.id, 'Hired')}
+                        className="btn-primary bg-emerald-600 hover:bg-emerald-700 border-none py-1 px-3 text-[10px] mt-2 w-full text-center"
+                      >
+                        Confirm Hire
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Column 4: Hired */}
+              <div className="kanban-column flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-1">
+                  <span className="text-xs font-bold text-slate-800 uppercase">Hired</span>
+                  <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                    {activeApplications.filter(app => app.status === 'Hired').length}
+                  </span>
+                </div>
+                {activeApplications.filter(app => app.status === 'Hired').map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  return (
+                    <div key={app.id} className="bg-emerald-50/50 border border-emerald-100 rounded p-3.5 shadow-sm flex flex-col gap-2">
+                      <div className="text-xs font-bold text-emerald-800">{app.candidateProfile?.name || 'Candidate'}</div>
+                      <div className="text-[10px] text-emerald-600 font-semibold">{job?.title || 'Job Opening'}</div>
+                      <div className="text-[10px] text-emerald-700 font-bold bg-emerald-100/50 p-1.5 rounded text-center mt-2">
+                        🎉 Hired Successfully
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
           {/* Recruiter Profile Details Card */}
-          <div className="glass-panel" style={{ padding: '32px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', marginBottom: '16px' }}>Verified Company Profile</h3>
+          <div className="card-flat" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 750, color: '#0f172a', marginBottom: '16px' }}>Verified Company Profile</h3>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <div className="avatar" style={{ width: '60px', height: '60px', fontSize: '22px', background: 'var(--secondary-gradient)' }}>
+              <div className="avatar" style={{ width: '48px', height: '48px', fontSize: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>
                 {recruiterProfile.companyName.substring(0, 2).toUpperCase()}
               </div>
               <div style={{ flex: 1 }}>
-                <h4 style={{ color: '#fff', fontSize: '18px' }}>{recruiterProfile.companyName}</h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '4px' }}>Representative: {recruiterProfile.recruiterName}</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px', fontStyle: 'italic' }}>"{recruiterProfile.bio}"</p>
+                <h4 style={{ color: '#0f172a', fontSize: '16px', margin: 0 }}>{recruiterProfile.companyName}</h4>
+                <p style={{ color: '#64748b', fontSize: '12px', marginTop: '4px' }}>Representative: {recruiterProfile.recruiterName}</p>
+                <p style={{ color: '#64748b', fontSize: '12px', marginTop: '6px', fontStyle: 'italic' }}>"{recruiterProfile.bio}"</p>
               </div>
             </div>
           </div>
@@ -1385,6 +1510,70 @@ export const RecruiterDashboard: React.FC = () => {
               )}
             </div>
           </main>
+        </div>
+      )}
+
+      {/* Calendar Invitation Scheduling Modal */}
+      {showCalendarModal && selectedKanbanCandidate && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 1050,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div className="bg-white border border-slate-200 rounded-lg p-6 max-w-sm w-full shadow-lg">
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>
+              🗓️ Schedule Calendar Invite
+            </h3>
+            <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px' }}>
+              Select date and time to invite <strong>{selectedKanbanCandidate.candidateProfile?.name || 'Candidate'}</strong> for the <strong>{jobs.find(j => j.id === selectedKanbanCandidate.jobId)?.title || 'Role'}</strong> interview.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569' }}>Date</label>
+                <input 
+                  type="date" 
+                  value={calendarDate} 
+                  onChange={(e) => setCalendarDate(e.target.value)}
+                  className="input-flat text-slate-800"
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569' }}>Time</label>
+                <input 
+                  type="time" 
+                  value={calendarTime} 
+                  onChange={(e) => setCalendarTime(e.target.value)}
+                  className="input-flat text-slate-800"
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'end' }}>
+              <button 
+                onClick={() => setShowCalendarModal(false)}
+                className="btn-ghost py-2 px-4 text-xs"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  updateApplicationStatus(selectedKanbanCandidate.id, 'Interview');
+                  alert(`Calendar invite sent successfully to ${selectedKanbanCandidate.candidateProfile?.name || 'Candidate'} for ${calendarDate} at ${calendarTime}!`);
+                  setShowCalendarModal(false);
+                }}
+                className="btn-primary py-2 px-4 text-xs"
+              >
+                Send Invite
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

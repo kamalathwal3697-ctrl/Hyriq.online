@@ -31,6 +31,7 @@ export const CandidateDashboard: React.FC = () => {
     setPerspective
   } = useAppState();
   const [detailsTab, setDetailsTab] = useState<'info' | 'pact'>('info');
+  const [isAvailable, setIsAvailable] = useState(true);
   const [showApplyPactModal, setShowApplyPactModal] = useState(false);
   const [pactChecked, setPactChecked] = useState(false);
   const [typedSignature, setTypedSignature] = useState('');
@@ -2652,202 +2653,237 @@ export const CandidateDashboard: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* NOTIFICATIONS VIEW */}
-      {activeTab === 'notifications' && (
-        <NotificationsPage />
-      )}
-
-      {/* WORKSPACE VIEW - Dashboard with Stats */}
       {activeTab === 'workspace' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Stats Overview Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-            <div className="seeker-light-card" style={{ padding: '16px', borderRadius: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Applications Sent</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--corporate-blue)' }}>{applications.length}</div>
-              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>Active pipeline</div>
+          {/* Welcome greeting with Availability Toggle switch */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: 0 }}>Career Hub</h2>
+              <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>Manage applications and discover matched openings.</p>
             </div>
-            <div className="seeker-light-card" style={{ padding: '16px', borderRadius: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Under Review</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--tech-orange)' }}>{applications.filter(a => a.status === 'Reviewing').length}</div>
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '4px' }}>Pending response</div>
-            </div>
-            <div className="seeker-light-card" style={{ padding: '16px', borderRadius: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Shortlisted</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#10b981' }}>{applications.filter(a => a.status === 'Shortlisted' || a.status === 'Interview').length}</div>
-              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>Interviews lined up</div>
-            </div>
-            <div className="seeker-light-card" style={{ padding: '16px', borderRadius: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Job Matches</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--corporate-blue)' }}>{jobs.length}</div>
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '4px' }}>Available positions</div>
-            </div>
-          </div>
 
-          {/* Profile Completion Card */}
-          <div className="seeker-light-card" style={{ padding: '20px', borderRadius: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--corporate-blue)', margin: 0 }}>Profile Strength</h3>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: candidateProfile.onboardingCompleted ? '#10b981' : 'var(--tech-orange)' }}>
-                {candidateProfile.onboardingCompleted ? 'Complete' : 'In Progress'}
-              </span>
-            </div>
-            <div style={{ height: '6px', background: 'rgba(26,62,98,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: candidateProfile.onboardingCompleted ? '100%' : '60%',
-                background: candidateProfile.onboardingCompleted ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, var(--tech-orange), #f97316)',
-                borderRadius: '3px',
-                transition: 'width 0.5s ease'
-              }} />
-            </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => setActiveTab('profile')}
-                style={{
-                  background: 'var(--corporate-blue)',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
+            {/* Prominent Availability Toggle switch */}
+            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-lg">
+              <span className="text-xs font-semibold text-slate-700">Update Availability</span>
+              <button 
+                onClick={() => setIsAvailable(!isAvailable)}
+                className={`w-11 h-6 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-200 ${isAvailable ? 'bg-[#2563eb]' : 'bg-slate-300'}`}
               >
-                {candidateProfile.onboardingCompleted ? 'Edit Profile' : 'Complete Setup'}
-              </button>
-              <button
-                onClick={() => setActiveTab('explore')}
-                style={{
-                  background: 'rgba(242,153,74,0.1)',
-                  color: 'var(--tech-orange)',
-                  border: '1px solid rgba(242,153,74,0.3)',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                Browse Jobs
+                <div className={`bg-white w-5 h-5 rounded-full shadow-sm transform transition-transform duration-200 ${isAvailable ? 'translate-x-5' : 'translate-x-0'}`}></div>
               </button>
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="seeker-light-card" style={{ padding: '20px', borderRadius: '14px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--corporate-blue)', margin: '0 0 16px 0' }}>Recent Activity</h3>
-            {applications.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
-                <p style={{ fontSize: '13px', margin: 0 }}>No applications yet. Start exploring jobs!</p>
+          {/* Top Metric Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+            <div className="card-flat" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Profile Views</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a' }}>142</div>
+              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>+12% this week</div>
+            </div>
+            <div className="card-flat" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Applications Sent</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a' }}>{applications.length}</div>
+              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '4px' }}>Active pipelines</div>
+            </div>
+            <div className="card-flat" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Active Matches</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a' }}>
+                {jobs.filter(job => {
+                  if (candidateProfile.skills && candidateProfile.skills.length > 0) {
+                    return candidateProfile.skills.some(skill => 
+                      job.title.toLowerCase().includes(skill.toLowerCase()) || 
+                      job.description.toLowerCase().includes(skill.toLowerCase())
+                    );
+                  }
+                  return true;
+                }).length}
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {applications.slice(0, 5).map(app => {
-                  const job = jobs.find(j => j.id === app.jobId);
+              <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 600, marginTop: '4px' }}>Highly aligned</div>
+            </div>
+          </div>
+
+          {/* Main Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px' }} className="workspace-main-grid">
+            {/* Left Column: Tailored Recommended Roles */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: '8px 0 0 0' }}>Recommended Roles</h3>
+              {(() => {
+                const recommended = jobs.filter(job => {
+                  if (candidateProfile.skills && candidateProfile.skills.length > 0) {
+                    return candidateProfile.skills.some(skill => 
+                      job.title.toLowerCase().includes(skill.toLowerCase()) || 
+                      job.description.toLowerCase().includes(skill.toLowerCase())
+                    );
+                  }
+                  return true;
+                }).slice(0, 5);
+
+                if (recommended.length === 0) {
                   return (
-                    <div key={app.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'rgba(26,62,98,0.03)', borderRadius: '8px', border: '1px solid rgba(26,62,98,0.06)' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, #1A3E62, #F2994A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
-                        {job?.logoSeed || '💼'}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--corporate-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job?.title || 'Unknown Job'}</div>
-                        <div style={{ fontSize: '11px', color: '#64748b' }}>{job?.companyName || 'Unknown Company'}</div>
-                      </div>
-                      {getStatusBadge(app.status)}
+                    <div className="card-flat p-8 text-center text-slate-500">
+                      <p className="text-xs">No recommended roles matching your skill tags. Try updating your profile!</p>
                     </div>
                   );
-                })}
-              </div>
-            )}
-          </div>
+                }
 
-          {/* Quick Actions */}
-          <div className="seeker-light-card" style={{ padding: '20px', borderRadius: '14px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--corporate-blue)', margin: '0 0 12px 0' }}>Quick Actions</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <button
-                onClick={() => setActiveTab('explore')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  background: 'rgba(26,62,98,0.05)',
-                  border: '1px solid rgba(26,62,98,0.1)',
-                  borderRadius: '10px',
-                  color: 'var(--corporate-blue)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Briefcase size={16} />
-                Find Jobs
-              </button>
-              <button
-                onClick={() => setActiveTab('chats')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  background: 'rgba(242,153,74,0.05)',
-                  border: '1px solid rgba(242,153,74,0.15)',
-                  borderRadius: '10px',
-                  color: 'var(--tech-orange)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <MessageCircle size={16} />
-                View Chats
-              </button>
-              <button
-                onClick={() => setActiveTab('govt')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  background: 'rgba(16,185,129,0.05)',
-                  border: '1px solid rgba(16,185,129,0.15)',
-                  borderRadius: '10px',
-                  color: '#10b981',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <span>🏛️</span>
-                Govt Jobs
-              </button>
-              <button
-                onClick={() => setActiveTab('settings')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  background: 'rgba(100,116,139,0.05)',
-                  border: '1px solid rgba(100,116,139,0.15)',
-                  borderRadius: '10px',
-                  color: '#64748b',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Settings size={16} />
-                Settings
-              </button>
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {recommended.map(job => {
+                      const alreadyApplied = applications.some(app => app.jobId === job.id);
+                      return (
+                        <div 
+                          key={job.id} 
+                          className="card-flat p-5 flex justify-between items-center relative group hover:border-[#2563eb]/30"
+                        >
+                          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', border: '1px solid #f1f5f9' }}>
+                              {job.logoSeed || '💼'}
+                            </div>
+                            <div>
+                              <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', margin: 0 }}>{job.title}</h4>
+                              <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0' }}>{job.companyName} • {job.location}</p>
+                              <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                                <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium">{job.type}</span>
+                                <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium">{job.mode}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Hover Quick Apply action */}
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {alreadyApplied ? (
+                              <span className="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded">Applied</span>
+                            ) : (
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button 
+                                  onClick={() => handleApply(job.id)}
+                                  className="btn-primary py-1.5 px-3.5 text-xs"
+                                >
+                                  Quick Apply
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Right Column: Profile Strength & Quick Actions */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Profile Completion Card */}
+              <div className="card-flat" style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', margin: 0 }}>Profile Strength</h3>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: candidateProfile.onboardingCompleted ? '#10b981' : '#f97316' }}>
+                    {candidateProfile.onboardingCompleted ? 'Complete' : 'In Progress'}
+                  </span>
+                </div>
+                <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: candidateProfile.onboardingCompleted ? '100%' : '60%',
+                    background: '#2563eb',
+                    borderRadius: '3px',
+                    transition: 'width 0.5s ease'
+                  }} />
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className="btn-primary py-1.5 px-4 text-xs"
+                  >
+                    Edit Profile
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="card-flat" style={{ padding: '20px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', margin: '0 0 12px 0' }}>Quick Actions</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <button
+                    onClick={() => setActiveTab('explore')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      color: '#475569',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Find Jobs
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('chats')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      color: '#475569',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    View Chats
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('govt')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      color: '#475569',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Govt Jobs
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('settings')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      color: '#475569',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Settings
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

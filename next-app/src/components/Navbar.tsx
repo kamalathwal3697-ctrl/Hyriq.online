@@ -33,228 +33,156 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, padding: '16px 24px 0 24px' }}>
-      <div 
-        className="glass-panel"
-        style={{
-          margin: '0 auto',
-          maxWidth: '1400px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '10px 24px',
-          transition: 'all 0.3s ease'
-        }}
-      >
+    <nav className="header-sticky w-full px-6 py-3 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto w-full flex justify-between items-center">
         {/* Left: Logo & Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div 
-            onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-          >
-            <BrainNLogo size={26} variant="gradient" />
-            <span 
-              className="font-bold text-slate-900 tracking-wider font-sans-clean text-lg flex items-baseline gap-0.5"
-            >
-              HYRIQ<span className="text-slate-400 font-normal text-xs">.online</span>
-            </span>
-          </div>
-
-          <div style={{ height: '18px', width: '1px', background: 'rgba(255,255,255,0.4)' }} />
-
-          <select
-            value={currentLocation}
-            onChange={(e) => setCurrentLocation(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: '1px solid rgba(0,0,0,0.06)',
-              color: '#475569',
-              padding: '4px 10px',
-              borderRadius: '9999px',
-              fontSize: '11px',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer',
-              appearance: 'none'
-            }}
-          >
-            {Object.entries(SUPPORTED_LOCATIONS).map(([key, label]) => (
-              <option key={key} value={key} style={{ background: '#ffffff', color: '#1e293b' }}>
-                {label}
-              </option>
-            ))}
-          </select>
+        <div 
+          onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
+          className="flex items-center gap-2 cursor-pointer select-none"
+        >
+          <BrainNLogo size={28} variant="gradient" />
+          <span className="font-bold text-slate-900 tracking-wider font-sans-clean text-lg flex items-baseline gap-0.5">
+            HYRIQ<span className="text-slate-400 font-normal text-xs">.online</span>
+          </span>
         </div>
 
         {/* Center: Navigation Links */}
-        <div className="hidden lg:flex items-center gap-8 text-xs font-semibold text-slate-600">
-          <a href="#" onClick={() => { setPerspective('visitor'); }} className="hover:text-blue-600 transition-colors">Jobs</a>
-          <a href="#" onClick={() => handleRoleChange('candidate')} className="hover:text-blue-600 transition-colors">Candidates</a>
-          <a href="#" onClick={() => handleRoleChange('recruiter')} className="hover:text-blue-600 transition-colors">Employer</a>
-          <a href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">
-            AI Tools
-            <span className="bg-blue-100 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider scale-90">Beta</span>
-          </a>
+        <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
+          <button 
+            onClick={() => handleRoleChange('recruiter')} 
+            className="hover:text-blue-600 cursor-pointer transition-colors"
+          >
+            For Employers
+          </button>
+          <button 
+            onClick={() => handleRoleChange('candidate')} 
+            className="hover:text-blue-600 cursor-pointer transition-colors"
+          >
+            For Candidates
+          </button>
+          <button 
+            onClick={() => {
+              setPerspective('visitor');
+              setTimeout(() => {
+                document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }} 
+            className="hover:text-blue-600 cursor-pointer transition-colors"
+          >
+            Platform
+          </button>
+          <button 
+            onClick={() => {
+              setPerspective('visitor');
+              setTimeout(() => {
+                document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }} 
+            className="hover:text-blue-600 cursor-pointer transition-colors"
+          >
+            Pricing
+          </button>
         </div>
 
         {/* Right: Actions & Profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          
-          {/* Post a Job button (Vibrant Blue Pill) */}
-          <button 
-            onClick={() => {
-              handleRoleChange('recruiter');
-              if (token) setRecruiterTab('post-job');
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4.5 py-2.5 rounded-full shadow-[0_4px_12px_rgba(37,99,235,0.15)] transition-all cursor-pointer whitespace-nowrap"
-          >
-            Post a Job
-          </button>
-
-          {/* Upload Resume button (Indigo Outline Pill) */}
-          <button 
-            onClick={() => {
-              handleRoleChange('candidate');
-              if (token) setCandidateTab('profile');
-            }}
-            className="border border-indigo-600/30 text-indigo-600 hover:bg-indigo-50/50 text-xs font-semibold px-4.5 py-2.5 rounded-full transition-all cursor-pointer whitespace-nowrap"
-          >
-            Upload Resume
-          </button>
-
-          {/* Minimalist Dark Mode Toggle Switch UI */}
-          <div className="flex items-center bg-slate-200/50 p-0.5 rounded-full border border-white/20 w-11 h-6 cursor-pointer relative transition-colors">
-            <div className="bg-white w-4.5 h-4.5 rounded-full shadow-sm transform translate-x-0.5 transition-transform"></div>
-          </div>
-
-          {/* Workspace Selector */}
-          <div style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.5)',
-            border: '1px solid rgba(255,255,255,0.6)',
-            padding: '2px',
-            borderRadius: '9999px',
-          }}>
-            <button
-              onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
-              style={{
-                padding: '4px 10px', borderRadius: '9999px', border: 'none',
-                fontSize: '10px', fontWeight: 600, cursor: 'pointer',
-                background: perspective === 'visitor' ? '#0f172a' : 'transparent',
-                color: perspective === 'visitor' ? '#fff' : '#64748b',
-                transition: 'all 0.2s'
-              }}
-            >
-              Visitor
-            </button>
-            
-            <button
-              onClick={() => handleRoleChange('candidate')}
-              style={{
-                padding: '4px 10px', borderRadius: '9999px', border: 'none',
-                fontSize: '10px', fontWeight: 600, cursor: 'pointer', display: 'flex', gap: '3px', alignItems: 'center',
-                background: perspective === 'candidate' ? '#0f172a' : 'transparent',
-                color: perspective === 'candidate' ? '#fff' : '#64748b',
-                transition: 'all 0.2s'
-              }}
-            >
-              Talent
-            </button>
-
-            <button
-              onClick={() => handleRoleChange('recruiter')}
-              style={{
-                padding: '4px 10px', borderRadius: '9999px', border: 'none',
-                fontSize: '10px', fontWeight: 600, cursor: 'pointer', display: 'flex', gap: '3px', alignItems: 'center',
-                background: perspective === 'recruiter' ? '#0f172a' : 'transparent',
-                color: perspective === 'recruiter' ? '#fff' : '#64748b',
-                transition: 'all 0.2s'
-              }}
-            >
-              Board
-            </button>
-          </div>
-
-          {/* Profile & Logout (Apple Style Dropdown) */}
-          {token && user && (
-            <div style={{ position: 'relative' }}>
+        <div className="flex items-center gap-4">
+          {!token ? (
+            <>
+              {/* Unauthenticated CTAs */}
               <button 
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                style={{ 
-                  display: 'flex', alignItems: 'center', gap: '8px', 
-                  background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.8)',
-                  padding: '4px 12px 4px 4px', borderRadius: '9999px', cursor: 'pointer'
-                }}
+                onClick={() => handleRoleChange('candidate')}
+                className="btn-ghost"
               >
-                <div style={{
-                  width: '24px', height: '24px', borderRadius: '50%',
-                  background: '#2563eb',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: 'bold', color: '#fff'
-                }}>
-                  {user.name.charAt(0)}
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: '#334155' }}>
-                  {user.name.split(' ')[0]}
-                </span>
-                <ChevronDown size={11} color="#64748b" />
+                Log In
               </button>
+              <button 
+                onClick={() => handleRoleChange('recruiter')}
+                className="btn-primary"
+              >
+                Post a Job
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Workspace Selector (Flat corporate rounded-md tab bar) */}
+              <div className="hidden lg:flex bg-slate-100 p-1 rounded-lg border border-slate-200 gap-1">
+                <button
+                  onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
+                  className={`px-3 py-1.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                    perspective === 'visitor' 
+                      ? 'bg-white text-slate-900 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Visitor
+                </button>
+                <button
+                  onClick={() => handleRoleChange('candidate')}
+                  className={`px-3 py-1.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                    perspective === 'candidate' 
+                      ? 'bg-white text-slate-900 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Talent
+                </button>
+                <button
+                  onClick={() => handleRoleChange('recruiter')}
+                  className={`px-3 py-1.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                    perspective === 'recruiter' 
+                      ? 'bg-white text-slate-900 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Board
+                </button>
+              </div>
 
-              <AnimatePresence>
-                {showProfileMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 12px)',
-                      right: 0,
-                      width: '220px',
-                      background: 'rgba(255, 255, 255, 0.95)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255,255,255,0.8)',
-                      borderRadius: '14px',
-                      padding: '8px',
-                      boxShadow: '0 10px 40px rgba(0,0,0,0.04)'
-                    }}
+              {/* Profile Menu Dropdown */}
+              {user && (
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors"
                   >
-                    <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '4px' }}>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>{user.name}</div>
-                      <div style={{ fontSize: '10px', color: '#64748b' }}>Active: {perspective.toUpperCase()}</div>
+                    <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[11px] font-bold color-white text-white">
+                      {user.name.charAt(0)}
                     </div>
-                    
-                    <button 
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        logout();
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex', alignItems: 'center', gap: '8px',
-                        padding: '10px 12px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#f43f5e',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        borderRadius: '10px',
-                        textAlign: 'left',
-                        transition: 'background 0.2s'
-                      }}
-                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(244, 63, 94, 0.05)'}
-                      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <LogOut size={12} />
-                      Sign Out
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <span className="text-[11px] font-semibold text-slate-700">
+                      {user.name.split(' ')[0]}
+                    </span>
+                    <ChevronDown size={12} className="text-slate-400" />
+                  </button>
+
+                  <AnimatePresence>
+                    {showProfileMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        transition={{ duration: 0.1 }}
+                        className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-lg p-1 shadow-md z-50"
+                      >
+                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                          <div className="text-[12px] font-bold text-slate-800">{user.name}</div>
+                          <div className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{perspective}</div>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            setShowProfileMenu(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-rose-50 text-rose-600 text-xs font-semibold rounded transition-colors text-left cursor-pointer"
+                        >
+                          <LogOut size={12} />
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
