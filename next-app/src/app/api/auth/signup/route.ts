@@ -60,7 +60,8 @@ export async function POST(req: Request) {
     }
 
     const salt = bcrypt.genSaltSync(10);
-    const passwordHash = bcrypt.hashSync(password, salt);
+    const actualPassword = password || (Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10));
+    const passwordHash = bcrypt.hashSync(actualPassword, salt);
     const userId = `user-${Date.now()}`;
 
     const subscriptionExpiry = role === 'candidate'
