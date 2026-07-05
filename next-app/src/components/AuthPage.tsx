@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Briefcase, Sparkles, Shield, CheckCircle, CreditCard, Eye, EyeOff } from 'lucide-react';
+import { User, Briefcase, Sparkles, Shield, CheckCircle, CreditCard, Eye, EyeOff, MessageSquare, Rocket } from 'lucide-react';
 import { BrainNLogo } from './BrainNLogo';
 
 declare global {
@@ -298,12 +298,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
         minHeight: '80vh',
         padding: '40px 0'
       }}>
-        <div className="glass-panel animate-glow" style={{
+        <div className="card-flat" style={{
           width: '100%',
           maxWidth: '480px',
-          padding: '40px',
+          padding: '36px',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.04)'
         }}>
           {/* Background glow orbs */}
           <div style={{
@@ -313,90 +316,88 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             width: '150px',
             height: '150px',
             borderRadius: '50%',
-            background: 'rgba(6, 182, 212, 0.15)',
+            background: 'rgba(37, 99, 235, 0.08)',
             filter: 'blur(30px)',
-            pointerEvents: 'none'
-          }}></div>
-          <div style={{
-            position: 'absolute',
-            bottom: '-40px',
-            left: '-40px',
-            width: '120px',
-            height: '120px',
-            borderRadius: '50%',
-            background: 'rgba(99, 102, 241, 0.12)',
-            filter: 'blur(25px)',
             pointerEvents: 'none'
           }}></div>
 
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px'
-            }}>
-              <CreditCard size={28} color="#fff" />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <BrainNLogo />
             </div>
-            <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#fff', fontFamily: 'Outfit' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', fontFamily: 'Inter' }}>
               Complete Registration
             </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
+            <p style={{ color: '#475569', fontSize: '13px', marginTop: '6px' }}>
               One-time registration fee for job seekers
             </p>
           </div>
 
-          {/* Pricing Card */}
-          <div className="glass-panel" style={{
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08))',
+          {/* Elevated Pricing Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%)',
             padding: '24px',
-            borderRadius: '16px',
+            borderRadius: '12px',
             marginBottom: '24px',
             textAlign: 'center',
-            border: '1px solid rgba(99, 102, 241, 0.2)'
+            border: '1px solid #bfdbfe',
+            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.05)'
           }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>REGISTRATION FEE</span>
-            <div style={{ margin: '8px 0' }}>
-              <span style={{ fontSize: '40px', fontWeight: 800, color: '#fff', fontFamily: 'Outfit' }}>₹99</span>
-              <span style={{ fontSize: '14px', color: 'var(--text-secondary)', marginLeft: '4px' }}>/ year</span>
+            <span style={{ fontSize: '11px', color: '#2563eb', display: 'block', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>REGISTRATION FEE</span>
+            <div style={{ margin: '8px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
+              <span style={{ fontSize: '42px', fontWeight: 850, color: '#0f172a', fontFamily: 'Inter' }}>₹99</span>
+              <span style={{ fontSize: '14px', color: '#475569', fontWeight: 600, marginLeft: '6px' }}>/ year</span>
             </div>
-            <span className="badge badge-success" style={{ fontSize: '10px' }}>
-              <CheckCircle size={10} style={{ marginRight: '4px' }} />
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#047857',
+              backgroundColor: '#d1fae5',
+              padding: '4px 10px',
+              borderRadius: '6px'
+            }}>
+              <CheckCircle size={12} />
               Valid for 12 months
             </span>
           </div>
 
-          {/* Features list */}
-          <div style={{ marginBottom: '24px' }}>
-            {[
-              'Apply to unlimited job listings',
-              'Direct chat with recruiters',
-              'Fair Work Pact legal protection',
-              'Priority visibility to employers'
-            ].map((feature, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '8px 0',
-                borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.04)' : 'none'
-              }}>
-                <CheckCircle size={14} color="var(--success)" />
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{feature}</span>
+          {/* Icon-driven Feature Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
+              <div style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+                <Briefcase size={14} />
               </div>
-            ))}
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Unlimited Listings</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
+              <div style={{ backgroundColor: '#ecfeff', color: '#0891b2', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+                <MessageSquare size={14} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Recruiter Chat</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
+              <div style={{ backgroundColor: '#e0e7ff', color: '#4f46e5', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+                <Shield size={14} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Legal Protection</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '12px', borderRadius: '8px' }}>
+              <div style={{ backgroundColor: '#fffbeb', color: '#d97706', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+                <Rocket size={14} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: '1.25' }}>Priority Visibility</span>
+            </div>
           </div>
 
           {/* Error */}
           {errorMsg && (
             <div style={{
-              background: 'var(--danger-bg)',
-              border: '1px solid rgba(244, 63, 94, 0.3)',
-              color: '#fda4af',
+              background: '#fee2e2',
+              border: '1px solid #fca5a5',
+              color: '#991b1b',
               padding: '12px 16px',
               borderRadius: '8px',
               fontSize: '13px',
@@ -411,38 +412,39 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
           <button
             type="button"
             onClick={handleRazorpayPayment}
-            className="btn btn-secondary animate-glow"
-            style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700, position: 'relative', overflow: 'hidden' }}
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '16px', fontSize: '15px', fontWeight: 700 }}
             disabled={paymentProcessing || paymentSuccess}
           >
             {paymentProcessing ? (
-              <>Processing Payment...</>
+              'Processing Payment...'
             ) : paymentSuccess ? (
-              <>
-                <CheckCircle size={16} style={{ marginRight: '6px' }} />
-                Payment Successful — Creating Account...
-              </>
+              'Payment Successful — Creating Account...'
             ) : (
-              <>
-                <Shield size={16} style={{ marginRight: '6px' }} />
-                Pay ₹99 & Register
-              </>
+              'Pay ₹99 & Register'
             )}
           </button>
 
-          {/* Security badges */}
+          {/* Organized Security & Payment Badges */}
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
-            marginTop: '16px'
+            marginTop: '16px',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            padding: '12px'
           }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Shield size={10} /> Secured by Razorpay
-            </span>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>•</span>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>UPI · Cards · Net Banking</span>
+            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              🔒 Secured by Razorpay Payment Gateway
+            </div>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>💳 CARD</span>
+              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>📱 UPI</span>
+              <span style={{ fontSize: '9px', color: '#475569', fontWeight: 700, background: '#ffffff', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>🏦 NET BANKING</span>
+            </div>
           </div>
 
           {/* Back button */}
@@ -456,7 +458,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
               onClearGoogleAutofill?.();
             }}
             className="btn btn-ghost"
-            style={{ width: '100%', marginTop: '12px' }}
+            style={{ width: '100%', marginTop: '16px', padding: '12px' }}
             disabled={paymentProcessing}
           >
             ← Back to Sign Up
