@@ -21,7 +21,7 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-white text-slate-600 flex flex-col font-sans antialiased">
+    <div className="w-full min-h-screen bg-slate-50 text-slate-600 flex flex-col font-sans antialiased">
       
       {/* 2. Hero Section (Deep Navy Background) */}
       <section className="bg-[#0f172a] text-white pt-24 pb-20 px-6 overflow-hidden relative">
@@ -126,7 +126,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 3. Social Proof Section (White Background) */}
-      <section className="bg-white py-12 px-6 border-b border-slate-100">
+      <section className="bg-slate-50 py-12 px-6 border-b border-slate-100">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">
             Trusted by innovative companies worldwide
