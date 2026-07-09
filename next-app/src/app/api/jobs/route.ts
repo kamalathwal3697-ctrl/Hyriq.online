@@ -42,6 +42,7 @@ export async function GET() {
         id: job.id,
         title: job.title,
         company: job.company || job.postedBy?.companyName || 'Hyriq Employer',
+        companyName: job.company || job.postedBy?.companyName || 'Hyriq Employer',
         location: job.location,
         mode: mode,
         type: job.type,
