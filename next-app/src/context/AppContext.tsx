@@ -84,7 +84,7 @@ interface AppContextType {
   perspective: Perspective;
   setPerspective: (p: Perspective) => void;
   token: string | null;
-  user: { id: string; email: string; role: 'candidate' | 'recruiter'; name: string } | null;
+  user: { id: string; email: string; role: 'candidate' | 'recruiter' | 'admin'; name: string } | null;
   jobs: Job[];
   applications: Application[];
   candidateProfile: CandidateProfile;

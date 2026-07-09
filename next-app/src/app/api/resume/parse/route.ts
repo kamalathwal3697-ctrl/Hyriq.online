@@ -48,6 +48,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Only PDF files are supported for now' }, { status: 400 });
     }
 
+    // Verify PDF header magic bytes signature (%PDF-) to prevent spoofing
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const header = buffer.toString('utf-8', 0, 5);
+    if (header !== '%PDF-') {
+      return NextResponse.json({ error: 'Invalid file format. File is not a valid PDF document.' }, { status: 400 });
+    }
+
     // 1. In a real app, we would use pdf-parse or send to Gemini API
     // Since we are mocking AI to avoid native build issues, we just generate mock text based on the file
     const text = `I am a skilled developer with experience in React, Next.js, and TypeScript. I have also used Node.js and PostgreSQL for backend APIs. My skills include Sales, Leadership, and Management from past roles.`;

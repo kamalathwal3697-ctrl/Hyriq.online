@@ -2,21 +2,31 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id                  String        @id @default(uuid())
   email               String        @unique
   passwordHash        String
-  role                String        @default("candidate") // "candidate", "recruiter", "admin"
+  role                String        @default("candidate") // "candidate", "recruiter", "admin", "moderator", "support"
   name                String?
   phone               String?
   bio                 String?
+  
+  // Security
+  mfaEnabled          Boolean       @default(false)
+  mfaSecret           String?
+  emailVerified       Boolean       @default(false)
+  phoneVerified       Boolean       @default(false)
+  lastLoginIp         String?
+  lastLoginAt         DateTime?
   
   // Candidate specific
   skills              String[]
@@ -24,11 +34,14 @@ model User {
   resumeName          String?
   onboardingCompleted Boolean       @default(false)
   subscriptionExpiry  DateTime?
-  preferences         Json?
+  paymentId           String?       @unique
+  preferences         Json?         // Candidate job preferences: type, mode, minSalary, experience
   
   // Recruiter specific
   companyName         String?
   companyBio          String?
+  companyId           String?
+  company             Company?      @relation(fields: [companyId], references: [id])
 
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
@@ -38,53 +51,92 @@ model User {
   messagesSent        Message[]     @relation("SentMessages")
   messagesReceived    Message[]     @relation("ReceivedMessages")
   payments            Payment[]
+  auditLogs           AuditLog[]
+}
+
+model Company {
+  id                 String   @id @default(uuid())
+  name               String   @unique
+  logo               String?
+  banner             String?
+  overview           String?
+  mission            String?
+  vision             String?
+  culture            String?
+  benefits           String[]
+  officeLocations    String[]
+  website            String?
+  socialLinks        Json?
+  isVerified         Boolean  @default(false)
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  recruiters         User[]
+  jobs               Job[]
 }
 
 model Job {
-  id              String        @id @default(uuid())
-  title           String
-  company         String
-  location        String
-  type            String        // Full-time, Part-time, Internship, etc.
-  salary          String?
-  description     String
-  requirements    String[]
-  responsibilities String[]
-  tags            String[]
-  logo            String?       // URL to company logo
+  id                 String        @id @default(uuid())
+  title              String
+  company            String
+  companyId          String?
+  companyProfile     Company?      @relation(fields: [companyId], references: [id])
+  location           String
+  type               String        // Full-time, Part-time, Internship, Contract
+  salary             String?
+  description        String
+  requirements       String[]
+  responsibilities   String[]
+  tags               String[]
+  logo               String?       // URL to company logo
   
-  postedById      String
-  postedBy        User          @relation(fields: [postedById], references: [id])
+  // Screening
+  screeningQuestions Json?         // List of custom screening questions: { question: string, type: 'text' | 'yesno' }[]
   
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  postedById         String
+  postedBy           User          @relation(fields: [postedById], references: [id])
+  
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-  applications    Application[]
+  applications       Application[]
 }
 
 model Application {
-  id            String    @id @default(uuid())
-  jobId         String
-  job           Job       @relation(fields: [jobId], references: [id])
-  applicantId   String
-  applicant     User      @relation(fields: [applicantId], references: [id])
-  status        String    @default("pending") // pending, reviewing, accepted, rejected
-  coverLetter   String?
+  id               String    @id @default(uuid())
+  jobId            String
+  job              Job       @relation(fields: [jobId], references: [id])
+  applicantId      String
+  applicant        User      @relation(fields: [applicantId], references: [id])
+  status           String    @default("pending") // pending, reviewing, accepted, rejected, hired
+  coverLetter      String?
   
-  appliedAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  // Responses
+  screeningAnswers Json?     // Candidate's answers to screening questions: { question: string, answer: string }[]
+  
+  // Dynamic Pact/Signatures
+  candidateSignature String?
+  candidateSignedAt  DateTime?
+  recruiterSignature String?
+  recruiterSignedAt  DateTime?
+
+  appliedAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  messages         Message[]
 }
 
 model Message {
-  id          String    @id @default(uuid())
-  senderId    String
-  sender      User      @relation("SentMessages", fields: [senderId], references: [id])
-  receiverId  String
-  receiver    User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  content     String
-  
-  read        Boolean   @default(false)
-  createdAt   DateTime  @default(now())
+  id            String       @id @default(uuid())
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  senderId      String
+  sender        User         @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId    String
+  receiver      User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  content       String
+  read          Boolean      @default(false)
+  createdAt     DateTime     @default(now())
 }
 
 model Payment {
@@ -94,8 +146,19 @@ model Payment {
   amount      Float
   currency    String    @default("INR")
   status      String    @default("pending") // pending, successful, failed
-  paymentId   String?   // External payment gateway ID (e.g., Razorpay)
+  paymentId   String?   // External payment gateway ID (e.g., Razorpay / Stripe)
   
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // "login", "create_job", "update_application", "delete_job", "verify_company"
+  ipAddress String?
+  userAgent String?
+  details   String?
+  createdAt DateTime @default(now())
 }

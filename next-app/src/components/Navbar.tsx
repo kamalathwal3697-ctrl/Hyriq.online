@@ -32,31 +32,36 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const isVisitor = perspective === 'visitor';
+
   return (
-    <nav className="header-sticky w-full px-6 py-3 flex items-center justify-between">
-      <div className="max-w-6xl mx-auto w-full flex justify-between items-center">
+    <nav className={isVisitor 
+      ? "fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl px-8 py-3.5 flex items-center justify-between z-50 glass-pill-nav"
+      : "header-sticky w-full px-6 py-3 flex items-center justify-between"
+    }>
+      <div className="w-full flex justify-between items-center">
         {/* Left: Logo & Brand */}
         <div 
           onClick={() => { setPerspective('visitor'); setVisitorRole(null); }}
           className="flex items-center gap-2 cursor-pointer select-none"
         >
           <BrainNLogo size={28} variant="gradient" />
-          <span className="font-bold text-slate-900 tracking-wider font-sans-clean text-lg flex items-baseline gap-0.5">
+          <span className={`font-bold tracking-wider font-sans-clean text-lg flex items-baseline gap-0.5 ${isVisitor ? 'text-white' : 'text-slate-900'}`}>
             HYRIQ<span className="text-slate-400 font-normal text-xs">.online</span>
           </span>
         </div>
 
         {/* Center: Navigation Links */}
-        <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
+        <div className={`hidden md:flex items-center gap-8 text-xs font-semibold ${isVisitor ? 'text-slate-200' : 'text-slate-600'}`}>
           <button 
             onClick={() => handleRoleChange('recruiter')} 
-            className="hover:text-blue-600 cursor-pointer transition-colors"
+            className={`hover:text-[#06b6d4] cursor-pointer transition-colors ${isVisitor ? 'hover:text-white' : ''}`}
           >
             For Employers
           </button>
           <button 
             onClick={() => handleRoleChange('candidate')} 
-            className="hover:text-blue-600 cursor-pointer transition-colors"
+            className={`hover:text-[#06b6d4] cursor-pointer transition-colors ${isVisitor ? 'hover:text-white' : ''}`}
           >
             For Candidates
           </button>
@@ -67,7 +72,7 @@ const Navbar: React.FC = () => {
                 document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }} 
-            className="hover:text-blue-600 cursor-pointer transition-colors"
+            className={`hover:text-[#06b6d4] cursor-pointer transition-colors ${isVisitor ? 'hover:text-white' : ''}`}
           >
             Platform
           </button>
@@ -78,7 +83,7 @@ const Navbar: React.FC = () => {
                 document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }} 
-            className="hover:text-blue-600 cursor-pointer transition-colors"
+            className={`hover:text-[#06b6d4] cursor-pointer transition-colors ${isVisitor ? 'hover:text-white' : ''}`}
           >
             Pricing
           </button>
@@ -91,13 +96,13 @@ const Navbar: React.FC = () => {
               {/* Unauthenticated CTAs */}
               <button 
                 onClick={() => handleRoleChange('candidate')}
-                className="btn-ghost"
+                className={`btn-ghost rounded-full ${isVisitor ? 'text-white hover:text-white hover:bg-white/10' : ''}`}
               >
                 Log In
               </button>
               <button 
                 onClick={() => handleRoleChange('recruiter')}
-                className="btn-primary"
+                className="btn-primary rounded-full bg-[#2563eb] text-white border border-transparent hover:bg-[#1d4ed8] active:scale-95 transition-all shadow-[0_4px_14px_rgba(37,99,235,0.4)]"
               >
                 Post a Job
               </button>

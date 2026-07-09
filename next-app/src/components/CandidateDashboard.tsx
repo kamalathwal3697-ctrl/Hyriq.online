@@ -28,6 +28,7 @@ export const CandidateDashboard: React.FC = () => {
     setSelectedJobId,
     currentLocation,
     setCurrentLocation,
+    perspective,
     setPerspective
   } = useAppState();
   const [detailsTab, setDetailsTab] = useState<'info' | 'pact'>('info');
@@ -579,638 +580,528 @@ export const CandidateDashboard: React.FC = () => {
     }
   };
 
-  const isLightMode = activeTab === 'explore' || activeTab === 'govt' || activeTab === 'workspace' || activeTab === 'chats';
+  const renderJobDetailsContent = (job: Job) => {
+    const isApplied = applications.some(app => app.jobId === job.id && app.candidateId === 'cand-1');
+    const matchingApp = applications.find(app => app.jobId === job.id && app.candidateId === 'cand-1');
+    const matchInfo = getAIFeedback(job);
+    const matchScore = matchInfo.score;
+    const matchLabel = matchInfo.label;
+
+    let barColor = 'bg-emerald-500';
+    let textColor = 'text-emerald-600';
+    if (matchScore < 40) {
+      barColor = 'bg-rose-500';
+      textColor = 'text-rose-600';
+    } else if (matchScore < 80) {
+      barColor = 'bg-amber-500';
+      textColor = 'text-amber-600';
+    }
+
+    // Initials for avatar
+    const initials = job.companyName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+    return (
+      <div className="flex flex-col h-full bg-white text-[#111827] rounded-2xl overflow-hidden border border-[#E5E7EB]">
+        {/* Header Block */}
+        <div className="p-6 border-b border-[#E5E7EB] flex-shrink-0">
+          <div className="flex justify-between items-start gap-4 mb-4">
+            <div className="min-w-0">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 mb-2 border border-slate-200">{job.experience}</span>
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight mb-1 leading-snug">{job.title}</h3>
+              <p className="text-[#2563EB] font-bold text-base hover:underline cursor-pointer">{job.companyName}</p>
+            </div>
+            
+            {/* Initials Avatar */}
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 flex items-center justify-center font-extrabold text-sm flex-shrink-0 select-none">
+              {initials}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs font-semibold text-slate-500">
+            <span className="flex items-center gap-1"><MapPin size={13} className="text-[#2563EB]" /> {job.location} ({job.mode})</span>
+            <span className="text-slate-300 select-none">•</span>
+            <span className="flex items-center gap-1"><IndianRupee size={13} className="text-[#2563EB]" /> {job.salary}</span>
+            <span className="text-slate-300 select-none">•</span>
+            <span className="flex items-center gap-1"><Briefcase size={13} className="text-[#2563EB]" /> {job.type}</span>
+          </div>
+
+          {job.chatLiveHours && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold mt-3 bg-emerald-50/50 border border-emerald-100 rounded-lg px-2.5 py-1 w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Chat: {job.chatLiveHours}
+            </div>
+          )}
+        </div>
+
+        {/* Scrollable Body Content */}
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6" style={{ maxHeight: 'calc(100vh - 380px)' }}>
+          {/* Compatibility score progress bar */}
+          {candidateProfile.onboardingCompleted && (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">AI Candidate Fit</span>
+                <span className={`text-xs font-black ${textColor}`}>{matchScore}% Match ({matchLabel})</span>
+              </div>
+              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div className={`h-full ${barColor} transition-all duration-500`} style={{ width: `${matchScore}%` }} />
+              </div>
+            </div>
+          )}
+
+          {/* Skills Badges */}
+          <div>
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Key Skills Required</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {job.skills.map(skill => (
+                <span key={skill} className="text-xs bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1 rounded-lg font-bold">{skill}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Job Description</h4>
+            <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">{job.description}</p>
+          </div>
+
+          {/* Requirements */}
+          <div>
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Key Requirements</h4>
+            <ul className="list-disc pl-5 text-slate-600 text-sm flex flex-col gap-1.5">
+              {job.requirements.map((req, i) => (
+                <li key={i}>{req}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Benefits */}
+          <div>
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Comp & Benefits</h4>
+            <ul className="list-disc pl-5 text-slate-600 text-sm flex flex-col gap-1.5">
+              {job.benefits.map((benefit, i) => (
+                <li key={i}>{benefit}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Sticky Apply Button Bar at Bottom */}
+        <div className="p-6 border-t border-[#E5E7EB] bg-slate-50 flex-shrink-0">
+          {isApplied ? (
+            <div className="flex gap-3">
+              {matchingApp?.status === 'Offered' ? (
+                <button 
+                  onClick={() => {
+                    setContractApp(matchingApp);
+                    setShowContractModal(true);
+                  }}
+                  className="flex-grow py-3 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer border-none"
+                >
+                  ✍️ Sign Fair Work Contract
+                </button>
+              ) : (
+                <div className="flex-grow text-center py-3 bg-slate-100 border border-slate-200 text-slate-500 font-bold rounded-xl text-sm flex items-center justify-center gap-1.5 select-none">
+                  📩 Applied {job.fairWorkPact && "• Pact Secured 🛡️"}
+                </div>
+              )}
+
+              {job.fairWorkPact && (
+                <button 
+                  onClick={() => {
+                    if (matchingApp) {
+                      setContractApp(matchingApp);
+                      setShowContractModal(true);
+                    }
+                  }}
+                  className="px-4 py-3 border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 rounded-xl font-bold text-xs cursor-pointer transition-all flex items-center justify-center gap-1"
+                >
+                  View Deed
+                </button>
+              )}
+            </div>
+          ) : (
+            <button 
+              onClick={() => {
+                if (job.fairWorkPact) {
+                  setPactChecked(false);
+                  setTypedSignature('');
+                  setShowApplyPactModal(true);
+                } else {
+                  handleApply(job.id);
+                }
+              }} 
+              className="w-full py-3.5 px-6 bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-extrabold rounded-xl shadow-lg shadow-blue-500/10 active:scale-98 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer border-none"
+            >
+              {job.fairWorkPact ? '🛡️ Quick Apply with Fair Work Pact' : 'Apply Now'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const isLightMode = false; // Always use dark theme for the premium Acrylic & Pop Design System
 
   return (
     <>
       <div 
-        className="container animate-fade-in" 
+        className="w-full flex-grow flex flex-col animate-fade-in pb-16 relative z-10"
         style={{ 
-          paddingTop: '32px', 
-          paddingBottom: '60px', 
-          background: isLightMode ? '#F5F7FA' : 'transparent',
-          minHeight: '100vh',
-          color: isLightMode ? 'var(--corporate-blue)' : '#fff',
+          color: '#fff',
           transition: 'all 0.3s ease'
         }}
       >
-      {/* Onboarding Preference Overlay */}
+        {/* Onboarding Preference Overlay */}
         {candidateProfile.onboardingCompleted === false && (
           <OnboardingModal profile={candidateProfile} onSaveProfile={setCandidateProfile} />
         )}
-        {/* Dashboard Subheader Tabs */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        
+        {/* Premium SaaS Greeting Card */}
+        <div className="w-full bg-white border border-[#E5E7EB] p-5 rounded-2xl mb-6 shadow-sm">
           <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 700, color: isLightMode ? 'var(--corporate-blue)' : '#fff' }}>
+            {/* SaaS style badge showing active sidebar option */}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-2">
+              {activeTab === 'explore' && <><Briefcase size={10} className="text-[#2563EB]" /> Explore Jobs</>}
+              {activeTab === 'govt' && <><span style={{ fontSize: '10px' }}>🏛️</span> Govt Jobs Info</>}
+              {activeTab === 'applications' && <><FileText size={10} className="text-[#2563EB]" /> My Applications</>}
+              {activeTab === 'profile' && <><UserCheck size={10} className="text-[#2563EB]" /> Candidate Profile</>}
+              {activeTab === 'chats' && <><Sparkles size={10} className="text-[#2563EB]" /> AI Copilot Chats</>}
+              {activeTab === 'settings' && <><Settings size={10} className="text-[#2563EB]" /> Settings</>}
+              {activeTab === 'notifications' && <><Bell size={10} className="text-[#2563EB]" /> Notifications</>}
+            </div>
+            
+            <h2 className="text-2xl font-black tracking-tight text-slate-900 mb-0.5 font-sans">
               {locDetails.greeting} Welcome back, {candidateProfile.name}
             </h2>
-            <p style={{ color: isLightMode ? '#475569' : 'var(--text-secondary)', fontSize: '14px' }}>
+            <p className="text-slate-500 text-xs font-medium">
               Let's land your dream workspace in {locDetails.city}.
             </p>
-          </div>
-
-          <div className="tabs-header md:hidden flex" style={{ background: isLightMode ? 'rgba(26, 62, 98, 0.08)' : 'rgba(0, 0, 0, 0.2)', border: isLightMode ? '1px solid rgba(26, 62, 98, 0.1)' : '1px solid var(--border-color)' }}>
-            <button 
-              className={`tab-btn ${activeTab === 'workspace' ? 'active' : ''}`}
-              onClick={() => setActiveTab('workspace')}
-              style={{ color: activeTab === 'workspace' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'workspace' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <Sparkles size={16} />
-              My Workspace
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'explore' ? 'active' : ''}`}
-              onClick={() => setActiveTab('explore')}
-              style={{ color: activeTab === 'explore' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'explore' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <Briefcase size={16} />
-              Explore Jobs
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'govt' ? 'active' : ''}`}
-              onClick={() => setActiveTab('govt')}
-              style={{ color: activeTab === 'govt' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'govt' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              🏛️ Govt Jobs
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'chats' ? 'active' : ''}`}
-              onClick={() => setActiveTab('chats')}
-              style={{ color: activeTab === 'chats' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'chats' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <MessageCircle size={16} />
-              Chats
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'applications' ? 'active' : ''}`}
-              onClick={() => setActiveTab('applications')}
-              style={{ color: activeTab === 'applications' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'applications' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <FileText size={16} />
-              Applications ({applications.length})
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveTab('profile')}
-              style={{ color: activeTab === 'profile' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'profile' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <UserCheck size={16} />
-              Profile
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
-              style={{ color: activeTab === 'settings' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'settings' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <Settings size={16} />
-              Settings
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'notifications' ? 'active' : ''}`}
-              onClick={() => setActiveTab('notifications')}
-              style={{ color: activeTab === 'notifications' ? '#fff' : (isLightMode ? 'var(--corporate-blue)' : 'var(--text-secondary)'), background: activeTab === 'notifications' ? 'var(--corporate-blue)' : 'transparent' }}
-            >
-              <Bell size={16} />
-              Notifications
-            </button>
           </div>
         </div>
 
         {/* EXPLORE JOBS VIEW */}
         {activeTab === 'explore' && (
           <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="explore-grid">
-            {/* Compact Inline Filter Bar */}
-            <aside className="seeker-light-card" style={{ padding: '10px 16px', borderRadius: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--tech-orange)', flexShrink: 0 }}>
-                  <Filter size={14} />
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--corporate-blue)' }}>Filters</span>
+          <div className="flex flex-col gap-4 w-full">
+            {/* Unified Modern SaaS Filters Toolbar */}
+            <div className="w-full bg-white border border-[#E5E7EB] p-4 rounded-2xl shadow-sm flex flex-col gap-4">
+              {/* Row 1: Search Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 w-full focus-within:bg-white focus-within:border-[#2563EB] focus-within:ring-1 focus-within:ring-[#2563EB] transition-all">
+                  <Search size={16} className="text-[#2563EB] flex-shrink-0" />
+                  <input
+                    id="dashboard-search-input"
+                    type="text"
+                    placeholder="Search job title, skills, or category..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border-none outline-none text-slate-900 text-xs font-semibold flex-1 placeholder-slate-400"
+                  />
                 </div>
+                <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 w-full focus-within:bg-white focus-within:border-[#2563EB] focus-within:ring-1 focus-within:ring-[#2563EB] transition-all">
+                  <MapPin size={16} className="text-[#2563EB] flex-shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search location (e.g. Bathinda, Remote)..."
+                    value={locationQuery}
+                    onChange={(e) => setLocationQuery(e.target.value)}
+                    className="bg-transparent border-none outline-none text-slate-900 text-xs font-semibold flex-1 placeholder-slate-400"
+                  />
+                </div>
+              </div>
 
+              {/* Row 2: Selects, Chips, and Reset */}
+              <div className="flex items-center gap-3 flex-wrap w-full border-t border-slate-100 pt-3">
                 {/* Category */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(26,62,98,0.06)', borderRadius: '8px', padding: '4px 8px' }}>
-                  <Briefcase size={13} color="var(--corporate-blue)" />
+                <div className={`flex items-center gap-2 border rounded-xl px-3 py-1.5 hover:border-slate-300 transition-all ${
+                  categoryFilter ? 'badge-blue' : 'bg-slate-50 border-slate-200 text-slate-700'
+                }`}>
+                  <Briefcase size={13} className={categoryFilter ? 'text-[#2563EB]' : 'text-slate-400'} />
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    style={{ border: 'none', background: 'transparent', fontSize: '11px', fontWeight: 600, color: 'var(--corporate-blue)', outline: 'none', cursor: 'pointer', padding: '2px 0' }}
+                    className={`bg-transparent border-none outline-none text-xs font-bold cursor-pointer ${
+                      categoryFilter ? 'text-[#2563EB]' : 'text-slate-700'
+                    }`}
                   >
-                    <option value="">Category</option>
-                    <option value="Tech & Engineering">Tech & Engineering</option>
-                    <option value="Design & Product">Design & Product</option>
-                    <option value="Marketing & Content">Marketing & Content</option>
-                    <option value="Sales & Operations">Sales & Operations</option>
+                    <option value="" className="bg-white text-slate-900">Category</option>
+                    <option value="Tech & Engineering" className="bg-white text-slate-900">Tech & Engineering</option>
+                    <option value="Design & Product" className="bg-white text-slate-900">Design & Product</option>
+                    <option value="Marketing & Content" className="bg-white text-slate-900">Marketing & Content</option>
+                    <option value="Sales & Operations" className="bg-white text-slate-900">Sales & Operations</option>
                   </select>
                 </div>
 
                 {/* Work Mode */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(26,62,98,0.06)', borderRadius: '8px', padding: '4px 8px' }}>
-                  <MapPin size={13} color="var(--corporate-blue)" />
+                <div className={`flex items-center gap-2 border rounded-xl px-3 py-1.5 hover:border-slate-300 transition-all ${
+                  modeFilter.length > 0 ? 'badge-teal' : 'bg-slate-50 border-slate-200 text-slate-700'
+                }`}>
+                  <MapPin size={13} className={modeFilter.length > 0 ? 'text-[#0D9488]' : 'text-slate-400'} />
                   <select
                     value={modeFilter.length === 1 ? modeFilter[0] : ''}
                     onChange={(e) => setModeFilter(e.target.value ? [e.target.value] : [])}
-                    style={{ border: 'none', background: 'transparent', fontSize: '11px', fontWeight: 600, color: 'var(--corporate-blue)', outline: 'none', cursor: 'pointer', padding: '2px 0' }}
+                    className={`bg-transparent border-none outline-none text-xs font-bold cursor-pointer ${
+                      modeFilter.length > 0 ? 'text-[#0D9488]' : 'text-slate-700'
+                    }`}
                   >
-                    <option value="">Mode</option>
-                    <option value="Remote">Remote</option>
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="On-site">On-site</option>
+                    <option value="" className="bg-white text-slate-900">Mode</option>
+                    <option value="Remote" className="bg-white text-slate-900">Remote</option>
+                    <option value="Hybrid" className="bg-white text-slate-900">Hybrid</option>
+                    <option value="On-site" className="bg-white text-slate-900">On-site</option>
                   </select>
                 </div>
 
                 {/* Job Type */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(26,62,98,0.06)', borderRadius: '8px', padding: '4px 8px' }}>
-                  <FileText size={13} color="var(--corporate-blue)" />
+                <div className={`flex items-center gap-2 border rounded-xl px-3 py-1.5 hover:border-slate-300 transition-all ${
+                  typeFilter.length > 0 ? 'badge-purple' : 'bg-slate-50 border-slate-200 text-slate-700'
+                }`}>
+                  <FileText size={13} className={typeFilter.length > 0 ? 'text-[#7C3AED]' : 'text-slate-400'} />
                   <select
                     value={typeFilter.length === 1 ? typeFilter[0] : ''}
                     onChange={(e) => setTypeFilter(e.target.value ? [e.target.value] : [])}
-                    style={{ border: 'none', background: 'transparent', fontSize: '11px', fontWeight: 600, color: 'var(--corporate-blue)', outline: 'none', cursor: 'pointer', padding: '2px 0' }}
+                    className={`bg-transparent border-none outline-none text-xs font-bold cursor-pointer ${
+                      typeFilter.length > 0 ? 'text-[#7C3AED]' : 'text-slate-700'
+                    }`}
                   >
-                    <option value="">Type</option>
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Internship">Internship</option>
-                    <option value="Contract">Contract</option>
+                    <option value="" className="bg-white text-slate-900">Type</option>
+                    <option value="Full-time" className="bg-white text-slate-900">Full-time</option>
+                    <option value="Part-time" className="bg-white text-slate-900">Part-time</option>
+                    <option value="Internship" className="bg-white text-slate-900">Internship</option>
+                    <option value="Contract" className="bg-white text-slate-900">Contract</option>
                   </select>
                 </div>
 
                 {/* Experience */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(26,62,98,0.06)', borderRadius: '8px', padding: '4px 8px' }}>
-                  <Sparkles size={13} color="var(--corporate-blue)" />
+                <div className={`flex items-center gap-2 border rounded-xl px-3 py-1.5 hover:border-slate-300 transition-all ${
+                  experienceFilter.length > 0 ? 'badge-pink' : 'bg-slate-50 border-slate-200 text-slate-700'
+                }`}>
+                  <Sparkles size={13} className={experienceFilter.length > 0 ? 'text-[#EC4899]' : 'text-slate-400'} />
                   <select
                     value={experienceFilter.length === 1 ? experienceFilter[0] : ''}
                     onChange={(e) => setExperienceFilter(e.target.value ? [e.target.value] : [])}
-                    style={{ border: 'none', background: 'transparent', fontSize: '11px', fontWeight: 600, color: 'var(--corporate-blue)', outline: 'none', cursor: 'pointer', padding: '2px 0' }}
+                    className={`bg-transparent border-none outline-none text-xs font-bold cursor-pointer ${
+                      experienceFilter.length > 0 ? 'text-[#EC4899]' : 'text-slate-700'
+                    }`}
                   >
-                    <option value="">Exp</option>
-                    <option value="Entry-level">Entry</option>
-                    <option value="Mid-level">Mid</option>
-                    <option value="Senior-level">Senior</option>
+                    <option value="" className="bg-white text-slate-900">Experience</option>
+                    <option value="Entry-level" className="bg-white text-slate-900">Entry</option>
+                    <option value="Mid-level" className="bg-white text-slate-900">Mid</option>
+                    <option value="Senior-level" className="bg-white text-slate-900">Senior</option>
                   </select>
                 </div>
 
-                {/* Reset */}
-                <button
-                  onClick={() => {
-                    setCategoryFilter('');
-                    setTypeFilter([]);
-                    setModeFilter([]);
-                    setExperienceFilter([]);
-                    setSearchQuery('');
-                    setLocationQuery('');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#ef4444',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    padding: '4px 6px',
-                    borderRadius: '6px',
-                    flexShrink: 0,
-                    transition: 'background 0.15s'
-                  }}
-                  title="Reset All Filters"
-                >
-                  <X size={14} />
-                </button>
+                {/* Reset Filters */}
+                {(categoryFilter || modeFilter.length > 0 || typeFilter.length > 0 || experienceFilter.length > 0 || searchQuery || locationQuery) && (
+                  <button
+                    onClick={() => {
+                      setCategoryFilter('');
+                      setTypeFilter([]);
+                      setModeFilter([]);
+                      setExperienceFilter([]);
+                      setSearchQuery('');
+                      setLocationQuery('');
+                    }}
+                    className="text-red-500 border border-red-200 bg-red-50 hover:bg-red-100/70 rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 flex-shrink-0"
+                    title="Reset All Filters"
+                  >
+                    <X size={13} /> Reset
+                  </button>
+                )}
 
                 {/* Matches Only Toggle */}
                 {candidateProfile.onboardingCompleted && (
                   <button
                     type="button"
                     onClick={() => setMatchesOnly(!matchesOnly)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      background: matchesOnly ? 'var(--tech-orange)' : 'rgba(26,62,98,0.06)',
-                      color: matchesOnly ? '#fff' : 'var(--corporate-blue)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '4px 10px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.2s',
-                      flexShrink: 0
-                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                      matchesOnly 
+                        ? 'bg-[#7C3AED]/10 border border-[#7C3AED]/30 text-[#7C3AED] shadow-sm' 
+                        : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
                   >
-                    <Sparkles size={12} />
+                    <Sparkles size={12} className={matchesOnly ? 'text-[#7C3AED]' : 'text-slate-400'} />
                     Match {matchesOnly ? 'ON' : 'OFF'}
                   </button>
                 )}
                 
                 {/* Resume Upload Action */}
-                <label style={{
-                    display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.1)', color: '#059669', padding: '4px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', marginLeft: 'auto'
-                }}>
-                  <Upload size={13} />
+                <label className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-sm px-4 py-2 rounded-xl text-xs font-black cursor-pointer transition-all ml-auto flex-shrink-0 border-none active:scale-95">
+                  <Upload size={14} className="text-white" />
                   {isUploadingResume ? 'Parsing...' : 'Sync Resume'}
                   <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} style={{ display: 'none' }} />
                 </label>
               </div>
-            </aside>
-
-          {/* Main Job Listing + Detail Split */}
-          <main style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }} className="explore-main">
-            {/* Job List Feed */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Single Search Bar: Title / Location */}
-              <div className="seeker-light-card" style={{ display: 'flex', alignItems: 'center', padding: '4px 12px', borderRadius: '12px' }}>
-                <Search size={15} color="var(--corporate-blue)" style={{ flexShrink: 0 }} />
-                <input
-                  id="dashboard-search-input"
-                  type="text"
-                  placeholder="Title or skill..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 500, flex: 1, padding: '10px 8px', minWidth: 0 }}
-                />
-                <span style={{ color: 'rgba(26,62,98,0.3)', fontSize: '16px', fontWeight: 300, flexShrink: 0, userSelect: 'none' }}>/</span>
-                <MapPin size={15} color="var(--corporate-blue)" style={{ flexShrink: 0, marginLeft: '4px' }} />
-                <input
-                  type="text"
-                  placeholder="Location..."
-                  value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 500, flex: 1, padding: '10px 8px', minWidth: 0 }}
-                />
-              </div>
-
-              {sortedJobs.length === 0 ? (
-                <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center', color: '#64748b', fontWeight: 600 }}>
-                  No matching jobs found. Try adjusting your filters.
-                </div>
-              ) : (
-                sortedJobs.map(job => {
-                  const isSelected = selectedJob?.id === job.id;
-                  return (
-                    <div 
-                      key={job.id}
-                      onClick={() => handleSelectJob(job)}
-                      className="seeker-light-card"
-                      style={{
-                        padding: '20px',
-                        cursor: 'pointer',
-                        border: isSelected ? '2px solid var(--tech-orange)' : '1px solid #E2E8F0',
-                        background: isSelected ? 'rgba(242, 153, 74, 0.05)' : '#ffffff',
-                        transform: isSelected ? 'translateY(-2px)' : 'none'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <h4 style={{ color: 'var(--corporate-blue)', fontSize: '16px', fontWeight: 800, marginBottom: '2px' }}>{job.title}</h4>
-                            {isJobNew(job) && (
-                              <span style={{
-                                fontSize: '9px',
-                                fontWeight: 800,
-                                color: '#fff',
-                                background: 'linear-gradient(135deg, #10b981, #059669)',
-                                padding: '2px 8px',
-                                borderRadius: '6px',
-                                letterSpacing: '0.5px',
-                                textTransform: 'uppercase',
-                                flexShrink: 0
-                              }}>New</span>
-                            )}
-                          </div>
-                          <p style={{ color: '#475569', fontSize: '13px', fontWeight: 600 }}>{job.companyName}</p>
-                        </div>
-                        {/* Custom Gradient Avatar */}
-                        <div className="avatar" style={{
-                          background: `linear-gradient(135deg, #${job.logoSeed.charCodeAt(0).toString(16)}6df2 0%, #F2994A 100%)`
-                        }}>
-                          {job.logoSeed}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                        <span className="badge seeker-tag-blue">{job.mode}</span>
-                        <span className="badge seeker-tag-blue">{job.type}</span>
-                        <span className="badge seeker-tag-orange">{job.salary}</span>
-                        
-                        {job.fairWorkPact && (
-                          <span className="badge" style={{
-                            background: 'rgba(16, 185, 129, 0.08)',
-                            border: '1px solid var(--success)',
-                            color: '#10b981',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontWeight: 700
-                          }}>
-                            🛡️ Fair Work Pact
-                          </span>
-                        )}
-
-                        {candidateProfile.onboardingCompleted && (
-                          <span
-                            style={{
-                              padding: '4px 10px',
-                              borderRadius: '12px',
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              background: 'rgba(242, 153, 74, 0.15)',
-                              border: '1px solid var(--tech-orange)',
-                              color: 'var(--tech-orange)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px'
-                            }}
-                          >
-                            ⚡ {getAIFeedback(job).score}% Match - {getAIFeedback(job).label}
-                          </span>
-                        )}
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', borderTop: '1px solid rgba(26,62,98,0.06)', paddingTop: '12px' }}>
-                        {job.skills.slice(0, 3).map(skill => (
-                          <span key={skill} style={{ fontSize: '11px', color: 'var(--corporate-blue)', background: 'rgba(26,62,98,0.05)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(26,62,98,0.08)', fontWeight: 500 }}>{skill}</span>
-                        ))}
-                        {job.skills.length > 3 && <span style={{ fontSize: '10px', color: '#64748b', alignSelf: 'center', fontWeight: 600 }}>+{job.skills.length - 3} more</span>}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
             </div>
 
-            {/* Right Column: Sticky Detail Panel for Explore Jobs */}
-            <aside className="explore-sidebar" style={{ position: 'sticky', top: '24px', flexShrink: 0 }}>
-              {selectedJob ? (
-                <div className="seeker-light-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid rgba(26, 62, 98, 0.1)', borderRadius: '14px', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto', textAlign: 'left' }}>
-                  {/* Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                    <div>
-                      <span className="badge badge-primary" style={{ marginBottom: '8px', background: 'rgba(242,153,74,0.15)', color: 'var(--tech-orange)', border: '1px solid rgba(242,153,74,0.3)', display: 'inline-block' }}>{selectedJob.experience}</span>
-                      <h3 style={{ color: 'var(--corporate-blue)', fontSize: '18px', fontWeight: 800, marginBottom: '4px', marginTop: 0 }}>{selectedJob.title}</h3>
-                      <p style={{ color: 'var(--tech-orange)', fontWeight: 700, fontSize: '14px', margin: 0 }}>{selectedJob.companyName}</p>
-                    </div>
-                    <div className="avatar" style={{
-                      width: '45px',
-                      height: '45px',
-                      fontSize: '16px',
-                      flexShrink: 0,
-                      background: `linear-gradient(135deg, #${selectedJob.logoSeed.charCodeAt(0).toString(16)}6df2 0%, #F2994A 100%)`
-                    }}>
-                      {selectedJob.logoSeed}
-                    </div>
+            {/* Recommended Roles Header */}
+            <div className="flex justify-between items-center mt-2 mb-1">
+              <h2 className="text-lg font-bold tracking-tight text-slate-800 font-sans">Recommended Roles</h2>
+              <span className="text-xs bg-slate-100 border border-slate-200 text-slate-500 font-bold px-2.5 py-1 rounded-lg">
+                {sortedJobs.length} Positions Available
+              </span>
+            </div>
+
+            {/* Responsive 2-Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+              {/* Left Column: Job Cards List (35% width on desktop) */}
+              <div className="col-span-1 lg:col-span-5 flex flex-col gap-3.5 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
+                {sortedJobs.length === 0 ? (
+                  <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center text-slate-400 font-semibold shadow-sm">
+                    No matching jobs found. Try adjusting your filters.
                   </div>
-
-                  {/* Basic Info */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(26,62,98,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(26,62,98,0.05)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
-                      <MapPin size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Location:</strong> {selectedJob.location} ({selectedJob.mode})</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
-                      <IndianRupee size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Compensation:</strong> {selectedJob.salary}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
-                      <Briefcase size={14} color="var(--corporate-blue)" style={{ opacity: 0.7 }} /> <span><strong>Job Type:</strong> {selectedJob.type}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#10b981', fontWeight: 600, borderTop: '1px solid rgba(26,62,98,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                      <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
-                      <span>💬 Chat Live Hours: {selectedJob.chatLiveHours || '10:00 AM - 1:00 PM'}</span>
-                    </div>
-                  </div>
-
-                  {/* Compatibility Score Widget */}
-                  {candidateProfile.onboardingCompleted && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, #132B45 0%, #1A3E62 100%)',
-                      border: '1.5px solid rgba(242, 153, 74, 0.4)',
-                      borderRadius: '16px',
-                      padding: '16px',
-                      color: '#fff',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '16px',
-                      boxShadow: '0 8px 24px rgba(26, 62, 98, 0.15)'
-                    }}>
-                      <div style={{ flex: 1, zIndex: 2 }}>
-                        <h5 style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1px', color: 'var(--tech-orange)', textTransform: 'uppercase', marginBottom: '4px', marginTop: 0 }}>
-                          Compatibility Score
-                        </h5>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '24px', fontWeight: 800, color: '#fff' }}>
-                            {getAIFeedback(selectedJob).score}%
-                          </span>
-                          <span style={{
-                            fontSize: '10px',
-                            fontWeight: 600,
-                            background: 'rgba(242, 153, 74, 0.2)',
-                            color: 'var(--tech-orange)',
-                            padding: '1px 6px',
-                            borderRadius: '20px'
-                          }}>
-                            {getAIFeedback(selectedJob).label}
-                          </span>
-                        </div>
-                      </div>
-                      <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', zIndex: 1 }} />
-                    </div>
-                  )}
-
-                  {/* Job details tab control */}
-                  <div style={{ display: 'flex', borderBottom: '1px solid rgba(26,62,98,0.1)', gap: '16px', marginBottom: '4px' }}>
-                    <button
-                      onClick={() => setDetailsTab('info')}
-                      style={{
-                        padding: '8px 0',
-                        background: 'transparent',
-                        border: 'none',
-                        color: detailsTab === 'info' ? 'var(--tech-orange)' : 'var(--text-muted)',
-                        borderBottom: detailsTab === 'info' ? '2px solid var(--tech-orange)' : 'none',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        fontWeight: 600
-                      }}
-                    >
-                      Job Details
-                    </button>
-                    <button
-                      onClick={() => setDetailsTab('pact')}
-                      style={{
-                        padding: '8px 0',
-                        background: 'transparent',
-                        border: 'none',
-                        color: detailsTab === 'pact' ? 'var(--tech-orange)' : 'var(--text-muted)',
-                        borderBottom: detailsTab === 'pact' ? '2px solid var(--tech-orange)' : 'none',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      🛡️ Fair Work Pact {selectedJob.fairWorkPact && <span style={{ fontSize: '9px', color: 'var(--success)' }}>● Verified</span>}
-                    </button>
-                  </div>
-
-                  {/* Tab contents */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '13px', color: 'var(--corporate-blue)' }}>
-                    {detailsTab === 'info' ? (
-                      <>
-                        {/* Skills */}
+                ) : (
+                  sortedJobs.map(job => {
+                    const isSelected = selectedJob?.id === job.id;
+                    const matchScore = getAIFeedback(job).score;
+                    const initials = job.companyName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    return (
+                      <div 
+                        key={job.id}
+                        onClick={() => handleSelectJob(job)}
+                        className={`saas-card saas-card-hover p-5 cursor-pointer flex flex-col justify-between min-h-[170px] ${
+                          isSelected ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : ''
+                        }`}
+                      >
                         <div>
-                          <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>Required Skills</h4>
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                            {selectedJob.skills.map(skill => (
-                              <span key={skill} className="badge seeker-tag" style={{ borderRadius: '6px', fontSize: '11px', padding: '4px 8px' }}>{skill}</span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <div>
-                          <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>Job Description</h4>
-                          <p style={{ color: '#475569', fontSize: '12.5px', lineHeight: '1.5', margin: 0 }}>{selectedJob.description}</p>
-                        </div>
-
-                        {/* Requirements */}
-                        {selectedJob.requirements && selectedJob.requirements.length > 0 && (
-                          <div>
-                            <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>What you will bring</h4>
-                            <ul style={{ paddingLeft: '16px', color: '#475569', fontSize: '12.5px', display: 'flex', flexDirection: 'column', gap: '4px', margin: 0 }}>
-                              {selectedJob.requirements.map((req, i) => (
-                                <li key={i}>{req}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        {/* Benefits */}
-                        {selectedJob.benefits && selectedJob.benefits.length > 0 && (
-                          <div>
-                            <h4 style={{ color: 'var(--corporate-blue)', fontSize: '13px', fontWeight: 700, marginBottom: '6px', marginTop: 0 }}>Perks & Benefits</h4>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                              {selectedJob.benefits.map((benefit, i) => (
-                                <div key={i} style={{ fontSize: '11.5px', color: '#475569', background: 'rgba(26,62,98,0.03)', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(26,62,98,0.05)' }}>
-                                  ✨ {benefit}
-                                </div>
-                              ))}
+                          <div className="flex justify-between items-start gap-3 mb-2">
+                            <div className="min-w-0">
+                              <h4 className="text-slate-900 text-sm font-extrabold tracking-tight mb-0.5 truncate">{job.title}</h4>
+                              <p className="text-slate-500 text-xs font-semibold truncate">{job.companyName}</p>
+                            </div>
+                            
+                            {/* Initials Company Circle */}
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center font-bold text-[10px] flex-shrink-0 select-none">
+                              {initials}
                             </div>
                           </div>
-                        )}
-                      </>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div style={{
-                          background: 'rgba(16, 185, 129, 0.04)',
-                          border: '1px solid rgba(16, 185, 129, 0.2)',
-                          padding: '12px',
-                          borderRadius: '8px'
-                        }}>
-                          <h4 style={{ color: '#0f766e', fontSize: '13px', fontWeight: 700, marginBottom: '4px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            🛡️ Fair Work Pact Signed
-                          </h4>
-                          <p style={{ color: '#0f766e', fontSize: '11px', lineHeight: 1.4, margin: 0 }}>
-                            Both parties commit to standard hours, overtime pay, safe conditions, and integrity.
-                          </p>
-                        </div>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
-                          <div>
-                            <h5 style={{ color: 'var(--corporate-blue)', fontSize: '12px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>
-                              Employer Commitments
-                            </h5>
-                            <ul style={{ paddingLeft: '14px', color: '#475569', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '3px', margin: 0 }}>
-                              <li>Standard limited work schedule</li>
-                              <li>Guaranteed overtime pay</li>
-                              <li>Merit-based growth & raises</li>
-                            </ul>
+
+                          <div className="flex flex-wrap gap-1.5 mb-3.5">
+                            <span className="text-[9px] bg-slate-50 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-md font-bold">{job.mode}</span>
+                            <span className="text-[9px] bg-slate-50 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-md font-bold">{job.type}</span>
+                            <span className="text-[9px] bg-blue-50 border border-blue-100 text-[#2563EB] px-2 py-0.5 rounded-md font-extrabold">{job.salary}</span>
                           </div>
-                          <div>
-                            <h5 style={{ color: 'var(--corporate-blue)', fontSize: '12px', fontWeight: 700, marginBottom: '4px', marginTop: 0 }}>
-                              Employee Commitments
-                            </h5>
-                            <ul style={{ paddingLeft: '14px', color: '#475569', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '3px', margin: 0 }}>
-                              <li>Punctuality & schedules</li>
-                              <li>Prompt communication</li>
-                              <li>Ownership of tasks</li>
-                            </ul>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-3 border-t border-slate-100 mt-2">
+                          {candidateProfile.onboardingCompleted && (
+                            <span className="text-[10px] font-extrabold text-[#2563EB] flex items-center gap-0.5">
+                              ⚡ {matchScore}% Match
+                            </span>
+                          )}
+                          
+                          <div className="flex gap-1 overflow-hidden ml-auto">
+                            {job.skills.slice(0, 2).map(skill => (
+                              <span key={skill} className="text-[9px] bg-slate-50 border border-slate-200 text-slate-500 px-2 py-0.5 rounded-md font-semibold truncate max-w-[70px]">{skill}</span>
+                            ))}
+                            {job.skills.length > 2 && <span className="text-[9px] text-slate-400 font-bold self-center">+{job.skills.length - 2}</span>}
                           </div>
                         </div>
                       </div>
-                    )}
-                  </div>
+                    );
+                  })
+                )}
+              </div>
 
-                  {/* Actions */}
-                  <div style={{ borderTop: '1px solid rgba(26,62,98,0.1)', paddingTop: '16px', display: 'flex', gap: '8px' }}>
-                    {applications.some(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1') ? (
-                      <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                        <button className="btn btn-outline" style={{ flex: 1, padding: '10px', borderRadius: '10px', fontSize: '13px' }} disabled>
-                          Applied ✓
-                        </button>
-                        {selectedJob.fairWorkPact && (
-                          <button 
-                            onClick={() => {
-                              const matchingApp = applications.find(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1');
-                              if (matchingApp) {
-                                setContractApp(matchingApp);
-                                setShowContractModal(true);
-                              }
-                            }}
-                            className="btn btn-primary" 
-                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '10px', borderRadius: '10px', fontSize: '13px' }}
-                          >
-                            🛡️ View Pact Deed
-                          </button>
-                        )}
+              {/* Right Column: Sticky Details Panel (65% width on desktop) */}
+              <div className="col-span-1 lg:col-span-7 sticky top-0 hidden lg:block max-h-[calc(100vh-280px)] pr-1">
+                {selectedJob ? (
+                  renderJobDetailsContent(selectedJob)
+                ) : (
+                  <div className="flex flex-col gap-6 h-full min-h-[380px] rounded-2xl p-6 bg-slate-900/40 border border-white/5 shadow-sm text-left">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                      <div>
+                        <h3 className="text-sm font-black text-white flex items-center gap-1.5">
+                          <Sparkles size={16} className="text-[#06b6d4]" /> Profile Analysis
+                        </h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Real-time candidate compatibility scores</p>
                       </div>
-                    ) : (
-                      <button 
-                        onClick={() => {
-                          if (selectedJob.fairWorkPact) {
-                            setPactChecked(false);
-                            setTypedSignature('');
-                            setShowApplyPactModal(true);
-                          } else {
-                            handleApply(selectedJob.id);
-                          }
-                        }} 
-                        className="btn btn-seeker-active" 
-                        style={{ 
-                          flex: 1, 
-                          fontWeight: 700,
-                          padding: '10px',
-                          borderRadius: '10px',
-                          fontSize: '13px'
-                        }}
-                      >
-                        Apply Now
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center', color: '#64748b', fontWeight: 600, border: '1px solid rgba(26, 62, 98, 0.1)', borderRadius: '12px' }}>
-                  Select a job listing to view details and apply.
-                </div>
-              )}
-            </aside>
-          </main>
-        </div>
+                      <span className="bg-[#2563eb]/20 text-[#2563eb] text-[9px] font-extrabold px-2.5 py-1 rounded-full border border-[#2563eb]/20 uppercase">
+                        AI Screened
+                      </span>
+                    </div>
 
-        {/* Job Details Panel has been moved to the bottom of the component to bypass Android WebView transform rendering bugs */}
-        </>
-      )}
+                    {/* Gauges Grid */}
+                    <div className="grid grid-cols-3 gap-4 py-2">
+                      <div className="flex flex-col items-center text-center p-3.5 bg-slate-950/40 rounded-xl border border-white/5">
+                        <div className="relative w-16 h-16 flex items-center justify-center mb-2">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path className="text-[#2563eb] drop-shadow-[0_0_8px_rgba(37,99,235,0.5)]" strokeDasharray="58, 100" strokeWidth="2.5" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          </svg>
+                          <span className="absolute text-xs font-black text-white">58%</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-300">Resume Quality</span>
+                      </div>
+
+                      <div className="flex flex-col items-center text-center p-3.5 bg-slate-950/40 rounded-xl border border-white/5">
+                        <div className="relative w-16 h-16 flex items-center justify-center mb-2">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path className="text-[#06b6d4] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" strokeDasharray="76, 100" strokeWidth="2.5" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          </svg>
+                          <span className="absolute text-xs font-black text-white">76%</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-300">Skill Match</span>
+                      </div>
+
+                      <div className="flex flex-col items-center text-center p-3.5 bg-slate-950/40 rounded-xl border border-white/5">
+                        <div className="relative w-16 h-16 flex items-center justify-center mb-2">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path className="text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" strokeDasharray="75, 100" strokeWidth="2.5" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          </svg>
+                          <span className="absolute text-xs font-black text-white">75%</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-300">Readiness</span>
+                      </div>
+                    </div>
+
+                    {/* Recommended updates / optimizations */}
+                    <div className="flex-1 flex flex-col gap-3 mt-2">
+                      <h4 className="text-[10px] font-extrabold text-[#06b6d4] uppercase tracking-wider">AI Recommended For You</h4>
+                      <div className="flex flex-col gap-2">
+                        <div className="bg-slate-950/20 hover:bg-slate-950/40 border border-white/5 p-3 rounded-xl flex items-start gap-3 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-blue-950 text-blue-400 border border-blue-900/30 flex items-center justify-center text-[10px] font-bold mt-0.5 flex-shrink-0">1</span>
+                          <div>
+                            <h5 className="text-[11px] font-extrabold text-white">Optimize Resume for TS & React Roles</h5>
+                            <p className="text-[9px] text-slate-400 mt-0.5 leading-normal">Your profile lacks certification references. Add references to boost score by 15%.</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-950/20 hover:bg-slate-950/40 border border-white/5 p-3 rounded-xl flex items-start gap-3 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 flex items-center justify-center text-[10px] font-bold mt-0.5 flex-shrink-0">2</span>
+                          <div>
+                            <h5 className="text-[11px] font-extrabold text-white">Complete screening question forms</h5>
+                            <p className="text-[9px] text-slate-400 mt-0.5 leading-normal">Answer custom screening questionnaires to qualify for fast-track recruiter pipeline.</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-950/20 hover:bg-slate-950/40 border border-white/5 p-3 rounded-xl flex items-start gap-3 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-900/30 flex items-center justify-center text-[10px] font-bold mt-0.5 flex-shrink-0">3</span>
+                          <div>
+                            <h5 className="text-[11px] font-extrabold text-white">Record 30s Video Introduction</h5>
+                            <p className="text-[9px] text-slate-400 mt-0.5 leading-normal">Profiles with dynamic video presentations receive 3x more interviewer inquiries.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          </>
+        )}
 
       {/* GOVT JOBS VIEW */}
+      {/* GOVT JOBS VIEW */}
       {activeTab === 'govt' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '24px', alignItems: 'start' }} className="explore-grid">
-          {/* Left Column: Govt Jobs List */}
-          <main style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+          {/* Left Column: Govt Jobs List (35% on desktop) */}
+          <main className="col-span-1 lg:col-span-7 flex flex-col gap-4">
             
             {/* TABS ROW 1: Categories */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+            <div className="flex gap-2 flex-wrap mb-1">
               {[
                 { id: 'all', label: 'All India Govt Jobs' },
                 { id: 'bank', label: 'Bank Jobs' },
@@ -1228,17 +1119,11 @@ export const CandidateDashboard: React.FC = () => {
                       setSelectedGovtCategory(cat.id);
                       setSelectedGovtState('all');
                     }}
-                    style={{
-                      background: isActive ? 'var(--corporate-blue)' : 'rgba(26, 62, 98, 0.08)',
-                      color: isActive ? '#fff' : 'var(--corporate-blue)',
-                      border: 'none',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs cursor-pointer transition-all border-none ${
+                      isActive 
+                        ? 'bg-[#2563EB] text-white shadow-sm' 
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
                   >
                     {cat.label}
                   </button>
@@ -1247,7 +1132,7 @@ export const CandidateDashboard: React.FC = () => {
             </div>
 
             {/* TABS ROW 2: States */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px', borderBottom: '1px solid rgba(26, 62, 98, 0.1)', paddingBottom: '16px' }}>
+            <div className="flex gap-2 flex-wrap mb-4 border-b border-slate-200 pb-4">
               {[
                 { id: 'all', label: 'All States' },
                 { id: 'pb', label: 'Punjab (PB)' },
@@ -1280,17 +1165,11 @@ export const CandidateDashboard: React.FC = () => {
                       setSelectedGovtState(st.id);
                       setSelectedGovtCategory('all');
                     }}
-                    style={{
-                      background: isActive ? 'var(--tech-orange)' : 'rgba(26, 62, 98, 0.04)',
-                      color: isActive ? '#fff' : '#64748b',
-                      border: 'none',
-                      padding: '6px 12px',
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
+                    className={`px-2.5 py-1 rounded-md font-bold text-[11px] cursor-pointer transition-all border ${
+                      isActive 
+                        ? 'bg-[#2563EB] border-[#2563EB] text-white' 
+                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
                   >
                     {st.label}
                   </button>
@@ -1298,8 +1177,8 @@ export const CandidateDashboard: React.FC = () => {
               })}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--corporate-blue)' }}>
+            <div className="flex justify-between items-center mb-1">
+              <h3 className="text-sm font-bold text-slate-800">
                 {selectedGovtState !== 'all' 
                   ? `${selectedGovtState.toUpperCase()} Government Notifications` 
                   : selectedGovtCategory !== 'all' 
@@ -1307,88 +1186,68 @@ export const CandidateDashboard: React.FC = () => {
                     : "National Government Notifications"
                 }
               </h3>
-              <span className="seeker-tag" style={{ background: 'rgba(242, 153, 74, 0.1)', color: 'var(--tech-orange)', fontWeight: 600 }}>
+              <span className="text-xs bg-blue-50 border border-blue-100 text-[#2563EB] font-bold px-2.5 py-1 rounded-lg">
                 {govtJobs.length} Notifications Found
               </span>
             </div>
 
             {govtJobsLoading && (
-              <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center' }}>
-                <div className="animate-pulse" style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>
-                  🔍 Fetching latest government job listings...
+              <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center shadow-sm">
+                <div className="animate-pulse text-[#2563EB] font-bold text-sm">
+                  ⏳ Fetching latest government job listings...
                 </div>
               </div>
             )}
 
             {govtJobsError && (
-              <div className="seeker-light-card" style={{ padding: '24px', borderLeft: '4px solid var(--danger)', color: 'red' }}>
+              <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-red-600 text-xs font-semibold">
                 ⚠️ {govtJobsError}
               </div>
             )}
 
             {!govtJobsLoading && !govtJobsError && govtJobs.length === 0 && (
-              <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center' }}>
+              <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center text-slate-400 font-semibold shadow-sm">
                 No active notifications found. Please check back later.
               </div>
             )}
 
             {!govtJobsLoading && !govtJobsError && govtJobs.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="flex flex-col gap-3 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
                 {govtJobs.map((job) => {
                   const isSelected = selectedGovtJob?.id === job.id;
                   return (
                     <div 
                       key={job.id}
                       onClick={() => handleSelectGovtJob(job)}
-                      className="seeker-light-card animate-glow"
-                      style={{
-                        padding: '20px',
-                        cursor: 'pointer',
-                        border: isSelected ? '2px solid var(--tech-orange)' : '1px solid #E2E8F0',
-                        background: isSelected ? 'rgba(242, 153, 74, 0.05)' : '#ffffff',
-                        transition: 'all 0.15s ease',
-                        transform: isSelected ? 'translateY(-2px)' : 'none',
-                        borderRadius: '12px',
-                        textAlign: 'left'
-                      }}
+                      className={`saas-card saas-card-hover p-5 cursor-pointer flex flex-col justify-between min-h-[150px] ${
+                        isSelected ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : ''
+                      }`}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'start' }}>
-                        <div>
-                          <span className="badge badge-primary" style={{ marginBottom: '8px', background: 'rgba(26, 62, 98, 0.08)', color: 'var(--corporate-blue)', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', fontSize: '11px' }}>
+                      <div className="flex justify-between items-start gap-3 mb-2">
+                        <div className="min-w-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200 text-[9px] mb-1.5">
                             🏛️ {job.recruitmentBoard}
                           </span>
-                          <h4 style={{ color: 'var(--corporate-blue)', fontSize: '15px', fontWeight: 800, marginTop: '8px', marginBottom: '2px', lineHeight: '1.4' }}>
+                          <h4 className="text-slate-900 text-sm font-extrabold tracking-tight mb-1 leading-snug">
                             {job.title}
                           </h4>
                         </div>
-                        <div className="avatar" style={{
-                          background: 'linear-gradient(135deg, #1A3E62 0%, #F2994A 100%)',
-                          color: '#fff',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center font-bold text-[10px] flex-shrink-0 select-none">
                           Govt
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                        <span className="badge seeker-tag-blue" style={{ fontSize: '11px', padding: '3px 8px' }}>📅 Posted: {job.postDate}</span>
-                        <span className="badge seeker-tag-blue" style={{ fontSize: '11px', padding: '3px 8px' }}>🎓 Req: {job.qualification}</span>
-                        <span className="badge" style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', fontWeight: 700, fontSize: '11px', padding: '3px 8px' }}>
+                      <div className="flex gap-2 flex-wrap mb-2">
+                        <span className="text-[9px] bg-slate-50 border border-slate-200 text-slate-500 px-2 py-0.5 rounded-md font-semibold">📅 Posted: {job.postDate}</span>
+                        <span className="text-[9px] bg-slate-50 border border-slate-200 text-slate-500 px-2 py-0.5 rounded-md font-semibold">🎓 Req: {job.qualification}</span>
+                        <span className="text-[9px] bg-red-50 border border-red-100 text-red-600 px-2 py-0.5 rounded-md font-bold">
                           ⌛ Last Date: {job.lastDate || '—'}
                         </span>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-secondary)', borderTop: '1px solid rgba(26,62,98,0.06)', paddingTop: '10px' }}>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400 border-t border-slate-100 pt-2.5 mt-1 font-medium">
                         <span>📍 State: {job.state ? job.state.toUpperCase() : 'National'}</span>
-                        <span style={{ color: 'rgba(0,0,0,0.15)' }}>•</span>
+                        <span className="select-none text-slate-200">•</span>
                         <span>Category: {job.category ? job.category.toUpperCase() : 'General'}</span>
                       </div>
                     </div>
@@ -1398,78 +1257,67 @@ export const CandidateDashboard: React.FC = () => {
             )}
           </main>
 
-          {/* Right Column: Sticky Detail Panel */}
-          <aside className="govt-sidebar" style={{ position: 'sticky', top: '24px' }}>
+          {/* Right Column: Sticky Detail Panel (65% width on desktop) */}
+          <aside className="col-span-1 lg:col-span-5 sticky top-0 hidden lg:block max-h-[calc(100vh-280px)] pr-1">
             {selectedGovtJob ? (
-              <div className="seeker-light-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid rgba(26, 62, 98, 0.1)' }}>
+              <div className="saas-card p-6 flex flex-col gap-4 bg-white">
                 <div>
-                  <span className="seeker-tag" style={{ background: 'rgba(26, 62, 98, 0.08)', color: 'var(--corporate-blue)', marginBottom: '12px', display: 'inline-block' }}>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200 text-[9px] mb-2">
                     {selectedGovtJob.recruitmentBoard}
                   </span>
-                  <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--corporate-blue)', lineHeight: '1.4' }}>
+                  <h3 className="text-base font-extrabold text-slate-900 leading-snug">
                     {selectedGovtJob.title}
                   </h3>
                 </div>
 
                 {govtJobDetailsLoading ? (
-                  <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--corporate-blue)', fontWeight: 600 }}>
+                  <div className="p-12 text-center text-slate-400 font-semibold">
                     <div className="animate-pulse">
                       ⏳ Loading official job notifications, fee details & vacancy tables...
                     </div>
                   </div>
                 ) : selectedGovtJobDetails ? (
                    <div 
-                    className="govt-details-content"
+                    className="saas-card"
                     dangerouslySetInnerHTML={{ __html: selectedGovtJobDetails }} 
                     style={{ 
                       padding: '16px', 
-                      background: 'rgba(26, 62, 98, 0.02)', 
+                      background: '#F8FAFC', 
                       borderRadius: '12px', 
-                      border: '1px solid rgba(26, 62, 98, 0.08)',
-                      color: 'var(--corporate-blue)'
+                      border: '1px solid #E5E7EB',
+                      color: '#475569',
+                      fontSize: '12px',
+                      boxShadow: 'none',
+                      maxHeight: 'calc(100vh - 460px)',
+                      overflowY: 'auto'
                     }}
                   />
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(26, 62, 98, 0.1)', borderBottom: '1px solid rgba(26, 62, 98, 0.1)', padding: '16px 0' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                      <span style={{ color: '#64748b', fontWeight: 600 }}>Advt No:</span>
-                      <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.advtNo || '—'}</span>
+                  <div className="flex flex-col gap-3 border-t border-b border-slate-100 py-4">
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <span className="text-slate-400 font-bold">Advt No:</span>
+                      <span className="text-slate-700 font-semibold col-span-2">{selectedGovtJob.advtNo || '—'}</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                      <span style={{ color: '#64748b', fontWeight: 600 }}>Qualification:</span>
-                      <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.qualification}</span>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <span className="text-slate-400 font-bold">Qualification:</span>
+                      <span className="text-slate-700 font-bold col-span-2">{selectedGovtJob.qualification}</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                      <span style={{ color: '#64748b', fontWeight: 600 }}>Last Date:</span>
-                      <span style={{ color: 'var(--corporate-blue)', fontWeight: 600 }}>{selectedGovtJob.lastDate || '—'}</span>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <span className="text-slate-400 font-bold">Last Date:</span>
+                      <span className="text-slate-700 font-bold col-span-2">{selectedGovtJob.lastDate || '—'}</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', fontSize: '14px' }}>
-                      <span style={{ color: '#64748b', fontWeight: 600 }}>Posted On:</span>
-                      <span style={{ color: 'var(--corporate-blue)' }}>{selectedGovtJob.postDate}</span>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <span className="text-slate-400 font-bold">Posted On:</span>
+                      <span className="text-slate-700 font-semibold col-span-2">{selectedGovtJob.postDate}</span>
                     </div>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <div className="flex gap-3 mt-2 border-t border-slate-100 pt-4">
                   <button
                     type="button"
                     onClick={() => handleToggleSaveGovtJob(selectedGovtJob)}
-                    className="btn btn-outline"
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--corporate-blue)',
-                      color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--corporate-blue)',
-                      background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'rgba(242,153,74,0.08)' : 'transparent',
-                      fontWeight: 600,
-                      padding: '10px',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      cursor: 'pointer'
-                    }}
+                    style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#EF4444' : '#475569', borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#EF4444' : '#E5E7EB', borderStyle: 'solid', borderWidth: '1px', background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#FEF2F2' : '#ffffff', cursor: 'pointer', fontWeight: 600 }}
                   >
                     {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
                   </button>
@@ -1479,18 +1327,17 @@ export const CandidateDashboard: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setShowLinksDropdown(!showLinksDropdown)}
-                          className="btn btn-primary"
                           style={{
                             width: '100%',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '6px',
-                            background: 'var(--corporate-blue)',
+                            background: '#2563EB',
                             color: '#fff',
                             fontWeight: 700,
                             padding: '10px',
-                            borderRadius: '8px',
+                            borderRadius: '12px',
                             fontSize: '13px',
                             border: 'none',
                             cursor: 'pointer'
@@ -1505,17 +1352,17 @@ export const CandidateDashboard: React.FC = () => {
                             bottom: '100%',
                             right: 0,
                             marginBottom: '8px',
-                            background: '#0B0E14',
-                            border: '1px solid rgba(26,62,98,0.2)',
+                            background: '#ffffff',
+                            border: '1px solid #E5E7EB',
                             borderRadius: '8px',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                             zIndex: 100,
                             width: '240px',
                             overflow: 'hidden',
                             display: 'flex',
                             flexDirection: 'column'
                           }}>
-                            <div style={{ padding: '8px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600 }}>
+                            <div style={{ padding: '8px 12px', fontSize: '11px', color: '#94A3B8', borderBottom: '1px solid #F1F5F9', fontWeight: 600 }}>
                               SELECT LINK:
                             </div>
                             {govtResourceLinks.map((link, idx) => (
@@ -1528,16 +1375,13 @@ export const CandidateDashboard: React.FC = () => {
                                 style={{
                                   padding: '10px 12px',
                                   fontSize: '12px',
-                                  color: '#fff',
+                                  color: '#475569',
                                   textDecoration: 'none',
-                                  borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                                  borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid #F1F5F9' : 'none',
                                   display: 'block',
                                   textAlign: 'left',
-                                  transition: 'background 0.2s',
-                                  fontWeight: 500
+                                  fontWeight: 600
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(26,62,98,0.2)'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
                                 🔗 {link.label || 'Link'}
                               </a>
@@ -1550,17 +1394,17 @@ export const CandidateDashboard: React.FC = () => {
                         href={currentGovtApplyLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary"
+                        className="saas-btn-primary"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '6px',
-                          background: 'var(--corporate-blue)',
+                          background: '#2563EB',
                           color: '#fff',
                           fontWeight: 700,
                           padding: '10px',
-                          borderRadius: '8px',
+                          borderRadius: '12px',
                           textAlign: 'center',
                           fontSize: '13px',
                           textDecoration: 'none'
@@ -1573,7 +1417,7 @@ export const CandidateDashboard: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="seeker-light-card" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>
+              <div className="flex flex-col items-center justify-center h-full min-h-[300px] border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center text-slate-400 bg-white shadow-sm">
                 Select a notification to view application details.
               </div>
             )}
@@ -1583,53 +1427,32 @@ export const CandidateDashboard: React.FC = () => {
 
       {/* APPLICATIONS VIEW */}
       {activeTab === 'applications' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '24px', alignItems: 'start' }} className="applications-grid">
-          {/* Applications list / Saved jobs toggler */}
-          <aside className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+          {/* Applications list / Saved jobs toggler (35% on desktop) */}
+          <aside className="col-span-1 lg:col-span-4 bg-white border border-[#E5E7EB] p-5 rounded-2xl shadow-sm flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3">
               My Workspace
             </h3>
 
             {/* Applications sub-tab toggler */}
-            <div style={{
-              display: 'flex',
-              background: 'rgba(0,0,0,0.15)',
-              padding: '4px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.04)',
-              gap: '4px'
-            }}>
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1.5">
               <button
                 onClick={() => setApplicationsSubTab('applied')}
-                style={{
-                  flex: 1,
-                  padding: '6px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '11.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  background: applicationsSubTab === 'applied' ? 'var(--corporate-blue)' : 'transparent',
-                  color: applicationsSubTab === 'applied' ? '#fff' : 'var(--text-secondary)',
-                  transition: 'all 0.2s'
-                }}
+                className={`flex-1 py-1.5 rounded-lg border-none text-xs font-bold cursor-pointer transition-all ${
+                  applicationsSubTab === 'applied' 
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'bg-transparent text-slate-500 hover:text-slate-700'
+                }`}
               >
                 📩 Applied ({applications.length})
               </button>
               <button
                 onClick={() => setApplicationsSubTab('saved')}
-                style={{
-                  flex: 1,
-                  padding: '6px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '11.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  background: applicationsSubTab === 'saved' ? 'var(--corporate-blue)' : 'transparent',
-                  color: applicationsSubTab === 'saved' ? '#fff' : 'var(--text-secondary)',
-                  transition: 'all 0.2s'
-                }}
+                className={`flex-1 py-1.5 rounded-lg border-none text-xs font-bold cursor-pointer transition-all ${
+                  applicationsSubTab === 'saved' 
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'bg-transparent text-slate-500 hover:text-slate-700'
+                }`}
               >
                 ❤️ Saved ({savedGovtJobs.length})
               </button>
@@ -1637,11 +1460,11 @@ export const CandidateDashboard: React.FC = () => {
 
             {applicationsSubTab === 'applied' ? (
               applications.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+                <p className="text-slate-400 text-xs font-semibold text-center py-6">
                   You haven't applied to any jobs yet. Check "Explore Jobs"!
                 </p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="flex flex-col gap-3 max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
                   {applications.map(app => {
                     const job = jobs.find(j => j.id === app.jobId);
                     const isSelected = selectedApp?.id === app.id;
@@ -1651,26 +1474,22 @@ export const CandidateDashboard: React.FC = () => {
                       <div
                         key={app.id}
                         onClick={() => setSelectedApp(app)}
-                        className="glass-panel glass-panel-hover"
-                        style={{
-                          padding: '16px',
-                          cursor: 'pointer',
-                          border: isSelected ? '1px solid var(--border-color-active)' : '1px solid var(--border-color)',
-                          background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'rgba(255, 255, 255, 0.02)'
-                        }}
+                        className={`saas-card saas-card-hover p-4 cursor-pointer flex flex-col gap-2 ${
+                          isSelected ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : ''
+                        }`}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <div>
-                            <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{job.title}</h4>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{job.companyName}</p>
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="min-w-0">
+                            <h4 className="text-slate-900 text-xs font-extrabold truncate">{job.title}</h4>
+                            <p className="text-slate-500 text-[10px] font-semibold truncate">{job.companyName}</p>
                           </div>
                           {getStatusBadge(app.status)}
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <div className="flex justify-between items-center pt-2 border-t border-slate-100 mt-1 text-[9px] text-slate-400 font-semibold">
                           <span>Applied: {app.appliedDate}</span>
                           {app.chatHistory.length > 0 && (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)' }}>
-                              <MessageCircle size={10} /> Active chat
+                            <span className="flex items-center gap-0.5 text-[#2563EB]">
+                              <MessageCircle size={9} /> Active chat
                             </span>
                           )}
                         </div>
@@ -1681,30 +1500,26 @@ export const CandidateDashboard: React.FC = () => {
               )
             ) : (
               savedGovtJobs.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+                <p className="text-slate-400 text-xs font-semibold text-center py-6">
                   No saved jobs yet. Heart any listing under explore or govt jobs to save!
                 </p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="flex flex-col gap-3 max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
                   {savedGovtJobs.map(job => {
                     const isSelected = selectedSavedJob?.id === job.id;
                     return (
                       <div
                         key={job.id}
                         onClick={() => setSelectedSavedJob(job)}
-                        className="glass-panel glass-panel-hover"
-                        style={{
-                          padding: '16px',
-                          cursor: 'pointer',
-                          border: isSelected ? '1px solid var(--border-color-active)' : '1px solid var(--border-color)',
-                          background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'rgba(255, 255, 255, 0.02)'
-                        }}
+                        className={`saas-card saas-card-hover p-4 cursor-pointer flex flex-col gap-2 ${
+                          isSelected ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : ''
+                        }`}
                       >
-                        <h4 style={{ color: '#fff', fontSize: '13.5px', fontWeight: 600 }}>{job.title}</h4>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '11.5px', marginTop: '4px' }}>{job.companyName || 'Govt Department'}</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <h4 className="text-slate-900 text-xs font-extrabold truncate">{job.title}</h4>
+                        <p className="text-slate-500 text-[10px] font-semibold truncate">{job.companyName || 'Govt Department'}</p>
+                        <div className="flex justify-between items-center pt-2 border-t border-slate-100 mt-1 text-[9px] text-slate-400 font-semibold">
                           <span>📍 {job.location || 'India'}</span>
-                          <span style={{ color: 'var(--tech-orange)', fontWeight: 600 }}>Saved</span>
+                          <span className="text-[#2563EB] font-bold">Saved</span>
                         </div>
                       </div>
                     );
@@ -1714,28 +1529,27 @@ export const CandidateDashboard: React.FC = () => {
             )}
           </aside>
 
-          {/* Details / Chat Window Panel */}
-          <main>
+          {/* Details / Chat Window Panel (65% on desktop) */}
+          <main className="col-span-1 lg:col-span-8 w-full">
             {applicationsSubTab === 'applied' ? (
               currentApp ? (
-                <div>
+                <div className="flex flex-col gap-4">
                   {/* Job info header */}
-                  <div className="glass-panel" style={{ padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="bg-white border border-[#E5E7EB] p-4 rounded-2xl shadow-sm flex justify-between items-center gap-4 flex-wrap">
                     <div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Chatting about</span>
-                      <h4 style={{ color: '#fff', fontSize: '15px', fontWeight: 600 }}>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Chatting about</span>
+                      <h4 className="text-slate-900 text-sm font-extrabold leading-snug">
                         {jobs.find(j => j.id === currentApp.jobId)?.title} at {jobs.find(j => j.id === currentApp.jobId)?.companyName}
                       </h4>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} className="no-print">
+                    <div className="flex items-center gap-3 flex-wrap">
                       {jobs.find(j => j.id === currentApp.jobId)?.fairWorkPact && (
                         <button
                           onClick={() => {
                             setContractApp(currentApp);
                             setShowContractModal(true);
                           }}
-                          className="btn btn-outline"
-                          style={{ padding: '8px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                          className="px-3 py-1.5 bg-white border border-[#E5E7EB] hover:bg-slate-50 hover:border-slate-300 text-slate-700 font-bold text-xs rounded-xl cursor-pointer transition-all flex items-center gap-1"
                         >
                           🛡️ Legal Pact Deed
                         </button>
@@ -1756,56 +1570,60 @@ export const CandidateDashboard: React.FC = () => {
                   />
                 </div>
               ) : (
-                <div className="glass-panel" style={{ padding: '80px 40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  <MessageCircle size={40} style={{ color: 'var(--primary)', marginBottom: '16px' }} />
-                  <h3>Employer Direct Chat</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                <div className="bg-white border border-[#E5E7EB] rounded-2xl p-12 text-center text-slate-400 min-h-[380px] flex flex-col items-center justify-center shadow-sm">
+                  <MessageCircle size={36} className="text-[#2563EB] mb-3" />
+                  <h3 className="text-slate-900 text-sm font-extrabold mb-1">Employer Direct Chat</h3>
+                  <p className="text-xs text-slate-500 max-w-sm">
                     Select an application from the sidebar to view status and chat directly with recruiters.
                   </p>
                 </div>
               )
             ) : (
               selectedSavedJob ? (
-                <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
+                <div className="saas-card p-6 flex flex-col gap-4 bg-white">
+                  <div className="flex justify-between items-start border-b border-slate-100 pb-4 gap-4">
                     <div>
-                      <h3 style={{ fontSize: '18px', color: '#fff', fontWeight: 700 }}>{selectedSavedJob.title}</h3>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px' }}>{selectedSavedJob.companyName || 'Government Department'}</p>
+                      <h3 className="text-base font-extrabold text-slate-900 leading-snug">{selectedSavedJob.title}</h3>
+                      <p className="text-xs text-slate-500 font-semibold">{selectedSavedJob.companyName || 'Government Department'}</p>
                     </div>
                     <button
                       onClick={() => {
                         setSavedGovtJobs(savedGovtJobs.filter(sj => sj.id !== selectedSavedJob.id));
                         setSelectedSavedJob(null);
                       }}
-                      className="btn btn-outline"
-                      style={{ padding: '6px 12px', fontSize: '11px', borderColor: 'rgba(244, 63, 94, 0.3)', color: '#fda4af' }}
+                      className="px-3 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100/70 text-red-600 rounded-xl font-bold text-xs cursor-pointer transition-all border-none"
                     >
                       Remove Save
                     </button>
                   </div>
 
                   {savedJobDetailsLoading ? (
-                    <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading detailed specifications...</div>
+                    <div className="py-12 text-center text-slate-400 font-semibold">Loading detailed specifications...</div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      <div className="govt-job-html-content" dangerouslySetInnerHTML={{ __html: savedJobDetailsHtml }} style={{ fontSize: '13.5px', color: '#cbd5e1', lineHeight: '1.6' }} />
+                    <div className="flex flex-col gap-4">
+                      <div 
+                        className="saas-card"
+                        dangerouslySetInnerHTML={{ __html: savedJobDetailsHtml }} 
+                        style={{ 
+                          padding: '16px', 
+                          background: '#F8FAFC', 
+                          borderRadius: '12px', 
+                          border: '1px solid #E5E7EB',
+                          fontSize: '12.5px',
+                          color: '#475569',
+                          boxShadow: 'none',
+                          maxHeight: 'calc(100vh - 460px)',
+                          overflowY: 'auto'
+                        }}
+                      />
                       
                       {/* Apply button and links dropdown */}
-                      <div style={{ 
-                        marginTop: '24px', 
-                        paddingTop: '20px', 
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        gap: '12px'
-                      }}>
+                      <div className="mt-2 border-t border-slate-100 pt-4 flex items-center justify-start gap-3">
                         {savedJobResourceLinks.length > 0 ? (
                           <div style={{ position: 'relative' }}>
                             <button
                               onClick={() => setShowSavedLinksDropdown(!showSavedLinksDropdown)}
-                              className="btn btn-primary"
-                              style={{ padding: '10px 20px', fontSize: '13px' }}
+                              className="saas-btn-primary py-2 px-4 text-xs font-bold rounded-xl"
                             >
                               Apply Online ▾
                             </button>
@@ -1814,10 +1632,10 @@ export const CandidateDashboard: React.FC = () => {
                                 position: 'absolute',
                                 bottom: '46px',
                                 left: 0,
-                                background: '#121620',
-                                border: '1px solid rgba(255,255,255,0.15)',
+                                background: '#ffffff',
+                                border: '1px solid #E5E7EB',
                                 borderRadius: '8px',
-                                boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                                boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
                                 width: '220px',
                                 zIndex: 10,
                                 overflow: 'hidden'
@@ -1832,16 +1650,13 @@ export const CandidateDashboard: React.FC = () => {
                                     style={{
                                       display: 'block',
                                       padding: '10px 14px',
-                                      color: '#fff',
+                                      color: '#475569',
                                       textDecoration: 'none',
-                                      fontSize: '12px',
-                                      fontWeight: 500,
-                                      borderBottom: idx < savedJobResourceLinks.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                                      background: 'transparent',
-                                      transition: 'background 0.2s'
+                                      fontSize: '12.5px',
+                                      fontWeight: 600,
+                                      borderBottom: idx < savedJobResourceLinks.length - 1 ? '1px solid #F1F5F9' : 'none',
+                                      background: 'transparent'
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
                                     🔗 {link.label}
                                   </a>
@@ -1854,8 +1669,7 @@ export const CandidateDashboard: React.FC = () => {
                             href={savedJobApplyLink}
                             target="_blank"
                             rel="noreferrer"
-                            className="btn btn-primary"
-                            style={{ padding: '10px 20px', fontSize: '13px', textDecoration: 'none' }}
+                            className="saas-btn-primary text-xs font-bold rounded-xl text-center py-2 px-4 no-underline"
                           >
                             Apply Online
                           </a>
@@ -1865,10 +1679,10 @@ export const CandidateDashboard: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="glass-panel" style={{ padding: '80px 40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  <span style={{ fontSize: '40px', display: 'block', marginBottom: '16px' }}>❤️</span>
-                  <h3>Saved Jobs & Listings</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                <div className="bg-white border border-[#E5E7EB] rounded-2xl p-12 text-center text-slate-400 min-h-[380px] flex flex-col items-center justify-center shadow-sm">
+                  <span className="text-4xl mb-3 select-none">❤️</span>
+                  <h3 className="text-slate-900 text-sm font-extrabold mb-1">Saved Jobs & Listings</h3>
+                  <p className="text-xs text-slate-500 max-w-sm">
                     Select a saved job from the sidebar to view details, links, and apply.
                   </p>
                 </div>
@@ -1878,45 +1692,38 @@ export const CandidateDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* PROFILE VIEW */}
       {activeTab === 'profile' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '24px', alignItems: 'start' }} className="profile-grid">
-          {/* Main Info Card */}
-          <main style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div className="glass-panel" style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '24px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-                👤 Personal Details & DP
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+          {/* Main Info Card (8 columns on desktop) */}
+          <main className="col-span-1 lg:col-span-8 flex flex-col gap-6">
+            <div className="saas-card bg-white border border-[#E5E7EB] p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-5">
+                👤 Personal Details & Profile Avatar
               </h3>
 
               {/* AI Resume Upload Section */}
-              <div style={{ marginBottom: '32px', padding: '24px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '16px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} color="#818cf8" /> Smart AI Resume Parsing
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-6">
+                <h4 className="text-slate-800 font-extrabold text-sm flex items-center gap-1.5 mb-1.5">
+                  <Sparkles size={16} className="text-[#2563EB]" /> Smart AI Resume Parsing
                 </h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                <p className="text-slate-500 text-xs font-semibold mb-4 leading-relaxed">
                   Upload your PDF resume. Our AI will automatically extract your skills, experience, and tailor your job feed to find the best matches.
                 </p>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div className="flex items-center gap-4 flex-wrap">
                   <label 
-                    htmlFor="ai-resume-upload"
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '8px',
-                      background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-                      color: '#fff', padding: '10px 20px', borderRadius: '12px',
-                      fontSize: '14px', fontWeight: 600, cursor: isUploadingResume ? 'wait' : 'pointer',
-                      opacity: isUploadingResume ? 0.7 : 1, transition: 'all 0.2s'
-                    }}
+                    htmlFor="ai-resume-upload-profile"
+                    className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all border-none"
                   >
                     {isUploadingResume ? (
-                      <><RefreshCw size={16} className="spin" /> Parsing Resume...</>
+                      <><RefreshCw size={14} className="animate-spin" /> Parsing Resume...</>
                     ) : (
-                      <><Upload size={16} /> Select PDF Resume</>
+                      <><Upload size={14} /> Select PDF Resume</>
                     )}
                   </label>
                   <input 
                     type="file" 
-                    id="ai-resume-upload" 
+                    id="ai-resume-upload-profile" 
                     accept="application/pdf" 
                     onChange={handleResumeUpload}
                     disabled={isUploadingResume}
@@ -1924,7 +1731,7 @@ export const CandidateDashboard: React.FC = () => {
                   />
                   
                   {candidateProfile.resumeName && (
-                    <span style={{ fontSize: '13px', color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
                       <CheckCircle size={14} /> Active: {candidateProfile.resumeName}
                     </span>
                   )}
@@ -1932,27 +1739,19 @@ export const CandidateDashboard: React.FC = () => {
               </div>
 
               {/* Avatar / DP Picker */}
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '10px' }}>Select App Display Picture (DP)</label>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div className="mb-6">
+                <label className="text-xs font-bold text-slate-500 block mb-2.5 uppercase tracking-wider">Select App Display Picture (DP)</label>
+                <div className="flex gap-2.5 flex-wrap items-center">
                   {['🧑‍💻', '🚀', '🤖', '🎨', '💼', '🎓', '🦖', '🌟', '🦄'].map(emoji => (
                     <button
                       key={emoji}
                       type="button"
                       onClick={() => setProfileAvatar(emoji)}
-                      style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '50%',
-                        fontSize: '22px',
-                        background: profileAvatar === emoji ? 'var(--corporate-blue)' : 'rgba(255,255,255,0.03)',
-                        border: profileAvatar === emoji ? '2px solid var(--tech-orange)' : '1px solid rgba(255,255,255,0.08)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.2s'
-                      }}
+                      className={`w-11 h-11 rounded-full text-xl cursor-pointer flex items-center justify-center transition-all border ${
+                        profileAvatar === emoji 
+                          ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md shadow-blue-500/10' 
+                          : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700'
+                      }`}
                     >
                       {emoji}
                     </button>
@@ -1961,20 +1760,7 @@ export const CandidateDashboard: React.FC = () => {
                   {/* Custom Upload Button */}
                   <label 
                     htmlFor="profile-image-upload-input"
-                    style={{
-                      width: '46px',
-                      height: '46px',
-                      borderRadius: '50%',
-                      fontSize: '18px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px dashed var(--tech-orange)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s',
-                      color: 'var(--tech-orange)'
-                    }}
+                    className="w-11 h-11 rounded-full border border-dashed border-[#2563EB] bg-slate-50 cursor-pointer flex items-center justify-center transition-all text-slate-500 hover:bg-[#2563EB]/5 hover:text-[#2563EB]"
                     title="Upload Custom Image"
                   >
                     📸
@@ -2000,25 +1786,25 @@ export const CandidateDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <form onSubmit={handleProfileSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name</label>
+              <form onSubmit={handleProfileSave} className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500">Full Name</label>
                     <input 
                       type="text" 
                       value={profileName} 
                       onChange={(e) => setProfileName(e.target.value)}
-                      className="glass-input" 
+                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                       required 
                     />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Experience Tier</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500">Experience Tier</label>
                     <select 
                       value={profileExperience}
                       onChange={(e) => setProfileExperience(e.target.value)}
-                      className="glass-input"
-                      style={{ height: '45px' }}
+                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                      style={{ height: '42px' }}
                     >
                       <option value="Entry-level">Entry-level</option>
                       <option value="Mid-level">Mid-level</option>
@@ -2027,43 +1813,43 @@ export const CandidateDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Email Address</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500">Email Address</label>
                     <input 
                       type="email" 
                       value={profileEmail} 
                       onChange={(e) => setProfileEmail(e.target.value)}
-                      className="glass-input" 
+                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                       required 
                     />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Phone Number</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500">Phone Number</label>
                     <input 
                       type="tel" 
                       value={profilePhone} 
                       onChange={(e) => setProfilePhone(e.target.value)}
-                      className="glass-input" 
+                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                       required 
                     />
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Bio / Intro</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Bio / Intro</label>
                   <textarea 
                     value={profileBio} 
                     onChange={(e) => setProfileBio(e.target.value)}
-                    className="glass-input" 
+                    className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                     rows={4}
                     style={{ resize: 'none' }}
                     required
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button type="submit" className="btn btn-primary">Save Personal Details</button>
+                <div className="flex gap-3 items-center flex-wrap mt-2">
+                  <button type="submit" className="saas-btn-primary border-none">Save Personal Details</button>
                   
                   {candidateProfile.onboardingCompleted && (
                     <button 
@@ -2072,38 +1858,37 @@ export const CandidateDashboard: React.FC = () => {
                         setCandidateProfile(prev => ({ ...prev, onboardingCompleted: false }));
                         alert('Preferences reset! You will be guided to the onboarding vibe setup.');
                       }}
-                      className="btn btn-outline" 
-                      style={{ borderColor: 'rgba(244, 63, 94, 0.3)', color: '#fda4af' }}
+                      className="px-4 py-2 border border-red-200 bg-red-50 hover:bg-red-100/70 text-red-600 rounded-xl font-bold text-xs cursor-pointer transition-all border-none"
                     >
                       Reset Onboarding Quiz
                     </button>
                   )}
 
-                  {profileSaved && <span style={{ color: 'var(--success)', fontSize: '13px', fontWeight: 600 }}>✓ Info saved in profile</span>}
+                  {profileSaved && <span className="text-emerald-600 text-xs font-bold">✓ Info saved in profile</span>}
                 </div>
               </form>
             </div>
 
             {/* Academics & Qualifications Editor */}
-            <div className="glass-panel" style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+            <div className="saas-card bg-white border border-[#E5E7EB] p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">
                 🎓 Academics & Qualifications
               </h3>
               
               {/* Existing Academic Entries */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div className="flex flex-col gap-3 mb-5">
                 {academics.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>No academic credentials added yet.</p>
+                  <p className="text-slate-400 text-xs font-semibold">No academic credentials added yet.</p>
                 ) : (
                   academics.map((acad, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div key={idx} className="flex justify-between items-center bg-slate-50 border border-slate-200 p-4 rounded-xl">
                       <div>
-                        <strong style={{ color: '#fff', fontSize: '14px' }}>{acad.degree}</strong>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{acad.school} ({acad.year}) — {acad.grade}</p>
+                        <strong className="text-slate-800 text-sm">{acad.degree}</strong>
+                        <p className="text-xs text-slate-500 mt-0.5">{acad.school} ({acad.year}) — {acad.grade}</p>
                       </div>
                       <button 
                         onClick={() => handleRemoveAcademic(idx)}
-                        style={{ border: 'none', background: 'transparent', color: '#f43f5e', cursor: 'pointer' }}
+                        className="border-none bg-transparent text-rose-500 hover:text-rose-700 cursor-pointer"
                       >
                         <X size={16} />
                       </button>
@@ -2113,69 +1898,65 @@ export const CandidateDashboard: React.FC = () => {
               </div>
 
               {/* Add Academic Form */}
-              <form onSubmit={handleAddAcademic} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.15)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>Add Qualification</span>
+              <form onSubmit={handleAddAcademic} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col gap-3">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Add Qualification</span>
                 <input 
                   type="text" 
                   value={newDegree} 
                   onChange={(e) => setNewDegree(e.target.value)} 
                   placeholder="Degree e.g. B.Tech Computer Science" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <input 
                   type="text" 
                   value={newSchool} 
                   onChange={(e) => setNewSchool(e.target.value)} 
                   placeholder="School / University Name" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="grid grid-cols-2 gap-3">
                   <input 
                     type="text" 
                     value={newAcadYear} 
                     onChange={(e) => setNewAcadYear(e.target.value)} 
                     placeholder="Year (e.g. 2025)" 
-                    className="glass-input" 
-                    style={{ padding: '10px 14px', fontSize: '13px' }}
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                   />
                   <input 
                     type="text" 
                     value={newGrade} 
                     onChange={(e) => setNewGrade(e.target.value)} 
                     placeholder="Score / Grade (e.g. 8.5 CGPA)" 
-                    className="glass-input" 
-                    style={{ padding: '10px 14px', fontSize: '13px' }}
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                   />
                 </div>
-                <button type="submit" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', padding: '10px' }}>
+                <button type="submit" className="saas-btn-secondary py-2 px-4 rounded-xl flex items-center justify-center gap-1">
                   <Plus size={14} /> Add Academic Record
                 </button>
               </form>
             </div>
 
             {/* Work Experiences Editor */}
-            <div className="glass-panel" style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+            <div className="saas-card bg-white border border-[#E5E7EB] p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">
                 💼 Past Work Experience
               </h3>
 
               {/* Existing Work Entries */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div className="flex flex-col gap-3 mb-5">
                 {workExperiences.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>No work history added yet.</p>
+                  <p className="text-slate-400 text-xs font-semibold">No work history added yet.</p>
                 ) : (
                   workExperiences.map((work, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', background: 'rgba(255,255,255,0.02)', padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div key={idx} className="flex justify-between items-start bg-slate-50 border border-slate-200 p-4 rounded-xl">
                       <div>
-                        <strong style={{ color: '#fff', fontSize: '14px' }}>{work.role} at {work.company}</strong>
-                        <span style={{ fontSize: '11px', color: 'var(--tech-orange)', display: 'block', margin: '2px 0' }}>{work.duration}</span>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{work.description}</p>
+                        <strong className="text-slate-800 text-sm">{work.role} at {work.company}</strong>
+                        <span className="text-[10px] font-bold text-[#2563EB] block mt-0.5">{work.duration}</span>
+                        <p className="text-xs text-slate-500 mt-2 leading-relaxed">{work.description}</p>
                       </div>
                       <button 
                         onClick={() => handleRemoveExperience(idx)}
-                        style={{ border: 'none', background: 'transparent', color: '#f43f5e', cursor: 'pointer', marginTop: '2px' }}
+                        className="border-none bg-transparent text-rose-500 hover:text-rose-700 cursor-pointer mt-0.5"
                       >
                         <X size={16} />
                       </button>
@@ -2185,66 +1966,63 @@ export const CandidateDashboard: React.FC = () => {
               </div>
 
               {/* Add Work Form */}
-              <form onSubmit={handleAddExperience} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.15)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>Add Work Experience</span>
+              <form onSubmit={handleAddExperience} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col gap-3">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Add Work Experience</span>
                 <input 
                   type="text" 
                   value={newRole} 
                   onChange={(e) => setNewRole(e.target.value)} 
                   placeholder="Job Role / Title e.g. React Developer" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <input 
                   type="text" 
                   value={newCompany} 
                   onChange={(e) => setNewCompany(e.target.value)} 
                   placeholder="Company / Employer Name" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <input 
                   type="text" 
                   value={newWorkDuration} 
                   onChange={(e) => setNewWorkDuration(e.target.value)} 
                   placeholder="Duration (e.g. June 2024 - Dec 2024)" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <textarea 
                   value={newWorkDesc} 
                   onChange={(e) => setNewWorkDesc(e.target.value)} 
                   placeholder="Role description & key deliverables..." 
-                  className="glass-input" 
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                   rows={2}
-                  style={{ padding: '10px 14px', fontSize: '13px', resize: 'none' }}
+                  style={{ resize: 'none' }}
                 />
-                <button type="submit" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', padding: '10px' }}>
+                <button type="submit" className="saas-btn-secondary py-2 px-4 rounded-xl flex items-center justify-center gap-1">
                   <Plus size={14} /> Add Experience record
                 </button>
               </form>
             </div>
 
             {/* Certifications Editor */}
-            <div className="glass-panel" style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+            <div className="saas-card bg-white border border-[#E5E7EB] p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">
                 📜 Certifications & Credentials
               </h3>
 
               {/* Existing Certs Entries */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div className="flex flex-col gap-3 mb-5">
                 {certifications.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>No certifications added yet.</p>
+                  <p className="text-slate-400 text-xs font-semibold">No certifications added yet.</p>
                 ) : (
                   certifications.map((cert, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div key={idx} className="flex justify-between items-center bg-slate-50 border border-slate-200 p-4 rounded-xl">
                       <div>
-                        <strong style={{ color: '#fff', fontSize: '14px' }}>{cert.name}</strong>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{cert.issuer} ({cert.year})</p>
+                        <strong className="text-slate-800 text-sm">{cert.name}</strong>
+                        <p className="text-xs text-slate-500 mt-0.5">{cert.issuer} ({cert.year})</p>
                       </div>
                       <button 
                         onClick={() => handleRemoveCertification(idx)}
-                        style={{ border: 'none', background: 'transparent', color: '#f43f5e', cursor: 'pointer' }}
+                        className="border-none bg-transparent text-rose-500 hover:text-rose-700 cursor-pointer"
                       >
                         <X size={16} />
                       </button>
@@ -2254,33 +2032,30 @@ export const CandidateDashboard: React.FC = () => {
               </div>
 
               {/* Add Cert Form */}
-              <form onSubmit={handleAddCertification} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.15)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>Add Certification</span>
+              <form onSubmit={handleAddCertification} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col gap-3">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Add Certification</span>
                 <input 
                   type="text" 
                   value={newCertName} 
                   onChange={(e) => setNewCertName(e.target.value)} 
                   placeholder="Credential Name e.g. AWS practitioner" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <input 
                   type="text" 
                   value={newCertIssuer} 
                   onChange={(e) => setNewCertIssuer(e.target.value)} 
                   placeholder="Issuer Organisation e.g. Amazon Web Services" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
                 <input 
                   type="text" 
                   value={newCertYear} 
                   onChange={(e) => setNewCertYear(e.target.value)} 
                   placeholder="Year Achieved" 
-                  className="glass-input" 
-                  style={{ padding: '10px 14px', fontSize: '13px' }}
+                  className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all" 
                 />
-                <button type="submit" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', padding: '10px' }}>
+                <button type="submit" className="saas-btn-secondary py-2 px-4 rounded-xl flex items-center justify-center gap-1">
                   <Plus size={14} /> Add Certification
                 </button>
               </form>
@@ -2288,199 +2063,152 @@ export const CandidateDashboard: React.FC = () => {
           </main>
 
           {/* Live CV Resume Card Preview Panel (Aside) */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'sticky', top: '100px' }}>
-            <div className="glass-panel" style={{ padding: '24px', background: '#0B0E14', border: '2px solid var(--corporate-blue)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {/* Profile Card Header (Francisco style) */}
-              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap-reverse' }}>
-                <div style={{ flex: 1, minWidth: '150px' }}>
+          <aside className="col-span-1 lg:col-span-4 flex flex-col gap-6 sticky top-20">
+            <div className="saas-card bg-white border border-[#E5E7EB] p-6 shadow-sm flex flex-col gap-5">
+              {/* Profile Card Header */}
+              <div className="flex gap-4 items-center justify-between flex-wrap-reverse">
+                <div className="flex-1 min-w-[150px]">
                   {/* Visual Page dots */}
-                  <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tech-orange)' }}></span>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }}></span>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }}></span>
+                  <div className="flex gap-1.5 mb-2.5">
+                    <span className="width-2 height-2 rounded-full bg-[#2563EB] w-1.5 h-1.5"></span>
+                    <span className="width-2 height-2 rounded-full bg-slate-200 w-1.5 h-1.5"></span>
+                    <span className="width-2 height-2 rounded-full bg-slate-200 w-1.5 h-1.5"></span>
                   </div>
-                  <h2 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--tech-orange)', textTransform: 'uppercase', lineHeight: '1.1', fontFamily: 'Outfit', letterSpacing: '0.5px' }}>
+                  <h2 className="text-lg font-black text-slate-900 uppercase leading-none tracking-tight">
                     {profileName ? profileName.split(' ')[0] : 'Candidate'}<br/>
                     {profileName ? profileName.split(' ').slice(1).join(' ') : 'Name'}
                   </h2>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginTop: '6px', letterSpacing: '1px' }}>
+                  <span className="text-[9px] font-extrabold text-slate-400 block mt-1.5 uppercase tracking-widest leading-none">
                     {profileExperience ? `${profileExperience.toUpperCase()} PROFESSIONAL` : 'JOB SEEKER'}
                   </span>
                 </div>
                 
-                {/* Highlighted DP Container (circular orange frame) */}
-                <div style={{
-                  position: 'relative',
-                  width: '90px',
-                  height: '90px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--tech-orange) 0%, #1A3E62 100%)',
-                  padding: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 8px 24px rgba(242, 153, 74, 0.25)'
-                }}>
-                  <div style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '50%',
-                    background: '#0B0E14',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: profileAvatar && profileAvatar.length > 4 ? '18px' : '44px',
-                    overflow: 'hidden'
-                  }}>
+                {/* Highlighted DP Container */}
+                <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 p-1 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                     {profileAvatar && (profileAvatar.startsWith('data:image/') || profileAvatar.startsWith('http')) ? (
-                      <img src={profileAvatar} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={profileAvatar} alt="DP" className="w-full h-full object-cover" />
                     ) : (
-                      profileAvatar
+                      <span className="text-3xl select-none">{profileAvatar}</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Layout Grid inside Card */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '20px' }}>
+              <div className="flex flex-col gap-4 border-t border-slate-100 pt-4">
                 
-                {/* Column blocks */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  
-                  {/* About Me Orange check block */}
-                  <div style={{
-                    background: 'rgba(242, 153, 74, 0.05)',
-                    border: '1px solid rgba(242, 153, 74, 0.15)',
-                    padding: '16px',
-                    borderRadius: '16px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}>
-                    {/* Tiny Checkered graphic mimic */}
-                    <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '12px', opacity: 0.35 }}>🏁</div>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--tech-orange)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>About Me</span>
-                    <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: '1.45', margin: 0 }}>
-                      {profileBio || 'Write a brief description about your core competencies, qualifications, and personal career path objectives.'}
-                    </p>
-                  </div>
-
-                  {/* Education */}
-                  {academics.length > 0 && (
-                    <div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Education</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {academics.map((acad, idx) => (
-                          <div key={idx} style={{ position: 'relative', paddingLeft: '14px', borderLeft: '2px solid var(--tech-orange)' }}>
-                            <strong style={{ color: '#fff', fontSize: '12.5px', display: 'block' }}>{acad.degree}</strong>
-                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{acad.school}</span>
-                            <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>Year: {acad.year} • Score: {acad.grade}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Skills with Progress bars */}
-                  {candidateProfile.skills.length > 0 && (
-                    <div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Skills & Proficiencies</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {candidateProfile.skills.map((skill, index) => (
-                          <div key={skill} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>{skill}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveSkill(skill)}
-                                style={{ border: 'none', background: 'transparent', color: '#f43f5e', cursor: 'pointer', padding: 0, fontSize: '10px' }}
-                              >
-                                Remove
-                              </button>
-                            </div>
-                            {/* Visual Progress bar */}
-                            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
-                              <div style={{
-                                width: `${Math.max(45, 95 - index * 10)}%`,
-                                height: '100%',
-                                background: 'linear-gradient(90deg, var(--corporate-blue) 0%, var(--tech-orange) 100%)',
-                                borderRadius: '3px'
-                              }}></div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Past Experiences */}
-                  {workExperiences.length > 0 && (
-                    <div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Experience Timeline</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {workExperiences.map((work, idx) => (
-                          <div key={idx} style={{ position: 'relative', paddingLeft: '14px', borderLeft: '2px solid var(--corporate-blue)' }}>
-                            <strong style={{ color: '#fff', fontSize: '13px', display: 'block' }}>{work.role}</strong>
-                            <span style={{ fontSize: '11.5px', color: 'var(--tech-orange)', fontWeight: 600 }}>{work.company}</span>
-                            <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block', margin: '2px 0' }}>{work.duration}</span>
-                            <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>{work.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Certifications */}
-                  {certifications.length > 0 && (
-                    <div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Certifications</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {certifications.map((cert, idx) => (
-                          <div key={idx} style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '8px 12px', borderRadius: '10px' }}>
-                            🏆 <strong style={{ color: '#fff' }}>{cert.name}</strong>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '10.5px', margin: '2px 0 0 0' }}>{cert.issuer} — {cert.year}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
+                {/* About Me block */}
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl relative overflow-hidden">
+                  <div className="absolute top-2 right-2 text-xs opacity-20 select-none">🏁</div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">About Me</span>
+                  <p className="text-slate-600 text-xs leading-relaxed margin-none">
+                    {profileBio || 'Write a brief description about your core competencies, qualifications, and personal career path objectives.'}
+                  </p>
                 </div>
+
+                {/* Education */}
+                {academics.length > 0 && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Education</span>
+                    <div className="flex flex-col gap-2">
+                      {academics.map((acad, idx) => (
+                        <div key={idx} className="relative pl-3 border-l-2 border-l-[#2563EB] text-xs">
+                          <strong className="text-slate-800 font-bold block">{acad.degree}</strong>
+                          <span className="text-slate-500 block">{acad.school}</span>
+                          <span className="text-slate-400 block text-[10px] mt-0.5">Year: {acad.year} • Score: {acad.grade}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skills with Progress bars */}
+                {candidateProfile.skills.length > 0 && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Skills & Proficiencies</span>
+                    <div className="flex flex-col gap-2.5">
+                      {candidateProfile.skills.map((skill, index) => (
+                        <div key={skill} className="flex flex-col gap-1">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-slate-600 font-semibold">{skill}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveSkill(skill)}
+                              className="border-none bg-transparent text-rose-500 hover:text-rose-700 cursor-pointer p-0 text-[10px] font-bold"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                          {/* Visual Progress bar */}
+                          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-[#2563EB] rounded-full" 
+                              style={{ width: `${Math.max(45, 95 - index * 10)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Past Experiences */}
+                {workExperiences.length > 0 && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Experience Timeline</span>
+                    <div className="flex flex-col gap-3">
+                      {workExperiences.map((work, idx) => (
+                        <div key={idx} className="relative pl-3 border-l-2 border-l-[#2563EB] text-xs">
+                          <strong className="text-slate-800 font-bold block">{work.role}</strong>
+                          <span className="text-[#2563EB] font-bold block mt-0.5">{work.company}</span>
+                          <span className="text-slate-400 block text-[10px] mt-0.5">{work.duration}</span>
+                          <p className="text-slate-500 text-xs mt-1 leading-relaxed">{work.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Certifications */}
+                {certifications.length > 0 && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Certifications</span>
+                    <div className="flex flex-col gap-2">
+                      {certifications.map((cert, idx) => (
+                        <div key={idx} className="text-xs bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
+                          🏆 <strong className="text-slate-800 font-bold">{cert.name}</strong>
+                          <p className="text-slate-400 text-[10px] mt-0.5">{cert.issuer} — {cert.year}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </div>
 
               {/* Bottom Contact Card Bar */}
-              <div style={{
-                background: 'rgba(242, 153, 74, 0.07)',
-                border: '1px solid rgba(242, 153, 74, 0.15)',
-                padding: '16px',
-                borderRadius: '16px',
-                marginTop: '10px',
-                display: 'grid',
-                gridTemplateColumns: '1fr',
-                gap: '8px',
-                fontSize: '11.5px',
-                color: 'var(--text-secondary)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✉️ <strong>{profileEmail}</strong></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📞 <strong>{profilePhone}</strong></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📍 <strong>{currentLocation}, {locDetails.state}</strong></div>
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col gap-1.5 text-xs text-slate-600 font-semibold mt-2.5">
+                <div className="flex items-center gap-1.5">✉️ <strong>{profileEmail}</strong></div>
+                <div className="flex items-center gap-1.5">📞 <strong>{profilePhone}</strong></div>
+                <div className="flex items-center gap-1.5">📍 <strong>{currentLocation}, {locDetails.state}</strong></div>
               </div>
             </div>
 
             {/* Add Skill Widget inside preview column */}
-            <div className="glass-panel" style={{ padding: '24px' }}>
-              <h4 style={{ color: '#fff', fontSize: '15px', fontWeight: 600, marginBottom: '12px' }}>
-                Add Skills
+            <div className="saas-card bg-white border border-[#E5E7EB] p-5 shadow-sm">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">
+                Quick Add Skill
               </h4>
-              <form onSubmit={handleAddSkill} style={{ display: 'flex', gap: '8px' }}>
+              <form onSubmit={handleAddSkill} className="flex gap-2 w-full">
                 <input 
                   type="text" 
                   value={newSkill} 
                   onChange={(e) => setNewSkill(e.target.value)}
                   placeholder="e.g. React, Python..." 
-                  className="glass-input"
-                  style={{ flex: 1, padding: '8px 12px', fontSize: '13px' }}
+                  className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:bg-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all flex-1" 
                 />
-                <button type="submit" className="btn btn-outline" style={{ padding: '0 12px', borderRadius: '12px' }}>
+                <button type="submit" className="saas-btn-primary py-2 px-3 rounded-xl border-none flex items-center justify-center flex-shrink-0">
                   <Plus size={16} />
                 </button>
               </form>
@@ -2491,163 +2219,176 @@ export const CandidateDashboard: React.FC = () => {
 
       {/* SETTINGS VIEW */}
       {activeTab === 'settings' && (
-        <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 md:p-8 shadow-sm flex flex-col gap-6">
           {/* Account Settings Header */}
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', fontFamily: 'Outfit' }}>⚙️ App Settings</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px' }}>Manage your account, privacy, notifications, and app preferences.</p>
+          <div className="border-b border-slate-100 pb-4">
+            <h3 className="text-base font-extrabold text-slate-900">⚙️ App Settings</h3>
+            <p className="text-xs text-slate-500 font-semibold mt-1">Manage your account, privacy, notifications, and app preferences.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
              {/* Section 1: Account & Profile */}
-             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
-                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>1. Account & Profile</h4>
+             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">1. Account & Profile</h4>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Account Type Perspective</label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Account Type Perspective</label>
+                  <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => {
-                        setPerspective('candidate');
-                      }}
-                      className="btn"
-                      style={{ flex: 1, padding: '10px', fontSize: '12px', background: 'var(--corporate-blue)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                      onClick={() => setPerspective('candidate')}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border-none cursor-pointer transition-all ${
+                        perspective === 'candidate' 
+                          ? 'bg-[#2563EB] text-white shadow-sm shadow-blue-500/10' 
+                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
                     >
                       Job Seeker
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setPerspective('recruiter');
-                      }}
-                      className="btn"
-                      style={{ flex: 1, padding: '10px', fontSize: '12px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                      onClick={() => setPerspective('recruiter')}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border-none cursor-pointer transition-all ${
+                        perspective === 'recruiter' 
+                          ? 'bg-[#2563EB] text-white shadow-sm shadow-blue-500/10' 
+                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
                     >
                       Recruiter
                     </button>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Region/Location (National)</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Region/Location (National)</label>
                   <select 
-                    className="glass-input" 
-                    style={{ fontSize: '13px', background: '#090714', color: '#fff' }}
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
                     value={currentLocation}
                     onChange={(e) => setCurrentLocation(e.target.value)}
                   >
                     {Object.keys(SUPPORTED_LOCATIONS).map(loc => (
-                      <option key={loc} value={loc} style={{ background: '#090714', color: '#fff' }}>
+                      <option key={loc} value={loc}>
                         {loc} ({SUPPORTED_LOCATIONS[loc].state})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Portfolio & Website Link</label>
-                  <input type="url" placeholder="https://myportfolio.com" className="glass-input" style={{ fontSize: '13px' }} />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Portfolio & Website Link</label>
+                  <input 
+                    type="url" 
+                    placeholder="https://myportfolio.com" 
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                  />
                 </div>
              </div>
 
              {/* Section 2: Notifications */}
-             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
-                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>2. Notifications</h4>
+             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">2. Notifications</h4>
                 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Direct Messages (Chat)</span>
-                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Direct Messages (Chat)</span>
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Application status updates</span>
-                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Application status updates</span>
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Interview requests</span>
-                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Interview requests</span>
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Daily email job matches</span>
-                  <input type="checkbox" style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Daily email job matches</span>
+                  <input type="checkbox" className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
              </div>
 
              {/* Section 3: Privacy & Visibility */}
-             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
-                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>3. Privacy & Visibility</h4>
+             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">3. Privacy & Visibility</h4>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Profile Status</label>
-                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Profile Status</label>
+                  <select className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all">
                     <option>Actively Looking</option>
                     <option>Open to Offers</option>
                     <option>Not Looking</option>
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Resume Visibility</label>
-                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Resume Visibility</label>
+                  <select className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all">
                     <option>Public to all recruiters</option>
                     <option>Visible only to applied jobs</option>
                     <option>Completely hidden</option>
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Block Companies</label>
-                  <input type="text" placeholder="Enter company names to block..." className="glass-input" style={{ fontSize: '13px' }} />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Block Companies</label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter company names to block..." 
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                  />
                 </div>
              </div>
 
              {/* Section 4: Security & Access */}
-             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
-                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>4. Security & Access</h4>
+             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">4. Security & Access</h4>
                 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Two-Factor (2FA)</span>
-                  <input type="checkbox" style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Two-Factor (2FA)</span>
+                  <input type="checkbox" className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Reset Password</label>
-                  <input type="password" placeholder="New password" className="glass-input" style={{ fontSize: '13px' }} />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Reset Password</label>
+                  <input 
+                    type="password" 
+                    placeholder="New password" 
+                    className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                  />
                 </div>
 
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
                   🛡️ Active Sessions: 1 (Android WebView)
                 </div>
              </div>
 
              {/* Section 5: App Preferences */}
-             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.01)' }}>
-                <h4 style={{ color: 'var(--tech-orange)', fontSize: '16px', fontWeight: 700 }}>5. App Preferences</h4>
+             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">5. App Preferences</h4>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Appearance Theme</label>
-                  <select className="glass-input" style={{ fontSize: '13px' }}>
-                    <option>Dark Mode (Default)</option>
-                    <option>Light Mode</option>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">Appearance Theme</label>
+                  <select className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all">
+                    <option>Light Mode (Default)</option>
+                    <option>Dark Mode</option>
                     <option>System Default</option>
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>App Language / ਬੋਲੀ</label>
-                  <select className="glass-input" style={{ fontSize: '13px' }}>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-500">App Language / ਬੋਲੀ</label>
+                  <select className="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-semibold focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all">
                     <option>English</option>
                     <option>Punjabi (ਪੰਜਾਬੀ)</option>
                     <option>Hindi (हिन्दी)</option>
                   </select>
                 </div>
 
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Auto-play Wi-Fi Only</span>
-                  <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px' }} />
+                <label className="flex justify-between items-center cursor-pointer text-xs font-semibold text-slate-600">
+                  <span>Auto-play Wi-Fi Only</span>
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB] w-4 h-4" />
                 </label>
              </div>
           </div>
@@ -2891,430 +2632,95 @@ export const CandidateDashboard: React.FC = () => {
 
       {/* CHATS VIEW - Active Chat Threads with Employers */}
       {activeTab === 'chats' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--corporate-blue)', margin: 0 }}>Active Conversations</h3>
-            <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>
-              {applications.filter(a => a.chatHistory && a.chatHistory.length > 0).length} active
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center mb-1">
+            <h3 className="text-sm font-bold text-slate-800">Active Conversations</h3>
+            <span className="text-xs bg-blue-50 border border-blue-100 text-[#2563EB] font-bold px-2.5 py-1 rounded-lg">
+              {applications.filter(a => a.chatHistory && a.chatHistory.length > 0).length} Active Threads
             </span>
           </div>
 
           {applications.filter(a => a.chatHistory && a.chatHistory.length > 0).length === 0 ? (
-            <div className="seeker-light-card" style={{ padding: '40px', textAlign: 'center', borderRadius: '14px' }}>
-              <MessageCircle size={40} color="#cbd5e1" style={{ margin: '0 auto 12px' }} />
-              <p style={{ color: '#64748b', fontSize: '14px', fontWeight: 600, margin: '0 0 4px 0' }}>No active chats yet</p>
-              <p style={{ color: '#94a3b8', fontSize: '12px', margin: 0 }}>Apply to jobs to start conversations with employers</p>
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-12 text-center text-slate-400 shadow-sm">
+              <MessageCircle size={36} className="text-[#2563EB] mb-3 mx-auto" />
+              <p className="text-slate-900 text-sm font-extrabold mb-1">No active chats yet</p>
+              <p className="text-xs text-slate-500">Apply to jobs to start conversations with employers</p>
             </div>
           ) : (
-            applications
-              .filter(a => a.chatHistory && a.chatHistory.length > 0)
-              .sort((a, b) => {
-                const aLastMsg = a.chatHistory[a.chatHistory.length - 1];
-                const bLastMsg = b.chatHistory[b.chatHistory.length - 1];
-                return new Date(bLastMsg.timestamp).getTime() - new Date(aLastMsg.timestamp).getTime();
-              })
-              .map(app => {
-                const job = jobs.find(j => j.id === app.jobId);
-                const lastMessage = app.chatHistory[app.chatHistory.length - 1];
-                const isUnread = lastMessage.sender === 'recruiter';
-                return (
-                  <div
-                    key={app.id}
-                    onClick={() => {
-                      setSelectedApp(app);
-                      setActiveTab('applications');
-                    }}
-                    className="seeker-light-card"
-                    style={{
-                      padding: '16px',
-                      borderRadius: '12px',
-                      cursor: 'pointer',
-                      border: isUnread ? '1px solid rgba(242,153,74,0.3)' : '1px solid rgba(26,62,98,0.08)',
-                      background: isUnread ? 'rgba(242,153,74,0.03)' : '#fff',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                      <div style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '12px',
-                        background: `linear-gradient(135deg, #1A3E62, #F2994A)`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '16px',
-                        flexShrink: 0
-                      }}>
-                        {job?.logoSeed || '💼'}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--corporate-blue)' }}>{app.recruiterName || job?.companyName || 'Employer'}</span>
-                          {isUnread && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tech-orange)', flexShrink: 0 }} />}
+            <div className="flex flex-col gap-3">
+              {applications
+                .filter(a => a.chatHistory && a.chatHistory.length > 0)
+                .sort((a, b) => {
+                  const aLastMsg = a.chatHistory[a.chatHistory.length - 1];
+                  const bLastMsg = b.chatHistory[b.chatHistory.length - 1];
+                  return new Date(bLastMsg.timestamp).getTime() - new Date(aLastMsg.timestamp).getTime();
+                })
+                .map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  const lastMessage = app.chatHistory[app.chatHistory.length - 1];
+                  const isUnread = lastMessage.sender === 'recruiter';
+                  const initials = job ? job.companyName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'CO';
+                  
+                  return (
+                    <div
+                      key={app.id}
+                      onClick={() => {
+                        setSelectedApp(app);
+                        setActiveTab('applications');
+                      }}
+                      className={`saas-card saas-card-hover p-4 cursor-pointer flex justify-between items-center gap-4 ${
+                        isUnread ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : ''
+                      }`}
+                    >
+                      <div className="flex gap-3 items-center min-w-0 flex-1">
+                        {/* Initials Avatar */}
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs flex-shrink-0 select-none">
+                          {initials}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>{job?.title || 'Job Position'}</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-xs font-extrabold text-slate-900 truncate">
+                              {app.recruiterName || job?.companyName || 'Employer'}
+                            </span>
+                            {isUnread && <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0" />}
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-semibold truncate mb-1">{job?.title || 'Job Position'}</div>
+                          <div className="text-[11px] text-slate-400 truncate">
                             {lastMessage.sender === 'candidate' ? 'You: ' : ''}{lastMessage.text}
-                          </span>
-                          <span style={{ fontSize: '10px', color: '#94a3b8', flexShrink: 0, marginLeft: '8px' }}>
-                            {new Date(lastMessage.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
+                          </div>
                         </div>
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-bold flex-shrink-0 select-none">
+                        {new Date(lastMessage.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+            </div>
           )}
         </div>
       )}
 
-      {/* Fair Work Pact Modals have been moved to the bottom of the component (outside the container) to bypass Android WebView transform rendering bugs */}
-      {/* Mobile Bottom Navigation Bar – Icon Only */}
-      {!selectedJob && (
-        <div className="mobile-bottom-nav" style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '60px',
-        background: isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(11,14,20,0.97)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderTop: isLightMode ? '1px solid rgba(26,62,98,0.12)' : '1px solid rgba(255,255,255,0.06)',
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        zIndex: 1000,
-        boxShadow: isLightMode ? '0 -2px 16px rgba(0,0,0,0.06)' : '0 -4px 20px rgba(0,0,0,0.5)',
-        padding: '0 4px'
-      }}>
-        {[
-          { id: 'explore', icon: <Briefcase size={20} />, label: 'Explore' },
-          { id: 'govt', icon: <span style={{ fontSize: '18px' }}>🏛️</span>, label: 'Govt' },
-          { id: 'workspace', icon: <Sparkles size={20} />, label: 'Workspace' },
-          { id: 'chats', icon: <MessageCircle size={20} />, label: 'Chats' },
-          { id: 'notifications', icon: <Bell size={20} />, label: 'Alerts' },
-          { id: 'profile', icon: <UserCheck size={20} />, label: 'Profile' }
-        ].map(item => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: isActive ? 'var(--tech-orange)' : (isLightMode ? '#94a3b8' : 'rgba(255,255,255,0.35)'),
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '2px',
-                cursor: 'pointer',
-                flex: 1,
-                padding: '6px 0',
-                transition: 'color 0.2s',
-                position: 'relative'
-              }}
-            >
-              {isActive && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-1px',
-                  width: '20px',
-                  height: '3px',
-                  borderRadius: '0 0 4px 4px',
-                  background: 'var(--tech-orange)'
-                }} />
-              )}
-              {item.icon}
-              <span style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.3px' }}>{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
-      )}
+
       </div> {/* Close container here to bypass Android WebView coordinate transform bug */}
 
       {/* Standalone full-page overlay details view rendered outside .container to bypass Android WebView transform rendering context bugs */}
       {activeTab === 'explore' && selectedJob && (
-        <div className={`job-detail-panel job-detail-open ${isClosingExplore ? 'job-detail-closing' : ''}`}>
-          <div className="glass-panel" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className={`job-detail-panel job-detail-open ${isClosingExplore ? 'job-detail-closing' : ''} lg:hidden`}>
+          <div className="flex flex-col h-full bg-[#F8FAFC]">
             {/* Header: Sticky at Top */}
-            <div style={{ padding: '24px 24px 16px 24px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="p-4 bg-white border-b border-[#E5E7EB] flex-shrink-0">
               <button
                 onClick={handleCloseJobDetails}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-secondary)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  marginBottom: '16px',
-                  padding: '4px 0'
-                }}
-                className="mobile-back-btn"
+                className="bg-transparent border-none text-slate-600 hover:text-slate-900 text-xs font-bold cursor-pointer flex items-center gap-1.5"
               >
                 <ArrowLeft size={16} /> Back to Listings
               </button>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <div>
-                  <span className="badge badge-primary" style={{ marginBottom: '8px', background: 'rgba(242,153,74,0.15)', color: 'var(--tech-orange)', border: '1px solid rgba(242,153,74,0.3)' }}>{selectedJob.experience}</span>
-                  <h3 style={{ color: '#fff', fontSize: '20px', fontWeight: 800, marginBottom: '4px' }}>{selectedJob.title}</h3>
-                  <p style={{ color: 'var(--tech-orange)', fontWeight: 700, fontSize: '15px', margin: 0 }}>{selectedJob.companyName}</p>
-                </div>
-                <div className="avatar" style={{
-                  width: '50px',
-                  height: '50px',
-                  fontSize: '18px',
-                  background: `linear-gradient(135deg, #1A3E62 0%, #F2994A 100%)`
-                }}>
-                  {selectedJob.logoSeed}
-                </div>
-              </div>
             </div>
 
             {/* Scrollable Body Content */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  <MapPin size={14} color="var(--text-muted)" /> Location: {selectedJob.location} ({selectedJob.mode})
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  <IndianRupee size={14} color="var(--text-muted)" /> Compensation: {selectedJob.salary}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  <Briefcase size={14} color="var(--text-muted)" /> Job Type: {selectedJob.type}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#10b981', fontWeight: 600, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '4px' }}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
-                  💬 Chat Live Hours: {selectedJob.chatLiveHours || '10:00 AM - 1:00 PM'}
-                </div>
-              </div>
-
-              {/* Compatibility Score Widget */}
-              {candidateProfile.onboardingCompleted && (
-                <div style={{
-                  background: 'linear-gradient(135deg, #132B45 0%, #1A3E62 100%)',
-                  border: '1.5px solid rgba(242, 153, 74, 0.4)',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  color: '#fff',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  boxShadow: '0 8px 24px rgba(26, 62, 98, 0.3)'
-                }}>
-                  <div style={{ flex: 1, zIndex: 2 }}>
-                    <h5 style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '1px', color: 'var(--tech-orange)', textTransform: 'uppercase', marginBottom: '4px' }}>
-                      Compatibility Score
-                    </h5>
-                    <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', lineHeight: '1.4' }}>
-                      Based on work mode alignment, experience tier, job type, and key skills.
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
-                      <span style={{ fontSize: '28px', fontWeight: 800, color: '#fff' }}>
-                        {getAIFeedback(selectedJob).score}%
-                      </span>
-                      <span style={{
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        background: 'rgba(242, 153, 74, 0.2)',
-                        color: 'var(--tech-orange)',
-                        padding: '2px 8px',
-                        borderRadius: '20px'
-                      }}>
-                        {getAIFeedback(selectedJob).label}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <img src="/logo.png" alt="Logo" className="animate-glow" style={{ width: '72px', height: '72px', borderRadius: '12px', objectFit: 'cover', zIndex: 1 }} />
-                </div>
-              )}
-
-              {/* Job Details Tabs */}
-              <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '16px', marginBottom: '8px' }}>
-                <button
-                  onClick={() => setDetailsTab('info')}
-                  style={{
-                    padding: '8px 0 12px 0',
-                    background: 'transparent',
-                    border: 'none',
-                    color: detailsTab === 'info' ? 'var(--tech-orange)' : 'var(--text-secondary)',
-                    borderBottom: detailsTab === 'info' ? '2px solid var(--tech-orange)' : 'none',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 600
-                  }}
-                >
-                  Job Details
-                </button>
-                <button
-                  onClick={() => setDetailsTab('pact')}
-                  style={{
-                    padding: '8px 0 12px 0',
-                    background: 'transparent',
-                    border: 'none',
-                    color: detailsTab === 'pact' ? 'var(--tech-orange)' : 'var(--text-secondary)',
-                    borderBottom: detailsTab === 'pact' ? '2px solid var(--tech-orange)' : 'none',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  🛡️ Fair Work Pact {selectedJob.fairWorkPact && <span style={{ fontSize: '10px', color: 'var(--success)' }}>● Verified</span>}
-                </button>
-              </div>
-
-              {detailsTab === 'info' ? (
-                <>
-                  {/* Skills Grid */}
-                  <div>
-                    <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>Required Skills</h4>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {selectedJob.skills.map(skill => (
-                        <span key={skill} className="badge badge-secondary" style={{ borderRadius: '6px' }}>{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}>Job Description</h4>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>{selectedJob.description}</p>
-                  </div>
-
-                  {/* Requirements */}
-                  <div>
-                    <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>What you will bring</h4>
-                    <ul style={{ paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '6px', margin: 0 }}>
-                      {selectedJob.requirements.map((req, i) => (
-                        <li key={i}>{req}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Benefits */}
-                  <div>
-                    <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>Perks & Benefits</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      {selectedJob.benefits.map((benefit, i) => (
-                        <div key={i} style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                          ✨ {benefit}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div className="glass-panel" style={{
-                    background: 'rgba(16, 185, 129, 0.04)',
-                    border: '1px solid rgba(16, 185, 129, 0.2)',
-                    padding: '16px',
-                    borderRadius: '12px'
-                  }}>
-                    <h4 style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>🛡️</span> Fair Work Pact Signed
-                    </h4>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.5, margin: 0 }}>
-                      Both the candidate and the employer commit to a mutual standard of respect, security, and accountability.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h5 style={{ color: 'var(--primary)', fontSize: '13px', fontWeight: 700, marginBottom: '8px' }}>
-                      🛡️ Worker Rights (Employer Commitments)
-                    </h5>
-                    <ul style={{ paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px', margin: 0 }}>
-                      <li><strong>Fair Working Hours:</strong> Strict adherence to a standard, limited work schedule.</li>
-                      <li><strong>Overtime Pay:</strong> Guaranteed extra compensation for any hours worked beyond the daily limit.</li>
-                      <li><strong>Health & Well-being:</strong> Access to basic medical benefits and a safe working environment.</li>
-                      <li><strong>Accommodation Support:</strong> Housing allowance or safe, provided accommodation where applicable.</li>
-                      <li><strong>Job Security:</strong> Protection against unfair firing without valid cause or proper notice.</li>
-                      <li><strong>Merit-Based Growth:</strong> Guaranteed salary raises or promotions upon successfully achieving predefined work targets.</li>
-                    </ul>
-                  </div>
-
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px' }}>
-                    <h5 style={{ color: 'var(--secondary)', fontSize: '13px', fontWeight: 700, marginBottom: '8px' }}>
-                      🤝 Worker Duties (Employee Commitments)
-                    </h5>
-                    <ul style={{ paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px', margin: 0 }}>
-                      <li><strong>Punctuality:</strong> Consistently arriving on time and respecting the work schedule.</li>
-                      <li><strong>Prompt Communication:</strong> Timely and professional responses to all work-related messages or requests.</li>
-                      <li><strong>Responsibility:</strong> Taking full ownership of assigned tasks and performing them diligently.</li>
-                      <li><strong>Absolute Integrity:</strong> Honesty in reporting hours, tasks, and issues.</li>
-                      <li><strong>Professional Conduct:</strong> Respectful behavior towards coworkers and clients.</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Sticky Bottom actions container */}
-            <div style={{ padding: '16px 24px', background: '#0B0E14', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0, display: 'flex', gap: '12px' }}>
-              {applications.some(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1') ? (
-                <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                  <button className="btn btn-outline" style={{ flex: 1, padding: '12px', borderRadius: '12px' }} disabled>
-                    Applied ✓
-                  </button>
-                  {selectedJob.fairWorkPact && (
-                    <button 
-                      onClick={() => {
-                        const matchingApp = applications.find(app => app.jobId === selectedJob.id && app.candidateId === 'cand-1');
-                        if (matchingApp) {
-                          setContractApp(matchingApp);
-                          setShowContractModal(true);
-                        }
-                      }}
-                      className="btn btn-primary animate-glow" 
-                      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px', borderRadius: '12px' }}
-                    >
-                      🛡️ View Pact Deed
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <button 
-                  onClick={() => {
-                    if (selectedJob.fairWorkPact) {
-                      setPactChecked(false);
-                      setTypedSignature('');
-                      setShowApplyPactModal(true);
-                    } else {
-                      handleApply(selectedJob.id);
-                    }
-                  }} 
-                  className="btn animate-glow" 
-                  style={{ 
-                    flex: 1, 
-                    background: 'var(--tech-orange)', 
-                    color: '#fff',
-                    fontWeight: 700,
-                    padding: '12px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 15px -3px rgba(242, 153, 74, 0.4)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Apply Now
-                </button>
-              )}
+            <div className="flex-1 overflow-y-auto p-4">
+              {renderJobDetailsContent(selectedJob)}
             </div>
           </div>
         </div>
@@ -3323,15 +2729,15 @@ export const CandidateDashboard: React.FC = () => {
       {/* Standalone full-page overlay details view for Government Jobs rendered outside .container to bypass Android WebView transform rendering context bugs */}
       {activeTab === 'govt' && selectedGovtJob && (
         <div className={`job-detail-panel job-detail-open ${isClosingGovt ? 'job-detail-closing' : ''}`}>
-          <div className="glass-panel" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%', background: '#0B0E14', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="saas-card" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%', background: '#ffffff', color: '#111827', border: '1px solid #E5E7EB', borderRadius: '0' }}>
             {/* Header: Sticky at Top */}
-            <div style={{ padding: '24px 24px 16px 24px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ padding: '24px 24px 16px 24px', flexShrink: 0, borderBottom: '1px solid #E5E7EB' }}>
               <button
                 onClick={handleCloseGovtJobDetails}
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: 'var(--text-secondary)',
+                  color: '#475569',
                   fontSize: '14px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -3347,17 +2753,19 @@ export const CandidateDashboard: React.FC = () => {
               </button>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                 <div>
-                  <span className="badge badge-primary" style={{ marginBottom: '8px', background: 'rgba(26, 62, 98, 0.15)', color: 'var(--corporate-blue)', border: '1px solid rgba(26, 62, 98, 0.3)' }}>
+                  <span className="badge" style={{ marginBottom: '8px', background: '#F1F5F9', color: '#475569', border: '1px solid #E5E7EB', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px' }}>
                     {selectedGovtJob.recruitmentBoard}
                   </span>
-                  <h3 style={{ color: '#fff', fontSize: '20px', fontWeight: 800, marginBottom: '4px', lineHeight: '1.4', margin: 0 }}>{selectedGovtJob.title}</h3>
+                  <h3 style={{ color: '#111827', fontSize: '20px', fontWeight: 800, marginBottom: '4px', lineHeight: '1.4', margin: 0 }}>{selectedGovtJob.title}</h3>
                 </div>
-                <div className="avatar" style={{
+                <div className="saas-avatar" style={{
                   width: '50px',
                   height: '50px',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  background: `linear-gradient(135deg, #1A3E62 0%, #F2994A 100%)`
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  background: '#F1F5F9',
+                  color: '#2563EB',
+                  border: '1px solid #E5E7EB'
                 }}>
                   Govt
                 </div>
@@ -3366,31 +2774,31 @@ export const CandidateDashboard: React.FC = () => {
 
             {/* Scrollable Body Content */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  <MapPin size={14} color="var(--text-muted)" /> State/Region: {selectedGovtJob.state ? selectedGovtJob.state.toUpperCase() : 'All India'}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#F8FAFC', padding: '14px', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#475569', fontWeight: 500 }}>
+                  <MapPin size={14} className="text-[#2563EB]" /> State/Region: {selectedGovtJob.state ? selectedGovtJob.state.toUpperCase() : 'All India'}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  <Briefcase size={14} color="var(--text-muted)" /> Qualification Required: {selectedGovtJob.qualification}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#475569', fontWeight: 500 }}>
+                  <Briefcase size={14} className="text-[#2563EB]" /> Qualification Required: {selectedGovtJob.qualification}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#ef4444', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#ef4444', fontWeight: 700, borderTop: '1px solid #E5E7EB', paddingTop: '8px', marginTop: '4px' }}>
                   <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></span>
                   ⌛ Last Date to Apply: {selectedGovtJob.lastDate || '—'}
                 </div>
               </div>
 
               {/* Tabs */}
-              <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '16px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', gap: '16px', marginBottom: '8px' }}>
                 <button
                   className="tab-btn active"
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: '#fff',
+                    color: '#2563EB',
                     fontWeight: 700,
                     fontSize: '14px',
                     paddingBottom: '8px',
-                    borderBottom: '2px solid var(--tech-orange)',
+                    borderBottom: '2px solid #2563EB',
                     cursor: 'pointer'
                   }}
                 >
@@ -3400,39 +2808,39 @@ export const CandidateDashboard: React.FC = () => {
 
               {/* Details Content */}
               {govtJobDetailsLoading ? (
-                <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                <div style={{ padding: '40px 20px', textAlign: 'center', color: '#475569', fontWeight: 600 }}>
                   <div className="animate-pulse">
                     ⏳ Loading official job notifications, fee details & vacancy tables...
                   </div>
                 </div>
               ) : selectedGovtJobDetails ? (
                 <div 
-                  className="govt-details-content"
+                  className="saas-card"
                   dangerouslySetInnerHTML={{ __html: selectedGovtJobDetails }} 
                   style={{ 
                     padding: '16px', 
-                    background: 'rgba(255,255,255,0.03)', 
+                    background: '#F8FAFC', 
                     borderRadius: '12px', 
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid #E5E7EB',
                     fontSize: '13px',
                     lineHeight: '1.6',
-                    color: '#e2e8f0'
+                    color: '#475569',
+                    boxShadow: 'none'
                   }} 
                 />
               ) : (
-                <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <div style={{ padding: '24px', textAlign: 'center', color: '#475569' }}>
                   No notification details available.
                 </div>
               )}
             </div>
 
             {/* Sticky Bottom Actions */}
-            <div style={{ padding: '16px 24px', background: '#0B0E14', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', flexShrink: 0 }}>
+            <div style={{ padding: '16px 24px', background: '#F8FAFC', borderTop: '1px solid #E5E7EB', display: 'flex', gap: '12px', flexShrink: 0 }}>
               <button 
                 type="button"
                 onClick={() => handleToggleSaveGovtJob(selectedGovtJob)}
-                className="btn btn-outline" 
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'var(--text-secondary)', borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'var(--tech-orange)' : 'rgba(255,255,255,0.15)', background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? 'rgba(242,153,74,0.08)' : 'transparent', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#EF4444' : '#475569', borderColor: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#EF4444' : '#E5E7EB', borderStyle: 'solid', borderWidth: '1px', background: savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '#FEF2F2' : '#ffffff', cursor: 'pointer', fontWeight: 600 }}
               >
                 {savedGovtJobs.some(sj => sj.id === selectedGovtJob.id) ? '❤️ Saved' : '🤍 Save Job'}
               </button>
@@ -3442,7 +2850,6 @@ export const CandidateDashboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowLinksDropdown(!showLinksDropdown)}
-                      className="btn btn-primary"
                       style={{ 
                         width: '100%',
                         padding: '12px', 
@@ -3454,7 +2861,7 @@ export const CandidateDashboard: React.FC = () => {
                         alignItems: 'center', 
                         justifyContent: 'center',
                         border: 'none',
-                        background: 'var(--corporate-blue)',
+                        background: '#2563EB',
                         color: '#fff',
                         cursor: 'pointer'
                       }}
@@ -3468,17 +2875,17 @@ export const CandidateDashboard: React.FC = () => {
                         bottom: '100%',
                         right: 0,
                         marginBottom: '12px',
-                        background: '#0B0E14',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#ffffff',
+                        border: '1px solid #E5E7EB',
                         borderRadius: '12px',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                         zIndex: 1200,
                         width: '260px',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
                       }}>
-                        <div style={{ padding: '10px 14px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600 }}>
+                        <div style={{ padding: '10px 14px', fontSize: '11px', color: '#94A3B8', borderBottom: '1px solid #F1F5F9', fontWeight: 600 }}>
                           SELECT LINK:
                         </div>
                         {govtResourceLinks.map((link, idx) => (
@@ -3491,12 +2898,12 @@ export const CandidateDashboard: React.FC = () => {
                             style={{
                               padding: '12px 14px',
                               fontSize: '12.5px',
-                              color: '#fff',
+                              color: '#475569',
                               textDecoration: 'none',
-                              borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                              borderBottom: idx < govtResourceLinks.length - 1 ? '1px solid #F1F5F9' : 'none',
                               display: 'block',
                               textAlign: 'left',
-                              fontWeight: 500
+                              fontWeight: 600
                             }}
                           >
                             🔗 {link.label || 'Link'}
@@ -3510,8 +2917,8 @@ export const CandidateDashboard: React.FC = () => {
                     href={currentGovtApplyLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{ display: 'flex', width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--corporate-blue)', color: '#fff' }}
+                    className="saas-btn-primary"
+                    style={{ display: 'flex', width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: 700, alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: '#2563EB', color: '#fff' }}
                   >
                     Apply Online ↗
                   </a>

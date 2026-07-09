@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAppState } from "@/context/AppContext";
 import { LandingPage } from "@/components/LandingPage";
 import Navbar from "@/components/Navbar";
@@ -11,6 +12,11 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 
 export default function Home() {
   const { perspective, token, login, signup } = useAppState();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const renderMainContent = () => {
     if (perspective === 'visitor') {
@@ -53,8 +59,18 @@ export default function Home() {
     return <LandingPage />;
   };
 
+  // Prevent server-client HTML hydration mismatches
+  if (!isMounted) {
+    return (
+      <main className="flex min-h-screen flex-col relative bg-[#0f172a]">
+        <Navbar />
+        <LandingPage />
+      </main>
+    );
+  }
+
   return (
-    <main className="flex min-h-screen flex-col relative">
+    <main className="flex min-h-screen flex-col relative bg-[#0f172a]">
       <Navbar />
       {renderMainContent()}
     </main>

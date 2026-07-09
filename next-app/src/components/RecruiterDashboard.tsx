@@ -342,7 +342,7 @@ export const RecruiterDashboard: React.FC = () => {
           )}
 
           {/* Dashboard Summary Cards (Flat corporate styling) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="card-flat" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb' }}>
                 <Briefcase size={20} />
@@ -389,7 +389,7 @@ export const RecruiterDashboard: React.FC = () => {
           {/* Kanban Candidate Pipeline Board */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: '8px 0 0 0' }}>Candidate Pipeline</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="kanban-board-grid">
+            <div className="kanban-board-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Column 1: Sourced */}
               <div className="kanban-column flex flex-col gap-3">
                 <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-1">
@@ -906,14 +906,14 @@ export const RecruiterDashboard: React.FC = () => {
 
       {/* POST A JOB VIEW */}
       {activeTab === 'post-job' && (
-        <form onSubmit={handlePostJob} className="glass-panel animate-fade-in" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+        <form onSubmit={handlePostJob} className="saas-card bg-white border border-[#E5E7EB] shadow-sm p-6 md:p-8 flex flex-col gap-6 animate-fade-in">
+          <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
             List a New Opportunity
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Job Title</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Job Title</label>
               <input
                 type="text"
                 placeholder="e.g. Frontend Specialist, Product Designer"
@@ -923,8 +923,8 @@ export const RecruiterDashboard: React.FC = () => {
                 required
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Category</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Category</label>
               <select
                 value={jobCategory}
                 onChange={(e) => setJobCategory(e.target.value)}
@@ -939,9 +939,9 @@ export const RecruiterDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Job Type</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Job Type</label>
               <select
                 value={jobType}
                 onChange={(e) => setJobType(e.target.value as any)}
@@ -955,8 +955,8 @@ export const RecruiterDashboard: React.FC = () => {
               </select>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Work Mode</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Work Mode</label>
               <select
                 value={jobMode}
                 onChange={(e) => setJobMode(e.target.value as any)}
@@ -969,8 +969,8 @@ export const RecruiterDashboard: React.FC = () => {
               </select>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Experience Tier</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Experience Tier</label>
               <select
                 value={jobExp}
                 onChange={(e) => setJobExp(e.target.value as any)}
@@ -984,9 +984,9 @@ export const RecruiterDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Compensation Range</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Compensation Range</label>
               <input
                 type="text"
                 placeholder="e.g. ₹20,000 - ₹30,000 / mo, ₹15,000 / mo"
@@ -996,8 +996,8 @@ export const RecruiterDashboard: React.FC = () => {
                 required
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Location / Core Timezone</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Location / Core Timezone</label>
               <input
                 type="text"
                 placeholder="e.g. Remote (US), San Francisco, CA"
@@ -1008,9 +1008,9 @@ export const RecruiterDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Daily Chat Live Hours</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Daily Chat Live Hours</label>
               <input
                 type="text"
                 placeholder="e.g. 10:00 AM - 12:00 PM, 2:00 PM - 5:00 PM"
@@ -1019,28 +1019,28 @@ export const RecruiterDashboard: React.FC = () => {
                 className="glass-input"
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Chat Mode Status Indicator</label>
-              <div style={{ display: 'flex', alignItems: 'center', height: '45px', padding: '0 12px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '13px', color: 'var(--text-muted)' }}>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-700">Chat Mode Status Indicator</label>
+              <div className="flex items-center text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 h-[45px]">
                 ℹ️ Display scheduled hour blocks dynamically to matching applicants.
               </div>
             </div>
           </div>
 
           {/* Required Skills Adder */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Required Skills</label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700">Required Skills</label>
+            <div className="flex gap-2 flex-wrap mb-1">
               {jobSkills.map(skill => (
-                <span key={skill} className="badge badge-secondary" style={{ gap: '6px', paddingRight: '6px' }}>
+                <span key={skill} className="badge-teal text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 select-none">
                   {skill}
-                  <button type="button" onClick={() => handleRemoveSkill(skill)} style={{ border: 'none', background: 'transparent', color: '#67e8f9', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => handleRemoveSkill(skill)} className="border-none bg-transparent text-teal-600 hover:text-teal-800 cursor-pointer p-0">
                     <X size={12} />
                   </button>
                 </span>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="flex gap-2">
               <input
                 type="text"
                 value={newSkill}
@@ -1049,15 +1049,15 @@ export const RecruiterDashboard: React.FC = () => {
                 className="glass-input"
                 style={{ flex: 1, padding: '8px 12px', fontSize: '13px' }}
               />
-              <button type="button" onClick={handleAddSkill} className="btn btn-outline" style={{ padding: '0 16px' }}>
+              <button type="button" onClick={handleAddSkill} className="saas-btn-secondary px-4 py-2 hover:bg-slate-50 rounded-lg active:scale-95 transition-all text-xs font-bold">
                 Add Skill
               </button>
             </div>
           </div>
 
           {/* Job Description */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Job Description Summary</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700">Job Description Summary</label>
             <textarea
               placeholder="Provide a high-level overview of the role, challenges, and context..."
               value={jobDesc}
@@ -1070,8 +1070,8 @@ export const RecruiterDashboard: React.FC = () => {
           </div>
 
           {/* Requirements List (Newline separated) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Candidate Requirements (one per line)</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700">Candidate Requirements (one per line)</label>
             <textarea
               placeholder="e.g.&#10;3+ years of React development&#10;Familiarity with SQL databases&#10;Excellent communication skills"
               value={reqsText}
@@ -1083,8 +1083,8 @@ export const RecruiterDashboard: React.FC = () => {
           </div>
 
           {/* Benefits List (Newline separated) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Perks & Benefits (one per line)</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700">Perks & Benefits (one per line)</label>
             <textarea
               placeholder="e.g.&#10;Unlimited PTO&#10;Home office stipend ($1,500)&#10;Health/dental/vision coverage"
               value={benefitsText}
@@ -1096,36 +1096,28 @@ export const RecruiterDashboard: React.FC = () => {
           </div>
 
           {/* Fair Work Pact Commitment Checkbox */}
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.04)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            padding: '20px',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px'
-          }}>
-            <h4 style={{ color: '#fff', fontSize: '15px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col gap-3">
+            <h4 className="text-slate-900 text-sm font-black flex items-center gap-2 m-0">
               <span>🛡️</span> The Hyriq Fair Work Pact Commitment
             </h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: 1.5, margin: 0 }}>
+            <p className="text-slate-600 text-xs font-medium leading-relaxed m-0">
               By listing this job, you commit to respecting Worker Rights: limited fair working hours, guaranteed overtime compensation, safe working conditions, housing allowance/accommodation where applicable, merit-based advancement, and protection against unfair termination.
             </p>
-            <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
+            <label className="flex gap-2 items-center cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={fairWorkPactChecked}
                 onChange={(e) => setFairWorkPactChecked(e.target.checked)}
-                style={{ accentColor: 'var(--success)', width: '16px', height: '16px' }}
+                style={{ accentColor: '#10b981', width: '16px', height: '16px' }}
                 required
               />
-              <span style={{ fontSize: '13px', color: '#fff', fontWeight: 600 }}>
+              <span className="text-xs text-slate-800 font-extrabold">
                 I commit to uphold the Hyriq Fair Work Pact for this listing
               </span>
             </label>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ padding: '14px 28px', alignSelf: 'flex-start' }}>
+          <button type="submit" className="saas-btn-primary border-none self-start">
             Publish Job Listing
           </button>
         </form>
@@ -1133,16 +1125,16 @@ export const RecruiterDashboard: React.FC = () => {
 
       {/* APPLICANTS & JOBS VIEW */}
       {activeTab === 'manage' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px', alignItems: 'start' }} className="manage-grid">
+        <div className="manage-grid grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Active Jobs sidebar selector */}
-          <aside className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+          <aside className="col-span-1 lg:col-span-3 saas-card bg-white border border-[#E5E7EB] shadow-sm p-4 flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-1">
               Select Job Listing
             </h3>
             {myJobs.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center' }}>No active listings.</p>
+              <p className="text-xs font-semibold text-slate-400 text-center py-2">No active listings.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="flex flex-col gap-2.5">
                 {myJobs.map(job => {
                   const applicantsCount = applications.filter(app => app.jobId === job.id).length;
                   const isSelected = selectedJobId === job.id;
@@ -1153,18 +1145,14 @@ export const RecruiterDashboard: React.FC = () => {
                         setSelectedJobId(job.id);
                         setSelectedAppId(''); // Reset selected applicant
                       }}
-                      className="glass-panel glass-panel-hover"
-                      style={{
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        border: isSelected ? '1px solid var(--border-color-active)' : '1px solid var(--border-color)',
-                        background: isSelected ? 'rgba(6, 182, 212, 0.08)' : 'rgba(255, 255, 255, 0.02)'
-                      }}
+                      className={`saas-card saas-card-hover p-4 cursor-pointer border flex flex-col gap-2 ${
+                        isSelected ? 'saas-card-selected border-l-4 border-l-[#7C3AED]' : 'border-slate-200'
+                      }`}
                     >
-                      <h4 style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{job.title}</h4>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                      <h4 className="text-xs font-black text-slate-900 truncate">{job.title}</h4>
+                      <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold">
                         <span>{job.type}</span>
-                        <span style={{ color: 'var(--secondary)', fontWeight: 600 }}>{applicantsCount} applicants</span>
+                        <span className="text-[#7C3AED] font-extrabold">{applicantsCount} applicants</span>
                       </div>
                     </div>
                   );
@@ -1174,53 +1162,47 @@ export const RecruiterDashboard: React.FC = () => {
           </aside>
 
           {/* Job applicants detailed overview */}
-          <main style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px', alignItems: 'start' }} className="manage-main">
+          <main className="col-span-1 lg:col-span-9 grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {/* Candidates list for selected job */}
-            <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+            <div className="col-span-1 md:col-span-4 saas-card bg-white border border-[#E5E7EB] shadow-sm p-4 flex flex-col gap-4">
+              <h3 className="text-xs font-bold text-slate-800 border-b border-slate-100 pb-3 mb-1">
                 Applicants ({currentJobApplicants.length})
               </h3>
               {currentJobApplicants.length === 0 ? (
-                <div style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+                <div className="text-xs font-bold text-slate-400 text-center py-8">
                   No applicants for this job yet. Try applying from the "Job Seeker" view to test!
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className="flex flex-col gap-2.5">
                   {currentJobApplicants.map(app => {
-                    // In our mock database, candidate ID 'cand-1' represents candidateProfile
                     const isSelected = selectedAppId === app.id;
                     return (
                       <div
                         key={app.id}
                         onClick={() => setSelectedAppId(app.id)}
-                        className="glass-panel glass-panel-hover"
-                        style={{
-                          padding: '14px',
-                          cursor: 'pointer',
-                          border: isSelected ? '1px solid var(--border-color-active)' : '1px solid var(--border-color)',
-                          background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'rgba(255, 255, 255, 0.01)'
-                        }}
+                        className={`saas-card saas-card-hover p-4 cursor-pointer border flex flex-col gap-2 ${
+                          isSelected ? 'saas-card-selected border-l-4 border-l-[#2563EB]' : 'border-slate-200'
+                        }`}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
-                          <h4 style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{candidateProfile.name}</h4>
+                        <div className="flex justify-between items-start gap-2">
+                          <h4 className="text-xs font-black text-slate-900 truncate">{candidateProfile.name}</h4>
                           {getStatusBadge(app.status)}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                          <span style={{ 
-                            fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px',
-                            background: `rgba(${calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? '16, 185, 129' : '245, 158, 11'}, 0.1)`,
-                            color: calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? '#10b981' : '#f59e0b',
-                            border: `1px solid ${calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`
-                          }}>
+                        <div className="flex items-center gap-1">
+                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-md border ${
+                            calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70
+                              ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                              : 'bg-amber-50 border-amber-200 text-amber-600'
+                          }`}>
                             ⚡ {calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score}% Match
                           </span>
                         </div>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '11px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        <p className="text-[10px] text-slate-500 font-semibold truncate">
                           {candidateProfile.skills.slice(0, 3).join(' • ')}
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
+                        <div className="flex justify-between items-center mt-1 text-[9px] text-slate-400 font-bold">
                           <span>Applied: {app.appliedDate}</span>
-                          {app.chatHistory.length > 0 && <span style={{ color: 'var(--primary)' }}>Chat active</span>}
+                          {app.chatHistory.length > 0 && <span className="text-[#2563EB]">Chat active</span>}
                         </div>
                       </div>
                     );
@@ -1230,42 +1212,40 @@ export const RecruiterDashboard: React.FC = () => {
             </div>
 
             {/* Applicant details + Chat panel */}
-            <div>
+            <div className="col-span-1 md:col-span-8 flex flex-col gap-4">
               {currentApplication ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className="flex flex-col gap-4">
                   {/* Candidate Details summary card */}
-                  <div className="glass-panel" style={{ padding: '24px', background: '#0B0E14', border: '2px solid var(--corporate-blue)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {/* Profile Card Header (Francisco style) */}
-                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap-reverse' }}>
-                      <div style={{ flex: 1, minWidth: '150px' }}>
+                  <div className="saas-card bg-white border border-[#E5E7EB] shadow-sm p-6 flex flex-col gap-5">
+                    {/* Profile Card Header */}
+                    <div className="flex gap-4 items-center justify-between flex-wrap-reverse">
+                      <div className="flex-1 min-w-[150px]">
                         {/* Visual Page dots */}
-                        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tech-orange)' }}></span>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }}></span>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }}></span>
+                        <div className="flex gap-1.5 mb-3">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]"></span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                          <h2 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--tech-orange)', textTransform: 'uppercase', lineHeight: '1.1', fontFamily: 'Outfit', letterSpacing: '0.5px' }}>
+                        <div className="flex items-center gap-4">
+                          <h2 className="text-xl font-black text-slate-900 leading-tight uppercase font-sans tracking-wide">
                             {candidateProfile.name ? candidateProfile.name.split(' ')[0] : 'Candidate'}<br/>
                             {candidateProfile.name ? candidateProfile.name.split(' ').slice(1).join(' ') : 'Name'}
                           </h2>
-                          <div style={{
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                            width: '50px', height: '50px', borderRadius: '12px',
-                            background: `rgba(${calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? '16, 185, 129' : '245, 158, 11'}, 0.1)`,
-                            border: `2px solid ${calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? 'rgba(16, 185, 129, 0.4)' : 'rgba(245, 158, 11, 0.4)'}`,
-                            color: calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70 ? '#10b981' : '#f59e0b'
-                          }}>
-                            <span style={{ fontSize: '18px', fontWeight: 800 }}>
+                          <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl border-2 ${
+                            calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score >= 70
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-600'
+                              : 'bg-amber-50 border-amber-300 text-amber-600'
+                          }`}>
+                            <span className="text-sm font-black leading-none">
                               {calculateMatchScore(candidateProfile.skills, manageActiveJob?.requirements || [], manageActiveJob?.skills || []).score}
                             </span>
-                            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }}>Match</span>
+                            <span className="text-[7px] font-bold text-center uppercase tracking-tighter mt-0.5">Match</span>
                           </div>
                         </div>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginTop: '6px', letterSpacing: '1px' }}>
+                        <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mt-2">
                           {candidateProfile.experience ? `${candidateProfile.experience.toUpperCase()} PROFESSIONAL` : 'JOB SEEKER'}
                         </span>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '12px' }}>
+                        <div className="flex gap-2 items-center mt-3">
                           <button
                             onClick={handleSaveCandidate}
                             style={{
@@ -1275,9 +1255,9 @@ export const RecruiterDashboard: React.FC = () => {
                               padding: '6px 12px',
                               borderRadius: '20px',
                               border: '1px solid',
-                              borderColor: savedCandidates.some(c => c.email === candidateProfile.email) ? 'var(--tech-orange)' : 'rgba(255,255,255,0.15)',
-                              color: savedCandidates.some(c => c.email === candidateProfile.email) ? 'var(--tech-orange)' : 'var(--text-secondary)',
-                              background: savedCandidates.some(c => c.email === candidateProfile.email) ? 'rgba(242,153,74,0.08)' : 'transparent',
+                              borderColor: savedCandidates.some(c => c.email === candidateProfile.email) ? '#EA580C' : '#cbd5e1',
+                              color: savedCandidates.some(c => c.email === candidateProfile.email) ? '#EA580C' : '#64748b',
+                              background: savedCandidates.some(c => c.email === candidateProfile.email) ? 'rgba(234,88,12,0.08)' : 'transparent',
                               fontSize: '11px',
                               fontWeight: 700,
                               cursor: 'pointer',
@@ -1289,34 +1269,13 @@ export const RecruiterDashboard: React.FC = () => {
                         </div>
                       </div>
                       
-                      {/* Highlighted DP Container (circular orange frame) */}
-                      <div style={{
-                        position: 'relative',
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--tech-orange) 0%, #1A3E62 100%)',
-                        padding: '3px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 8px 24px rgba(242, 153, 74, 0.25)'
-                      }}>
-                        <div style={{
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: '50%',
-                          background: '#0B0E14',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: candidateProfile.logoSeed && candidateProfile.logoSeed.length > 4 ? '18px' : '38px',
-                          overflow: 'hidden'
-                        }}>
+                      {/* Highlighted DP Container */}
+                      <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-[#2563EB] to-[#7C3AED] p-0.5 flex items-center justify-center shadow-md flex-shrink-0">
+                        <div className="w-full h-full rounded-full bg-slate-50 border border-white flex items-center justify-center overflow-hidden">
                           {candidateProfile.logoSeed && (candidateProfile.logoSeed.startsWith('data:image/') || candidateProfile.logoSeed.startsWith('http')) ? (
                             <img src={candidateProfile.logoSeed} alt="DP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
-                            candidateProfile.logoSeed || '🧑‍💻'
+                            <span style={{ fontSize: '32px' }}>{candidateProfile.logoSeed || '🧑‍💻'}</span>
                           )}
                         </div>
                       </div>
@@ -2030,57 +1989,6 @@ export const RecruiterDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="mobile-bottom-nav" style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '64px',
-        background: '#0B0E14',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        display: 'none',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        zIndex: 1000,
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.4)',
-        paddingBottom: 'safe-area-inset-bottom'
-      }}>
-        {[
-          { id: 'workspace', label: 'Workspace', icon: '📊' },
-          { id: 'overview', label: 'Dashboard', icon: '🏠' },
-          { id: 'post-job', label: 'Post Job', icon: '➕' },
-          { id: 'chats', label: 'Chats', icon: '💬' },
-          { id: 'manage', label: 'Manage', icon: '📁' },
-          { id: 'notifications', label: 'Alerts', icon: '🔔' }
-        ].map(item => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: isActive ? 'var(--tech-orange)' : 'var(--text-secondary)',
-                fontSize: '11px',
-                fontWeight: 600,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                cursor: 'pointer',
-                flex: 1,
-                padding: '8px 0',
-                transition: 'all 0.2s'
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 };

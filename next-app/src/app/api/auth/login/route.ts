@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { loginSchema } from '@/lib/validations';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit';
 
 const { Pool } = pg;
 const connectionString = process.env.DATABASE_URL;
@@ -30,6 +31,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'hyriq_super_secret_key_2026';
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+    const rate = rateLimit(ip, 5, 60000); // 5 attempts/min max
+    if (!rate.success) {
+      return rateLimitResponse(rate.reset);
+    }
+
     const body = await req.json();
     
     // Zod validation
