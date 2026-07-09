@@ -62,7 +62,7 @@ async function main() {
         create: {
           id: job.id,
           title: job.title,
-          company: job.company || 'Unknown Company',
+          company: job.company || job.companyName || 'Unknown Company',
           location: job.location,
           type: job.type || 'Full-time',
           salary: job.salary || null,
