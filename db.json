@@ -3838,6 +3838,303 @@
       "recruiterId": "recruiter-imported",
       "fairWorkPact": true,
       "chatLiveHours": "10:00 AM - 6:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-0",
+      "title": "Territory Sales Manager, Bhatinda, Cons. Repl. Sales",
+      "companyName": "The Goodyear Tire & Rubber Company",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹6,00,000 - ₹10,00,000 / year",
+      "description": "Steer Goodyear's commercial tire replacement sales across Bathinda region. Build local dealership networks, drive product availability, and lead territory market share growth.",
+      "requirements": [
+        "Bachelor's degree",
+        "2+ years of field sales experience",
+        "Strong communication and negotiation skills"
+      ],
+      "responsibilities": [
+        "Increase replacement tire market share",
+        "Manage dealer channels and key relationships",
+        "Report distributor sales performance"
+      ],
+      "tags": [
+        "Sales",
+        "Manager",
+        "Bathinda"
+      ],
+      "logoSeed": "Goodyear",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-1",
+      "title": "Room Attendant",
+      "companyName": "Erica Hotels Pvt Ltd",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹1,44,000 - ₹1,68,000 / year",
+      "description": "Maintain cleanliness, sanitation, and premium presentation of guest rooms. Replenish room amenities, handle customer inquiries, and coordinate housekeeping schedule.",
+      "requirements": [
+        "10th Pass or above",
+        "Basic hospitality training or experience",
+        "Good physical stamina and work ethic"
+      ],
+      "responsibilities": [
+        "Clean and service guest rooms",
+        "Replenish toiletries and towels",
+        "Report any maintenance damage"
+      ],
+      "tags": [
+        "Hospitality",
+        "Hotel",
+        "Bathinda"
+      ],
+      "logoSeed": "Erica Hotels",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-2",
+      "title": "Medical Officer (MBBS)",
+      "companyName": "HireHut Private Limited",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹12,00,000 - ₹18,00,000 / year",
+      "description": "Provide clinical consultations, diagnose patient illnesses, and manage treatment plans. Must hold an MBBS degree from a recognized Indian institute with minimum 2 years of relevant experience.",
+      "requirements": [
+        "MBBS degree from recognized Indian Institute",
+        "2+ years of clinical experience",
+        "Active registration with medical council"
+      ],
+      "responsibilities": [
+        "Consult and treat patients",
+        "Prescribe medications and diagnostics",
+        "Maintain detailed clinical charts"
+      ],
+      "tags": [
+        "Healthcare",
+        "Doctor",
+        "MBBS",
+        "Bathinda"
+      ],
+      "logoSeed": "HireHut",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-3",
+      "title": "SUPPORT STAFF",
+      "companyName": "Rrayze business solutions",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹1,44,000 - ₹1,80,000 / year",
+      "description": "Assist in general office administration, file coordination, managing visitor logs, and supporting daily operations for Rrayze Business Solutions.",
+      "requirements": [
+        "12th Pass or above",
+        "Basic computer operation knowledge",
+        "Polite communication skills"
+      ],
+      "responsibilities": [
+        "Support administrative staff",
+        "Coordinate files and courier entries",
+        "Manage guest welcome desk"
+      ],
+      "tags": [
+        "Admin",
+        "Support",
+        "Office",
+        "Bathinda"
+      ],
+      "logoSeed": "Rrayze",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-4",
+      "title": "Evaluator",
+      "companyName": "Merlin Enterprises",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹1,08,000 - ₹1,44,000 / year",
+      "description": "Evaluate candidate profiles, conduct initial screenings, and match skills against client specifications. Ensure accurate reporting of qualifications.",
+      "requirements": [
+        "Graduate in any stream",
+        "Strong assessment and profile matching skills",
+        "Fluent in Punjabi and English"
+      ],
+      "responsibilities": [
+        "Screen resumes against job profiles",
+        "Conduct initial phone assessments",
+        "Verify applicant qualifications"
+      ],
+      "tags": [
+        "Evaluation",
+        "HR",
+        "Screening",
+        "Bathinda"
+      ],
+      "logoSeed": "Merlin",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-5",
+      "title": "Radiologist",
+      "companyName": "Krsnaa Diagnostics Ltd",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹24,00,000 - ₹36,00,000 / year",
+      "description": "Interpret diagnostic imaging scans (CT, MRI, Ultrasound, X-Ray) and collaborate with clinical staff. Must hold MD/DNB in Radiology.",
+      "requirements": [
+        "MD/DNB in Radiology",
+        "Registered medical practitioner",
+        "Minimum 1 year diagnostic experience"
+      ],
+      "responsibilities": [
+        "Analyze and interpret diagnostic scans",
+        "Provide clear written medical reports",
+        "Collaborate on complex clinical cases"
+      ],
+      "tags": [
+        "Healthcare",
+        "Radiology",
+        "Doctor",
+        "Bathinda"
+      ],
+      "logoSeed": "Krsnaa Diagnostics",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-6",
+      "title": "Full Time content creator",
+      "companyName": "INDIRA INFRATECH PRIVATE LIMITED",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹1,80,000 - ₹2,64,000 / year",
+      "description": "Create high-quality marketing and promotional content, videos, and graphics for Indira Infratech's social channels. Manage social media engagement.",
+      "requirements": [
+        "Video editing skills (Premiere Pro / CapCut)",
+        "Graphic design capability (Canva / Photoshop)",
+        "Active social media knowledge"
+      ],
+      "responsibilities": [
+        "Create short-form video reels",
+        "Design promotional layout materials",
+        "Interact with comments and build community"
+      ],
+      "tags": [
+        "Marketing",
+        "Content Creator",
+        "Design",
+        "Bathinda"
+      ],
+      "logoSeed": "Indira Infratech",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-7",
+      "title": "Other state job vacancy available (Girls Only)",
+      "companyName": "Confidential",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹1,80,000 - ₹2,40,000 / year",
+      "description": "Administrative and coordinating role assisting with other state branches. Manage incoming calls, schedule branch updates, and coordinate visitor logs.",
+      "requirements": [
+        "Graduate in any discipline",
+        "Strong coordination and time-management",
+        "Good telephone etiquette"
+      ],
+      "responsibilities": [
+        "Coordinate queries with interstate branches",
+        "Maintain records of updates",
+        "Handle support tickets"
+      ],
+      "tags": [
+        "Admin",
+        "Coordinator",
+        "Bathinda"
+      ],
+      "logoSeed": "Confidential",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-8",
+      "title": "Sales Officer",
+      "companyName": "Ferrero",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹4,00,000 - ₹6,50,000 / year",
+      "description": "Drive retail sales and brand visibility of Ferrero products across Bathinda distribution channels. Coordinate stock availability and manage local distributor performance.",
+      "requirements": [
+        "Bachelor's degree",
+        "1+ year experience in FMCG Retail Sales",
+        "Local route knowledge of Bathinda region"
+      ],
+      "responsibilities": [
+        "Execute sales and visibility targets",
+        "Manage retail store relationships",
+        "Ensure product stock replenishment"
+      ],
+      "tags": [
+        "Sales",
+        "FMCG",
+        "Officer",
+        "Bathinda"
+      ],
+      "logoSeed": "Ferrero",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
+    },
+    {
+      "id": "job-google-scraped-1784051739605-9",
+      "title": "Associate Video Editor",
+      "companyName": "Techie La",
+      "location": "Bathinda, Punjab",
+      "type": "Full-time",
+      "salary": "₹3,36,000 - ₹7,00,000 / year",
+      "description": "Edit high-quality video content for online educational courses and promotional reels. Collaborate with design and content production teams.",
+      "requirements": [
+        "Proficiency in Premiere Pro and After Effects",
+        "Basic sound design and typography integration skills",
+        "Good editing speed and creativity"
+      ],
+      "responsibilities": [
+        "Assemble and edit course video lectures",
+        "Enhance audio and add transitions",
+        "Maintain digital assets library"
+      ],
+      "tags": [
+        "Media",
+        "Video Editor",
+        "Design",
+        "Bathinda"
+      ],
+      "logoSeed": "Techie La",
+      "recruiterId": "user-recruiter-1",
+      "postedDate": "2026-07-14T17:55:30.056Z",
+      "fairWorkPact": true,
+      "chatLiveHours": "9:00 AM - 5:00 PM"
     }
   ],
   "applications": [
