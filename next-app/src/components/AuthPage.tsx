@@ -50,6 +50,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  const [selectedPlan, setSelectedPlan] = useState('launch');
+  const [planPrice, setPlanPrice] = useState(149);
+
+  React.useEffect(() => {
+    const plan = localStorage.getItem('hyriq_selected_plan') || 'launch';
+    setSelectedPlan(plan);
+    setPlanPrice(plan === 'regular' ? 299 : plan === 'premium' ? 499 : 149);
+  }, [showPayment]);
+
   // Coupon flow states
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
@@ -371,13 +380,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
                 LIMITED OFFER
               </span>
               <div style={{ fontSize: '48px', fontWeight: 900, color: '#0f172a', lineHeight: 1.1, marginTop: '6px', fontFamily: 'Inter' }}>
-                ₹99
+                ₹{planPrice}
               </div>
               <div style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', fontFamily: 'Inter' }}>
-                ₹99 / year
+                One-Time Payment
               </div>
               <div style={{ fontSize: '10px', color: '#475569', fontWeight: 800, marginTop: '4px', letterSpacing: '0.5px' }}>
-                VALID FOR 12 MONTHS
+                LIFETIME UNLIMITED ACCESS
               </div>
             </div>
           </div>
@@ -464,7 +473,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             ) : (
               <>
                 <Wallet size={18} />
-                Pay ₹99 & Register
+                Pay ₹{planPrice} & Register
               </>
             )}
           </button>
@@ -650,7 +659,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
               <>
                 <CreditCard size={13} color="var(--primary)" />
                 <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}>
-                  ₹99/year Registration for Job Seekers
+                  ₹{planPrice} One-Time Payment for Lifetime Job Alerts
                 </span>
               </>
             )}
@@ -824,7 +833,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
             ) : role === 'recruiter' ? (
               'Create Free Account'
             ) : (
-              'Continue to Payment — ₹99'
+              `Continue to Payment — ₹${planPrice}`
             )}
           </button>
         </form>
