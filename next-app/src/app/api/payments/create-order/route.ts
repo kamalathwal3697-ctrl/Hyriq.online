@@ -18,12 +18,20 @@ if (razorpayKeyId && razorpayKeyId !== 'rzp_test_placeholder') {
 
 export async function POST(req: Request) {
   try {
+    const { plan } = await req.json().catch(() => ({}));
+    let amount = 14900; // default ₹149 (Launch Offer)
+    if (plan === 'regular') {
+      amount = 29900; // ₹299
+    } else if (plan === 'premium') {
+      amount = 49900; // ₹499
+    }
+
     // If no real keys are provided, we simulate a successful order creation for test mode
     if (!razorpay) {
       console.log('No real Razorpay keys found, simulating order creation.');
       return NextResponse.json({
         orderId: `order_mock_${Date.now()}`,
-        amount: 9900,
+        amount,
         currency: 'INR',
         keyId: razorpayKeyId, // sending placeholder key
         isMock: true
@@ -31,7 +39,7 @@ export async function POST(req: Request) {
     }
 
     const options = {
-      amount: 9900, // ₹99
+      amount,
       currency: 'INR',
       receipt: `receipt_${Date.now()}`
     };

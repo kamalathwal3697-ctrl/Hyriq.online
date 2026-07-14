@@ -466,7 +466,11 @@ export const LandingPage: React.FC = () => {
                 </ul>
               </div>
               <button 
-                onClick={() => handleRoleSelect('candidate')}
+                onClick={() => {
+                  const planKey = i === 0 ? 'launch' : i === 1 ? 'regular' : 'premium';
+                  localStorage.setItem('hyriq_selected_plan', planKey);
+                  handleRoleSelect('candidate');
+                }}
                 className={`w-full font-bold text-xs py-3 rounded-xl mt-8 cursor-pointer transition-all ${plan.popular ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' : 'bg-white/5 text-white hover:bg-white/10'}`}
               >
                 {plan.cta}

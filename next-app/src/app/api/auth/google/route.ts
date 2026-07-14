@@ -185,7 +185,15 @@ export async function POST(req: Request) {
 
     // Create Candidate with coupon code bypass
     const userId = `user-${Date.now()}`;
-    const subscriptionExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    const subscriptionExpiry = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000); // 100 years lifetime
+    const initialPreferences = {
+      plan: "launch",
+      type: [],
+      mode: [],
+      minSalary: 0,
+      experience: "Entry-level"
+    };
+
     const newUser = await prisma.user.create({
       data: {
         id: userId,
@@ -200,6 +208,7 @@ export async function POST(req: Request) {
         resumeName: "No resume uploaded",
         onboardingCompleted: false,
         subscriptionExpiry,
+        preferences: initialPreferences
       },
     });
 

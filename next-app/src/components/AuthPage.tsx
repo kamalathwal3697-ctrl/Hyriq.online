@@ -179,10 +179,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
     setErrorMsg('');
 
     try {
+      const selectedPlan = localStorage.getItem('hyriq_selected_plan') || 'launch';
       // Step 1: Create order on backend
       const orderRes = await fetch('/api/payments/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: selectedPlan })
       });
 
       if (!orderRes.ok) {
@@ -203,8 +205,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
           name,
           phone,
           bio,
-          paymentId: `pay_mock_${Date.now()}`
-        });
+          paymentId: `pay_mock_${Date.now()}`,
+          plan: selectedPlan
+        } as any);
         setShowPayment(false);
         setPaymentProcessing(false);
         onClearGoogleAutofill?.();
@@ -217,7 +220,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Hyriq',
-        description: 'Job Seeker Registration — 1 Year Access',
+        description: `Lifetime Job Seeker Plan — ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}`,
         order_id: orderData.orderId,
         handler: async function (response: any) {
           try {
@@ -250,8 +253,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, googleAut
               name,
               phone,
               bio,
-              paymentId: response.razorpay_payment_id
-            });
+              paymentId: response.razorpay_payment_id,
+              plan: selectedPlan
+            } as any);
 
             setShowPayment(false);
             setPaymentProcessing(false);

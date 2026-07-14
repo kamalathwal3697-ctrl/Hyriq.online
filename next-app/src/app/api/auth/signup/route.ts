@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid input data' }, { status: 400 });
     }
     const { email, password, role, name, phone, bio } = parsed.data;
-    const { paymentId } = body; // Not in standard schema because of oauth/coupon overrides
+    const { paymentId, plan } = body; // Not in standard schema because of oauth/coupon overrides
 
     const exists = await prisma.user.findFirst({
       where: { email: { equals: email, mode: 'insensitive' } }
@@ -57,11 +57,12 @@ export async function POST(req: Request) {
 
     if (role === 'candidate') {
       if (!paymentId) {
+        const requiredAmount = plan === 'regular' ? 299 : plan === 'premium' ? 499 : 149;
         return NextResponse.json({
           error: 'Registration fee required for job seekers.',
           requiresPayment: true,
-          amount: 99,
-          message: 'A one-time registration fee of ₹99 is required for job seekers. Valid for 1 year.'
+          amount: requiredAmount,
+          message: `A one-time lifetime registration fee of ₹${requiredAmount} is required for job seekers.`
         }, { status: 402 });
       }
 
@@ -82,8 +83,16 @@ export async function POST(req: Request) {
     const userId = `user-${Date.now()}`;
 
     const subscriptionExpiry = role === 'candidate'
-      ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+      ? new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000) // 100 years lifetime
       : null;
+
+    const initialPreferences = role === 'candidate' ? {
+      plan: plan || 'launch',
+      type: [],
+      mode: [],
+      minSalary: 0,
+      experience: 'Entry-level'
+    } : null;
 
     const newUser = await prisma.user.create({
       data: {
@@ -100,6 +109,7 @@ export async function POST(req: Request) {
         onboardingCompleted: false,
         subscriptionExpiry,
         paymentId: paymentId || null,
+        preferences: initialPreferences,
         companyName: role === 'recruiter' ? `${name}'s Organization` : null,
         companyBio: role === 'recruiter' ? 'We are hiring progressive talent.' : null
       }
