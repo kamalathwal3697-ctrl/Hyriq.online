@@ -770,12 +770,37 @@ export const CandidateDashboard: React.FC = () => {
               {activeTab === 'notifications' && <><Bell size={10} className="text-[#2563EB]" /> Notifications</>}
             </div>
             
-            <h2 className="text-2xl font-black tracking-tight text-slate-900 mb-0.5 font-sans">
-              {locDetails.greeting} Welcome back, {candidateProfile.name}
+            <h2 className="text-2xl font-black tracking-tight text-slate-900 mb-0.5 font-sans flex items-center flex-wrap gap-2">
+              <span>{locDetails.greeting} Welcome back, {candidateProfile.name}</span>
+              {candidateProfile.preferences?.plan && (candidateProfile.preferences.plan === 'regular' || candidateProfile.preferences.plan === 'premium') && (
+                <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200/50 text-[10px] font-extrabold select-none">
+                  🛡️ Verified Candidate
+                </span>
+              )}
             </h2>
             <p className="text-slate-500 text-xs font-medium">
               Let's land your dream workspace in {locDetails.city}.
             </p>
+
+            {candidateProfile.preferences?.plan === 'premium' && (
+              <div className="mt-4 p-4 rounded-xl border border-blue-100 bg-blue-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-slate-800">
+                <div>
+                  <h4 className="text-xs font-bold text-blue-900 flex items-center gap-1">
+                    ✨ Premium Career Prep Kit Unlocked!
+                  </h4>
+                  <p className="text-[10px] text-blue-700 font-semibold mt-0.5">
+                    Your exclusive Resume Review Guide and Mock Interview Prep sheets are ready for download.
+                  </p>
+                </div>
+                <a 
+                  href="/hyriq_premium_prep_kit.pdf" 
+                  download 
+                  className="inline-flex items-center justify-center gap-1 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] transition-all cursor-pointer select-none no-underline border-none flex-shrink-0"
+                >
+                  📥 Download PDF Kit
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
