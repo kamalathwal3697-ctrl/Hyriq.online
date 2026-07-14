@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       mode: [],
       minSalary: 0,
       experience: 'Entry-level'
-    } : null;
+    } : undefined;
 
     const newUser = await prisma.user.create({
       data: {
