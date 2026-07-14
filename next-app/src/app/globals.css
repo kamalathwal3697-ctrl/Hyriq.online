@@ -207,7 +207,7 @@
   /* Slide-over Job Details glass drawer overlay */
   .job-detail-panel {
     position: fixed;
-    top: 64px; /* Align below mobile sticky header */
+    top: 64px; /* Align exactly below sticky header */
     right: 0;
     bottom: 0;
     width: 100%;
@@ -216,11 +216,6 @@
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: -10px 0 40px rgba(0, 0, 0, 0.35);
-  }
-  @media (min-width: 768px) {
-    .job-detail-panel {
-      top: 80px; /* Align below desktop sticky header */
-    }
   }
   .job-detail-open {
     transform: translateX(0);
