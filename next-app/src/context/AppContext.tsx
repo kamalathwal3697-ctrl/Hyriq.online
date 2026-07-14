@@ -538,6 +538,7 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
     bio?: string;
     paymentId?: string;
     couponCode?: string;
+    plan?: string;
   }) => {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
@@ -551,7 +552,8 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
         phone: details.phone,
         bio: details.bio,
         paymentId: details.paymentId,
-        couponCode: details.couponCode
+        couponCode: details.couponCode,
+        plan: details.plan
       })
     });
 
