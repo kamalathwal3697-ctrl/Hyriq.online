@@ -77,6 +77,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ profile: _prof
         experience,
         onboardingCompleted: true,
         preferences: {
+          ...prev.preferences,
           type: selectedTypes.length > 0 ? selectedTypes : ['Full-time'],
           mode: selectedModes.length > 0 ? selectedModes : ['Remote'],
           minSalary: minSalary || 50000,
