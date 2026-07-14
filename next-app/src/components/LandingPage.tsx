@@ -57,44 +57,54 @@ export const LandingPage: React.FC = () => {
 
   const pricingPlans = [
     {
-      name: "Starter",
-      price: "Free",
-      period: "for first 30 days",
+      name: "Launch Offer",
+      originalPrice: "₹999",
+      price: "₹149",
+      period: "Limited Time Offer",
       features: [
-        "1 Standard Job Posting",
-        "Basic Candidate Matching",
-        "In-app Chat & Messaging",
-        "Standard Onboarding Support"
+        "Lifetime Access",
+        "Daily Verified Job Updates",
+        "No Monthly Fees ever",
+        "One-Time Payment Only",
+        "AI Resume Parsing & Match Scoring",
+        "Standard Email Alerts"
       ],
-      cta: "Post a Job",
+      cta: "Grab Launch Offer",
       popular: false
     },
     {
-      name: "Growth Plan",
-      price: "₹9,999",
-      period: "per month",
+      name: "Regular Lifetime",
+      originalPrice: "₹1,499",
+      price: "₹299",
+      period: "One-Time Payment",
       features: [
-        "5 Premium Job Postings",
-        "AI Candidate Compatibility (98% match)",
-        "Advanced Sourcing Filters (Location, Exp)",
-        "Priority Customer Support",
-        "Resume Vault Access (100 downloads)"
+        "Lifetime Access",
+        "Daily Verified Job Updates",
+        "No Monthly Fees ever",
+        "One-Time Payment Only",
+        "AI Resume Parsing & Match Scoring",
+        "Priority WhatsApp/Telegram Alerts",
+        "Verified Candidate Badge"
       ],
-      cta: "Go Premium",
+      cta: "Get Lifetime Access",
       popular: true
     },
     {
-      name: "Enterprise Pro",
-      price: "Custom",
-      period: "tailored billing",
+      name: "Premium Support Lifetime",
+      originalPrice: "₹2,499",
+      price: "₹499",
+      period: "One-Time Payment",
       features: [
-        "Unlimited Featured Job Postings",
-        "Custom AI Screening Questions",
-        "Dedicated Recruitment Account Manager",
-        "Custom API Integrations",
-        "Full ATS Integration & Team Collaboration"
+        "Lifetime Access",
+        "Daily Verified Job Updates",
+        "No Monthly Fees ever",
+        "One-Time Payment Only",
+        "AI Resume Parsing & Match Scoring",
+        "Priority Support (24-hour turnaround)",
+        "Resume Review Guide & Mock Sheets",
+        "Direct recruiter chat access"
       ],
-      cta: "Contact Sales",
+      cta: "Go Premium Support",
       popular: false
     }
   ];
@@ -423,8 +433,8 @@ export const LandingPage: React.FC = () => {
       {/* Pricing Section */}
       <section id="pricing-section" className="py-20 px-6 max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-3">Predictable, Scalable Pricing</h2>
-          <p className="text-sm text-slate-400">Choose the optimal plan to scale your organization's talent acquisition</p>
+          <h2 className="text-3xl font-bold text-white mb-3">Affordable Lifetime Career Access</h2>
+          <p className="text-sm text-slate-400">Pay once, unlock daily verified job opportunities and premium AI matches forever.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {pricingPlans.map((plan, i) => (
@@ -439,9 +449,12 @@ export const LandingPage: React.FC = () => {
               )}
               <div>
                 <h4 className="text-lg font-bold text-white mb-2">{plan.name}</h4>
-                <div className="flex items-baseline gap-1 mb-2">
+                <div className="flex items-baseline gap-1.5 mb-2">
+                  {plan.originalPrice && (
+                    <span className="line-through text-slate-500 text-sm font-semibold mr-1">{plan.originalPrice}</span>
+                  )}
                   <span className="text-3xl font-black text-white">{plan.price}</span>
-                  <span className="text-xs text-slate-400 font-semibold">{plan.period}</span>
+                  <span className="text-xs text-slate-400 font-semibold">/ {plan.period}</span>
                 </div>
                 <ul className="space-y-3 mt-6 border-t border-white/5 pt-6">
                   {plan.features.map((feat, idx) => (
@@ -453,7 +466,7 @@ export const LandingPage: React.FC = () => {
                 </ul>
               </div>
               <button 
-                onClick={() => handleRoleSelect('recruiter')}
+                onClick={() => handleRoleSelect('candidate')}
                 className={`w-full font-bold text-xs py-3 rounded-xl mt-8 cursor-pointer transition-all ${plan.popular ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' : 'bg-white/5 text-white hover:bg-white/10'}`}
               >
                 {plan.cta}
