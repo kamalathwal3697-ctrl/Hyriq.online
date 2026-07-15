@@ -1,31 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { loginSchema } from '@/lib/validations';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
 import { rateLimit, rateLimitResponse } from '@/lib/rateLimit';
-
-const { Pool } = pg;
-const connectionString = process.env.DATABASE_URL;
-
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-let prisma: PrismaClient;
-if (process.env.NODE_ENV === 'production') {
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
-  prisma = new PrismaClient({ adapter });
-} else {
-  if (!globalForPrisma.prisma) {
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaPg(pool);
-    globalForPrisma.prisma = new PrismaClient({ adapter });
-  }
-  prisma = globalForPrisma.prisma;
-}
+import { prisma } from '@/lib/db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'hyriq_super_secret_key_2026';
 
