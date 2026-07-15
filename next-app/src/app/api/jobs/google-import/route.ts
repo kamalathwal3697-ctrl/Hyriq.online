@@ -40,7 +40,8 @@ export async function POST(req: Request) {
 
     const apiRes = await fetch(searchUrl);
     if (!apiRes.ok) {
-      return NextResponse.json({ error: 'Google Search API call failed' }, { status: 502 });
+      console.warn('Google Search API call failed, serving cached database jobs instead');
+      return NextResponse.json({ success: false, message: 'Google Search API call failed, using cached database jobs', count: 0, jobs: [] });
     }
 
     const data = await apiRes.json();
