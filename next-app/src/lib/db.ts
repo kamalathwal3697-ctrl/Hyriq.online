@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'production') {
   if (!globalForPrisma.pool) {
     globalForPrisma.pool = new pg.Pool({
       connectionString,
-      max: 2, // Prevent connection exhaustion in serverless containers
+      max: 1, // Keep connections to 1 in serverless to prevent Neon pool exhaustion
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
     });
@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === 'production') {
   if (!globalForPrisma.prisma) {
     globalForPrisma.pool = new pg.Pool({
       connectionString,
-      max: 2,
+      max: 1,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
     });

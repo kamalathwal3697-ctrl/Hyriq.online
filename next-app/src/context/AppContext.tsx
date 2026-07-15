@@ -361,11 +361,33 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
   // Trigger initial database fetch and periodic polling (for real-time chat sync!)
   useEffect(() => {
     fetchJobs();
-    fetchPromoSlots();
+    
+    // Stagger promo slots fetch slightly
+    const promoTimeout = setTimeout(() => {
+      fetchPromoSlots();
+    }, 150);
+
+    // Stagger user profile fetch
+    let meTimeout: NodeJS.Timeout | undefined;
     if (token) {
-      fetchApplications();
-      fetchMe(token);
+      meTimeout = setTimeout(() => {
+        fetchMe(token);
+      }, 300);
     }
+
+    // Stagger applications/chat fetch
+    let appTimeout: NodeJS.Timeout | undefined;
+    if (token) {
+      appTimeout = setTimeout(() => {
+        fetchApplications();
+      }, 450);
+    }
+
+    return () => {
+      clearTimeout(promoTimeout);
+      if (meTimeout) clearTimeout(meTimeout);
+      if (appTimeout) clearTimeout(appTimeout);
+    };
   }, [token]);
 
   // Setup a background polling schedule to sync applications/chat every 3 seconds
