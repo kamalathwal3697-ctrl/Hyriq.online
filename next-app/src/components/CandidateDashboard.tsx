@@ -253,6 +253,16 @@ export const CandidateDashboard: React.FC = () => {
   const [profileExperience, setProfileExperience] = useState(candidateProfile.experience);
   const [profileSaved, setProfileSaved] = useState(false);
 
+  // Keep profile edit states synced with candidateProfile once fetched
+  useEffect(() => {
+    if (candidateProfile.name) setProfileName(candidateProfile.name);
+    if (candidateProfile.email) setProfileEmail(candidateProfile.email);
+    if (candidateProfile.phone) setProfilePhone(candidateProfile.phone);
+    if (candidateProfile.bio) setProfileBio(candidateProfile.bio);
+    if (candidateProfile.experience) setProfileExperience(candidateProfile.experience);
+    if (candidateProfile.logoSeed) setProfileAvatar(candidateProfile.logoSeed);
+  }, [candidateProfile]);
+
   // Extended Resume States
   const [profileAvatar, setProfileAvatar] = useState(candidateProfile.logoSeed || '🧑‍💻');
   const [academics, setAcademics] = useState<Array<{ degree: string; school: string; year: string; grade: string }>>(
