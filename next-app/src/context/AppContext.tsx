@@ -352,6 +352,8 @@ const [promoSlots, setPromoSlots] = useState<number>(100);
             bio: profile.companyBio || ''
           });
         }
+      } else if (res.status === 401) {
+        logout();
       }
     } catch (err) {
       console.error('Error fetching user info:', err);
