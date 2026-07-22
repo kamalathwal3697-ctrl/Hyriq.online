@@ -39,6 +39,7 @@ export const CandidateDashboard: React.FC = () => {
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractApp, setContractApp] = useState<Application | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const [showResumeBuilderModal, setShowResumeBuilderModal] = useState(false);
   const locDetails = getLocationDetails(currentLocation);
 
   useEffect(() => {
@@ -1745,7 +1746,7 @@ export const CandidateDashboard: React.FC = () => {
                   Upload your PDF resume. Our AI will automatically extract your skills, experience, and tailor your job feed to find the best matches.
                 </p>
                 
-                <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-4 flex-wrap mb-4">
                   <label 
                     htmlFor="ai-resume-upload-profile"
                     className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all border-none"
@@ -1770,6 +1771,17 @@ export const CandidateDashboard: React.FC = () => {
                       <CheckCircle size={14} /> Active: {candidateProfile.resumeName}
                     </span>
                   )}
+                </div>
+
+                <div className="border-t border-blue-100/50 pt-4 flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Don't have a professional resume?</span>
+                  <button 
+                    type="button"
+                    onClick={() => setShowResumeBuilderModal(true)}
+                    className="inline-flex items-center gap-1.5 text-[#2563EB] hover:text-[#1d4ed8] text-xs font-black cursor-pointer transition-all bg-transparent border-none p-0"
+                  >
+                    🎨 Design Resume Free
+                  </button>
                 </div>
               </div>
 
@@ -3385,6 +3397,134 @@ export const CandidateDashboard: React.FC = () => {
                 background: '#fff'
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {showResumeBuilderModal && (
+        <div 
+          onClick={() => setShowResumeBuilderModal(false)}
+          className="fixed inset-0 bg-[#0f172a]/70 backdrop-blur-sm z-[3000] flex items-center justify-center p-4"
+          style={{ animation: 'fadeIn 0.2s ease-out' }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white border border-[#E5E7EB] rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col p-6"
+            style={{ animation: 'scaleIn 0.2s ease-out' }}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🎨</span>
+                <div style={{ textAlign: 'left' }}>
+                  <h3 className="text-sm font-black text-slate-800 leading-tight">Professional Resume Design Hub</h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider m-0">Create a premium ATS-friendly resume for free</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowResumeBuilderModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/50 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer font-sans transition-all text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed" style={{ textAlign: 'left' }}>
+              Design your CV using one of our verified free builders. Once finished, export/download your resume as a <strong>PDF</strong> and upload it on your profile dashboard to trigger automatic AI matching.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {/* Reactive Resume */}
+              <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all bg-slate-50/50 flex flex-col justify-between" style={{ textAlign: 'left' }}>
+                <div>
+                  <h4 className="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
+                    🚀 Reactive Resume
+                    <span className="bg-emerald-50 text-emerald-600 border border-emerald-200/50 text-[9px] px-1.5 py-0.5 rounded font-extrabold">100% Free</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                    Completely open-source builder. Zero ads, zero paywalls, highly customizable, and fully ATS-optimized templates.
+                  </p>
+                </div>
+                <a 
+                  href="https://rxresu.me/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-bold text-xs py-2 px-3 rounded-lg text-center transition-all w-full text-decoration-none"
+                >
+                  Launch Builder ↗
+                </a>
+              </div>
+
+              {/* FlowCV */}
+              <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all bg-slate-50/50 flex flex-col justify-between" style={{ textAlign: 'left' }}>
+                <div>
+                  <h4 className="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
+                    ✨ FlowCV
+                    <span className="bg-blue-50 text-blue-600 border border-blue-200/50 text-[9px] px-1.5 py-0.5 rounded font-extrabold">Popular</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                    Stunning modern aesthetics. Automatically handles spacing and alignments dynamically as you enter details.
+                  </p>
+                </div>
+                <a 
+                  href="https://flowcv.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 px-3 rounded-lg text-center transition-all w-full text-decoration-none"
+                >
+                  Launch Builder ↗
+                </a>
+              </div>
+
+              {/* Canva */}
+              <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all bg-slate-50/50 flex flex-col justify-between" style={{ textAlign: 'left' }}>
+                <div>
+                  <h4 className="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
+                    🎨 Canva Templates
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                    Creative visual templates. Ideal if you want drag-and-drop design elements and custom graphical layouts.
+                  </p>
+                </div>
+                <a 
+                  href="https://www.canva.com/resumes/templates/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 px-3 rounded-lg text-center transition-all w-full text-decoration-none"
+                >
+                  Browse Templates ↗
+                </a>
+              </div>
+
+              {/* Novoresume */}
+              <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all bg-slate-50/50 flex flex-col justify-between" style={{ textAlign: 'left' }}>
+                <div>
+                  <h4 className="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
+                    💼 Novoresume
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                    Strict professional CV structures. Vetted templates that comply with traditional corporate recruitment formats.
+                  </p>
+                </div>
+                <a 
+                  href="https://novoresume.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 px-3 rounded-lg text-center transition-all w-full text-decoration-none"
+                >
+                  Launch Builder ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Pro Tips box */}
+            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex gap-2" style={{ textAlign: 'left' }}>
+              <span className="text-xs">💡</span>
+              <p className="text-[11px] text-blue-900 leading-relaxed m-0 font-medium">
+                <strong>Pro-Tip:</strong> After designing, export/download your file in **PDF** format. Uploading the PDF back to Hyriq dynamically scans and updates your skill matching list.
+              </p>
+            </div>
           </div>
         </div>
       )}
