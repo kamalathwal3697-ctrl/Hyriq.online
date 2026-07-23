@@ -141,6 +141,18 @@ const Navbar: React.FC = () => {
                 >
                   Board
                 </button>
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={() => { setPerspective('admin'); setVisitorRole(null); }}
+                    className={`px-3 py-1.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                      perspective === 'admin' 
+                        ? 'bg-white text-slate-900 shadow-sm font-black' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Console
+                  </button>
+                )}
               </div>
 
               {/* Profile Menu Dropdown */}
