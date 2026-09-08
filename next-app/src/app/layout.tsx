@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/context/AppContext";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,11 +17,101 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "HYRIQ | sleep deeply, hire fully",
-  description: "A premium AI-powered vibe matching career platform designed for modern professional hiring.",
+  metadataBase: new URL("https://www.hyriq.online"),
+  title: {
+    default: "HYRIQ - Verified Job Updates, AI Resume Parser & Career Match",
+    template: "%s | HYRIQ",
+  },
+  description:
+    "Discover verified private & government jobs across India. AI resume parsing, candidate match scoring, and lifetime job alert access for students, freshers, and professionals.",
+  keywords: [
+    "job search India",
+    "verified job updates",
+    "government jobs notification",
+    "Punjab tech jobs",
+    "AI resume parser",
+    "lifetime job subscription",
+    "fresher jobs India",
+    "work from home jobs",
+    "recruitment platform India",
+    "HYRIQ online",
+    "career matching platform"
+  ],
+  authors: [{ name: "HYRIQ", url: "https://www.hyriq.online" }],
+  creator: "HYRIQ",
+  publisher: "HYRIQ",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "https://www.hyriq.online",
+  },
+  openGraph: {
+    title: "HYRIQ - Verified Jobs & AI Career Platform in India",
+    description:
+      "Find top verified jobs in India with AI-powered resume matching and daily job alerts. Pay once for lifetime access.",
+    url: "https://www.hyriq.online",
+    siteName: "HYRIQ",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HYRIQ - Verified Jobs & AI Career Platform in India",
+    description:
+      "Find top verified jobs in India with AI-powered resume matching and daily alerts. Lifetime access with one-time payment.",
+    creator: "@hyriq",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
-import Script from "next/script";
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.hyriq.online/#organization",
+      "name": "HYRIQ",
+      "url": "https://www.hyriq.online",
+      "logo": "https://www.hyriq.online/logo.png",
+      "description": "Punjab's leading candidate vetting and corporate career matching platform connecting companies with top talent.",
+      "sameAs": [
+        "https://www.linkedin.com/company/hyriq",
+        "https://twitter.com/hyriq"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.hyriq.online/#website",
+      "url": "https://www.hyriq.online",
+      "name": "HYRIQ",
+      "description": "Verified Job Updates, AI Resume Parser & Career Matching Platform in India",
+      "publisher": {
+        "@id": "https://www.hyriq.online/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.hyriq.online/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+};
 
 export default function RootLayout({
   children,
@@ -36,18 +127,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "HYRIQ",
-              "url": "https://hyriq.online",
-              "logo": "https://hyriq.online/logo.png",
-              "description": "A premium AI-powered vibe matching career platform designed for modern professional hiring.",
-              "sameAs": [
-                "https://www.linkedin.com/company/hyriq",
-                "https://twitter.com/hyriq"
-              ]
-            })
+            __html: JSON.stringify(structuredData),
           }}
         />
       </head>

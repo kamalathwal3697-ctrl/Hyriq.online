@@ -2,34 +2,35 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://hyriq.online';
+  const baseUrl = 'https://www.hyriq.online';
 
   // Base routes
-  const routes = [
+  const routes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily' as const,
+      changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/auth`,
       lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
+      changeFrequency: 'monthly',
       priority: 0.8,
     }
   ];
 
   try {
-    // Fetch jobs to add to sitemap dynamically
+    // Fetch active jobs dynamically
     const jobs = await prisma.job.findMany({
-      select: { id: true, updatedAt: true }
+      select: { id: true, updatedAt: true },
+      take: 500,
     });
 
-    const jobRoutes = jobs.map(job => ({
+    const jobRoutes: MetadataRoute.Sitemap = jobs.map(job => ({
       url: `${baseUrl}/jobs/${job.id}`,
-      lastModified: job.updatedAt,
-      changeFrequency: 'weekly' as const,
+      lastModified: job.updatedAt || new Date(),
+      changeFrequency: 'weekly',
       priority: 0.7,
     }));
 
